@@ -12,7 +12,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
-import dj_database_url
+try:
+    import dj_database_url # type: ignore
+except ModuleNotFoundError:
+    dj_database_url = None
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +34,7 @@ def _load_env_file():
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, value = line.split("=", 1)
-            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+            os.environ[key.strip()] = value.strip().strip('"').strip("'")
         break
 
 
@@ -109,27 +112,22 @@ WSGI_APPLICATION = 'kodehax_academy.wsgi.application'
 
 PRODUCTION = os.getenv("PRODUCTION", "False").lower() == "true"
 
-if PRODUCTION:
+if PRODUCTION and dj_database_url:
     DATABASES = {
         'default': dj_database_url.parse(os.environ.get('DB_URL'))
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'kodehax_academy',
+        'USER': 'root',
+        'PASSWORD': 'abc@123',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'kodehax_academy',
-#         'USER': 'root',
-#         'PASSWORD': 'abc@123',
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
@@ -177,7 +175,7 @@ STATICFILES_DIRS = [
 ]
 AUTH_USER_MODEL = 'users.User'
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
