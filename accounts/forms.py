@@ -1,3 +1,6 @@
+import logging
+import threading
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model, password_validation
@@ -10,6 +13,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+
+logger = logging.getLogger(__name__)
 
 from .models import TeacherInvitation
 from .tokens import email_verification_token, teacher_invitation_token
@@ -297,13 +302,20 @@ def send_verification_email(request, user):
             "site_name": "Kodehax Academy",
         },
     )
-    send_mail(
-        subject="Verify your Kodehax Academy email",
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        fail_silently=False,
-    )
+
+    def _send():
+        try:
+            send_mail(
+                subject="Verify your Kodehax Academy email",
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception:
+            logger.exception("Failed to send verification email to %s", user.email)
+
+    threading.Thread(target=_send, daemon=True).start()
 
 
 def send_password_reset_email(request, user):
@@ -318,10 +330,17 @@ def send_password_reset_email(request, user):
             "site_name": "Kodehax Academy",
         },
     )
-    send_mail(
-        subject="Reset your Kodehax Academy password",
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        fail_silently=False,
-    )
+
+    def _send():
+        try:
+            send_mail(
+                subject="Reset your Kodehax Academy password",
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception:
+            logger.exception("Failed to send password reset email to %s", user.email)
+
+    threading.Thread(target=_send, daemon=True).start()
