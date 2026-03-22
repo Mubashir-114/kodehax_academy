@@ -33,6 +33,54 @@ from .services.performance import (
 )
 
 
+def _get_submission_count(assignment):
+    if assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_FILE:
+        return assignment.submissions.count()
+    if assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_CODE:
+        return assignment.code_submissions.count()
+    return QuizAnswer.objects.filter(
+        question__assignment=assignment
+    ).values("student_id").distinct().count()
+
+
+def _format_deadline_delta(delta):
+    total_seconds = int(delta.total_seconds())
+    if total_seconds < 0:
+        total_seconds = 0
+
+    days = total_seconds // 86400
+    hours = (total_seconds % 86400) // 3600
+    minutes = (total_seconds % 3600) // 60
+
+    if days > 0:
+        return f"{days}d left" if days != 1 else "1d left"
+    if hours > 0:
+        return f"{hours}h left" if hours != 1 else "1h left"
+    return f"{minutes}m left" if minutes != 1 else "1m left"
+
+
+def _build_assignment_row(assignment, now):
+    submission_count = _get_submission_count(assignment)
+    is_overdue = assignment.due_date < now
+
+    if is_overdue:
+        since_deadline = now - assignment.due_date
+        deadline_hint = _format_deadline_delta(since_deadline).replace("left", "ago")
+        deadline_status = "Deadline passed"
+    else:
+        until_deadline = assignment.due_date - now
+        deadline_hint = _format_deadline_delta(until_deadline)
+        deadline_status = "Active"
+
+    return {
+        "assignment": assignment,
+        "submission_count": submission_count,
+        "is_overdue": is_overdue,
+        "deadline_hint": deadline_hint,
+        "deadline_status": deadline_status,
+    }
+
+
 def _get_teacher_classroom_or_redirect(request, class_id):
     if request.user.role != "teacher":
         messages.error(
@@ -154,25 +202,19 @@ def assignment_list(request, class_id):
     if redirect_response:
         return redirect_response
 
-    assignments = classroom.assignments.all().order_by("-created_at")
-    assignment_rows = []
-    for assignment in assignments:
-        if assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_FILE:
-            submission_count = assignment.submissions.count()
-        elif assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_CODE:
-            submission_count = assignment.code_submissions.count()
-        else:
-            submission_count = QuizAnswer.objects.filter(
-                question__assignment=assignment
-            ).values("student_id").distinct().count()
-        assignment_rows.append({
-            "assignment": assignment,
-            "submission_count": submission_count,
-        })
+    now = timezone.now()
+    active_assignments = classroom.assignments.filter(due_date__gte=now).order_by("due_date")
+    archived_assignments = classroom.assignments.filter(due_date__lt=now).order_by("-due_date")
+
+    active_assignment_rows = [_build_assignment_row(assignment, now) for assignment in active_assignments]
+    archived_assignment_rows = [_build_assignment_row(assignment, now) for assignment in archived_assignments]
 
     return render(request, "teacher/assignment_list.html", {
         "classroom": classroom,
-        "assignment_rows": assignment_rows
+        "active_assignment_rows": active_assignment_rows,
+        "archived_assignment_rows": archived_assignment_rows,
+        "active_count": len(active_assignment_rows),
+        "archived_count": len(archived_assignment_rows),
     })
 
 

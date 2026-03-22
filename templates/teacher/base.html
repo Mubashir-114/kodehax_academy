@@ -240,18 +240,18 @@
         </a>
         {% if classroom %}
         <a href="{% url 'assignment_list' classroom.id %}" class="nav-link {% if '/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Challenges
+          Assignment
         </a>
         {% elif assignment %}
         <a href="{% url 'assignment_list' assignment.classroom.id %}" class="nav-link {% if '/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Challenges
+          Assignment
         </a>
         {% elif first_class %}
         <a href="{% url 'assignments_page' class_id=first_class.id %}" class="nav-link {% if '/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Challenges
+          Assignment
         </a>
         {% else %}
-        <span class="nav-link nav-link-disabled text-slate-500 flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">Challenges</span>
+        <span class="nav-link nav-link-disabled text-slate-500 flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">Assignment</span>
         {% endif %}
 
         {% if classroom %}
@@ -352,7 +352,7 @@
               <div>
                 <p class="hidden text-xs uppercase tracking-[0.18em] text-slate-500 lg:block">Teacher Workspace</p>
                 <h1 class="text-xl font-black tracking-tight text-white md:text-2xl lg:text-3xl">{% block page_title %}Teacher Dashboard{% endblock %}</h1>
-                <p class="mt-2 text-sm text-slate-400 md:text-base">{% block page_subtitle %}Manage classrooms, challenge flow, student participation, and teaching analytics from a single responsive workspace.{% endblock %}</p>
+                <p class="mt-2 text-sm text-slate-400 md:text-base">{% block page_subtitle %}Manage classrooms, assignment flow, student participation, and teaching analytics from a single responsive workspace.{% endblock %}</p>
               </div>
               <div class="hidden items-center gap-3 lg:flex">
                 <a href="{% url 'create_class' %}" class="btn-muted inline-flex h-11 items-center justify-center px-4 text-sm">Create Class</a>
@@ -394,7 +394,7 @@
     <span class="mobile-tab text-slate-600 flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% endif %}
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>
-      <span>Challenges</span>
+      <span>Assignment</span>
     {% if classroom or assignment or first_class %}
     </a>
     {% else %}

@@ -4,25 +4,51 @@
 {% block page_title %}Grade File Submission{% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-4xl space-y-6">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css">
+<style>
+  .ai-output-render { line-height: 1.6; color: #e2e8f0; }
+  .ai-output-render h1, .ai-output-render h2, .ai-output-render h3, .ai-output-render h4 { color: #f8fafc; font-weight: 700; margin-top: 1.4rem; margin-bottom: 0.55rem; }
+  .ai-output-render p { margin: 0.5rem 0; }
+  .ai-output-render ul, .ai-output-render ol { margin: 0.5rem 0 0.5rem 1.25rem; }
+  .ai-output-render pre { background: rgba(2, 6, 23, 0.92); color: #e2e8f0; border-radius: 0.85rem; padding: 0.9rem; overflow-x: auto; margin: 0.9rem 0; border: 1px solid rgba(148, 163, 184, 0.35); }
+  .ai-output-render code { background: rgba(148, 163, 184, 0.2); color: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 0.4rem; font-size: 0.92em; }
+  .ai-output-render pre code { background: transparent; padding: 0; color: inherit; }
+  .meta-pill { display: inline-flex; align-items: center; border-radius: 9999px; border: 1px solid rgba(100, 116, 139, 0.8); background: rgba(15, 23, 42, 0.75); padding: 0.25rem 0.75rem; font-size: 0.75rem; color: #cbd5e1; }
+</style>
+
+<div class="mx-auto max-w-5xl space-y-6">
   <section class="glass-card hover-lift p-4 sm:p-6 reveal">
     <h3 class="text-2xl font-black text-white sm:text-3xl">{{ assignment.title }}</h3>
     <p class="mt-2 text-slate-300">Student: {{ submission.student.username }} ({{ submission.student.email }})</p>
-    <p class="text-slate-400 text-sm">Submitted: {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
+    <div class="mt-3 flex flex-wrap gap-2">
+      <span class="meta-pill">Submitted {{ submission.submitted_at|date:"M d, Y H:i" }}</span>
+      {% if submission.score != None %}
+      <span class="meta-pill text-emerald-300">Current Score: {{ submission.score }} / {{ assignment.max_score }}</span>
+      {% else %}
+      <span class="meta-pill text-amber-300">Not graded yet</span>
+      {% endif %}
+    </div>
     <a href="{{ submission.file.url }}" target="_blank" class="mt-4 inline-flex text-blue-300 font-semibold hover:underline">Open Submitted File</a>
+
+    <div class="mt-4 rounded-xl border border-slate-700 bg-slate-950/45 p-4">
+      <p class="mb-2 text-xs uppercase tracking-[0.14em] text-slate-400">Assignment Instructions</p>
+      <div class="ai-output-render"></div>
+      <textarea class="ai-output-raw hidden">{{ assignment.description }}</textarea>
+    </div>
   </section>
 
   <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-1">
-    <h4 class="text-xl font-bold text-white mb-4">Manual Grade</h4>
+    <h4 class="mb-4 text-xl font-bold text-white">Manual Grade</h4>
     <form method="post" class="space-y-4">
       {% csrf_token %}
       <input type="hidden" name="action" value="manual">
       <div>
-        <label class="block text-sm font-semibold text-slate-200 mb-2">Score (0 - {{ assignment.max_score }})</label>
+        <label class="mb-2 block text-sm font-semibold text-slate-200">Score (0 - {{ assignment.max_score }})</label>
         <input type="number" step="0.01" min="0" max="{{ assignment.max_score }}" name="score" value="{{ submission.score|default_if_none:'' }}" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200">
       </div>
       <div>
-        <label class="block text-sm font-semibold text-slate-200 mb-2">Feedback</label>
+        <label class="mb-2 block text-sm font-semibold text-slate-200">Feedback</label>
         <textarea name="feedback" rows="6" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200">{{ submission.ai_feedback }}</textarea>
       </div>
       <button type="submit" class="btn-primary h-11 px-6">Save Manual Grade</button>
@@ -30,7 +56,7 @@
   </section>
 
   <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-2">
-    <h4 class="text-xl font-bold text-white mb-4">AI Grade</h4>
+    <h4 class="mb-4 text-xl font-bold text-white">AI Grade</h4>
     <form method="post">
       {% csrf_token %}
       <input type="hidden" name="action" value="ai">
@@ -38,4 +64,79 @@
     </form>
   </section>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+  (function () {
+    const outputs = document.querySelectorAll(".ai-output-render");
+    if (!outputs.length) return;
+
+    const hasMarked = !!(window.marked && typeof marked.parse === "function");
+    const hasSanitizer = !!(window.DOMPurify && typeof DOMPurify.sanitize === "function");
+    const hasHighlighter = !!(window.hljs && typeof hljs.highlightElement === "function");
+
+    if (hasMarked) {
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function (code, lang) {
+          if (hasHighlighter && lang && hljs.getLanguage(lang)) {
+            return hljs.highlight(code, { language: lang }).value;
+          }
+          if (hasHighlighter && typeof hljs.highlightAuto === "function") {
+            return hljs.highlightAuto(code).value;
+          }
+          return code;
+        }
+      });
+    }
+
+    outputs.forEach((output) => {
+      const raw = output.nextElementSibling && output.nextElementSibling.classList.contains("ai-output-raw")
+        ? output.nextElementSibling
+        : null;
+      const markdown = raw ? (raw.value || "") : "";
+      if (!markdown.trim()) return;
+
+      try {
+        if (hasMarked) {
+          const parsed = marked.parse(markdown);
+          output.innerHTML = hasSanitizer ? DOMPurify.sanitize(parsed) : parsed;
+        } else {
+          output.textContent = markdown;
+        }
+      } catch (_) {
+        output.textContent = markdown;
+      }
+
+      if (hasHighlighter) {
+        output.querySelectorAll("pre code").forEach((block) => {
+          try { hljs.highlightElement(block); } catch (_) {}
+        });
+      }
+
+      if (window.renderMathInElement && window.katex) {
+        try {
+          renderMathInElement(output, {
+            throwOnError: false,
+            strict: "ignore",
+            trust: false,
+            delimiters: [
+              { left: "$$", right: "$$", display: true },
+              { left: "$", right: "$", display: false },
+              { left: "\\(", right: "\\)", display: false },
+              { left: "\\[", right: "\\]", display: true }
+            ]
+          });
+        } catch (_) {}
+      }
+    });
+  })();
+</script>
 {% endblock %}

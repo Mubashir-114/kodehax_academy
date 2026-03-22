@@ -7,47 +7,59 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css">
 <style>
-  .ai-output { line-height: 1.6; color: #e2e8f0; }
-  .ai-output h1, .ai-output h2, .ai-output h3, .ai-output h4 { color: #f8fafc; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-  .ai-output p { margin: 0.5rem 0; }
-  .ai-output ul, .ai-output ol { margin: 0.5rem 0 0.5rem 1.25rem; }
-  .ai-output pre { background: rgba(2, 6, 23, 0.9); color: #e2e8f0; border-radius: 0.85rem; padding: 1rem; overflow-x: auto; margin: 1rem 0; border: 1px solid rgba(148, 163, 184, 0.3); }
-  .ai-output code { background: rgba(148, 163, 184, 0.2); color: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 0.4rem; font-size: 0.92em; }
-  .ai-output pre code { background: transparent; padding: 0; color: inherit; }
-  .ai-output blockquote { border-left: 4px solid #818cf8; padding-left: 0.85rem; color: #cbd5e1; margin: 0.9rem 0; }
+  .ai-output-render { line-height: 1.6; color: #e2e8f0; }
+  .ai-output-render h1, .ai-output-render h2, .ai-output-render h3, .ai-output-render h4 { color: #f8fafc; font-weight: 700; margin-top: 1.4rem; margin-bottom: 0.55rem; }
+  .ai-output-render p { margin: 0.5rem 0; }
+  .ai-output-render ul, .ai-output-render ol { margin: 0.5rem 0 0.5rem 1.25rem; }
+  .ai-output-render pre { background: rgba(2, 6, 23, 0.9); color: #e2e8f0; border-radius: 0.85rem; padding: 0.9rem; overflow-x: auto; margin: 0.9rem 0; border: 1px solid rgba(148, 163, 184, 0.35); }
+  .ai-output-render code { background: rgba(148, 163, 184, 0.2); color: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 0.4rem; font-size: 0.92em; }
+  .ai-output-render pre code { background: transparent; padding: 0; color: inherit; }
+  .ai-output-render blockquote { border-left: 4px solid #818cf8; padding-left: 0.85rem; color: #cbd5e1; margin: 0.9rem 0; }
+  .submission-shell { border: 1px solid rgba(71, 85, 105, 0.8); background: rgba(15, 23, 42, 0.45); border-radius: 1rem; padding: 1rem; }
+  .meta-pill { display: inline-flex; align-items: center; border-radius: 9999px; border: 1px solid rgba(100, 116, 139, 0.8); background: rgba(15, 23, 42, 0.75); padding: 0.25rem 0.75rem; font-size: 0.75rem; color: #cbd5e1; }
+  .status-pill { display: inline-flex; align-items: center; border-radius: 0.65rem; padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 700; }
+  .status-graded { background: rgba(6, 95, 70, 0.28); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.35); }
+  .status-pending { background: rgba(146, 64, 14, 0.3); color: #fcd34d; border: 1px solid rgba(251, 191, 36, 0.35); }
+  .table-wrap { border: 1px solid rgba(71, 85, 105, 0.65); border-radius: 1rem; overflow: hidden; }
+  .feedback-card { border: 1px solid rgba(71, 85, 105, 0.8); background: rgba(2, 6, 23, 0.45); border-radius: 0.85rem; padding: 0.8rem; }
 </style>
+
 <div class="space-y-6">
-  <!-- Assignment Overview -->
   <section class="glass-card hover-lift p-4 sm:p-6 reveal">
-    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
       <div class="flex-1">
         <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Assignment</p>
         <h3 class="mt-1 text-2xl font-black text-white sm:text-3xl">{{ assignment.title }}</h3>
-        <p class="mt-2 text-sm text-slate-400">Type: {{ assignment.get_assignment_type_display }}</p>
-        <p class="mt-1 text-sm text-slate-400">Attempts: {{ assignment.get_attempt_policy_display }}</p>
-        <div class="mt-4 prose prose-slate max-w-none text-slate-300 ai-output" id="ai-output-render"></div>
-        <textarea id="ai-output-raw" class="hidden">{{ assignment.description }}</textarea>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="meta-pill">{{ assignment.get_assignment_type_display }}</span>
+          <span class="meta-pill">{{ assignment.get_attempt_policy_display }}</span>
+          <span class="meta-pill">Max Score: {{ assignment.max_score }}</span>
+        </div>
+        <div class="mt-4 rounded-xl border border-slate-700 bg-slate-950/45 p-4">
+          <p class="mb-2 text-xs uppercase tracking-[0.14em] text-slate-400">Instructions</p>
+          <div class="ai-output-render"></div>
+          <textarea class="ai-output-raw hidden">{{ assignment.description }}</textarea>
+        </div>
       </div>
-      <div class="w-full rounded-xl border border-rose-500/40 bg-rose-900/20 px-4 py-3 text-left md:max-w-xs md:text-right">
+
+      <div class="w-full rounded-xl border border-rose-500/35 bg-rose-900/15 px-4 py-3 md:max-w-xs">
         <p class="text-xs uppercase tracking-[0.1em] text-rose-300 font-semibold">Deadline</p>
-        <p class="text-lg font-bold text-rose-300 mt-1">{{ assignment.due_date|date:"M d, Y" }}</p>
-        <p class="text-sm text-rose-300/80">{{ assignment.due_date|date:"H:i" }}</p>
+        <p class="mt-1 text-lg font-bold text-rose-300">{{ assignment.due_date|date:"M d, Y" }}</p>
+        <p class="text-sm text-rose-300/85">{{ assignment.due_date|date:"H:i" }}</p>
         <form method="post" action="{% url 'extend_assignment_deadline' assignment.id %}" class="mt-4 space-y-2">
           {% csrf_token %}
-          <input type="datetime-local" name="new_due_date" required value="{{ assignment.due_date|date:'Y-m-d\\TH:i' }}" class="w-full rounded-lg border border-slate-600 bg-slate-900/70 px-2 py-1.5 text-xs text-slate-200">
-          <button type="submit" class="btn-primary w-full px-3 py-1.5 text-xs">Extend Deadline</button>
+          <input type="datetime-local" name="new_due_date" required value="{{ assignment.due_date|date:'Y-m-d\\TH:i' }}" class="w-full rounded-lg border border-slate-600 bg-slate-900/70 px-2.5 py-2 text-xs text-slate-200">
+          <button type="submit" class="btn-primary w-full px-3 py-2 text-xs">Extend Deadline</button>
         </form>
       </div>
     </div>
   </section>
 
   <section class="glass-card p-4 sm:p-6 reveal">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <div>
         <h4 class="text-lg font-bold text-rose-300">Danger Zone</h4>
-        <p class="mt-1 text-sm text-slate-300">
-          Deleting this assignment will permanently remove all related file submissions, assignment data, and code submissions.
-        </p>
+        <p class="mt-1 text-sm text-slate-300">Deleting this assignment permanently removes all related submission records.</p>
       </div>
       <form
         method="post"
@@ -57,68 +69,101 @@
         data-confirm-message="Delete {{ assignment.title|escapejs }} and all related records? This cannot be undone."
       >
         {% csrf_token %}
-        <button type="submit" class="btn-danger inline-flex w-full items-center justify-center px-4 py-2.5 text-sm sm:w-auto">
+        <button type="submit" class="btn-danger inline-flex w-full items-center justify-center px-4 py-2.5 text-sm md:w-auto">
           Delete Assignment Permanently
         </button>
       </form>
     </div>
   </section>
 
-  <!-- File submissions -->
   {% if assignment.assignment_type == "file" %}
   <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-1">
-    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h4 class="text-xl font-bold text-white">File Submissions</h4>
-      <span class="text-sm rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-slate-300">
-        {{ file_submissions.count }} total
-      </span>
+      <span class="meta-pill">{{ file_submissions.count }} total</span>
     </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full text-left min-w-[560px]">
-        <thead>
-          <tr class="text-sm text-slate-400 border-b border-slate-700">
-            <th class="py-3 font-semibold">Student</th>
-            <th class="py-3 font-semibold">Submitted At</th>
-            <th class="py-3 font-semibold">Status / Score</th>
-            <th class="py-3 font-semibold">Feedback</th>
-            <th class="py-3 font-semibold text-right">Action</th>
+    <div class="hidden md:block table-wrap overflow-x-auto">
+      <table class="w-full min-w-[700px] text-left">
+        <thead class="bg-slate-900/65">
+          <tr class="text-sm text-slate-400">
+            <th class="px-4 py-3 font-semibold">Student</th>
+            <th class="px-4 py-3 font-semibold">Submitted</th>
+            <th class="px-4 py-3 font-semibold">Status / Score</th>
+            <th class="px-4 py-3 font-semibold">Feedback</th>
+            <th class="px-4 py-3 font-semibold text-right">Action</th>
           </tr>
         </thead>
         <tbody>
           {% for submission in file_submissions %}
-          <tr class="table-row border-b border-slate-800">
-            <td class="py-4">
-              <div class="font-medium text-slate-200">{{ submission.student.username }}</div>
+          <tr class="border-t border-slate-800/85 align-top">
+            <td class="px-4 py-4">
+              <div class="font-semibold text-slate-200">{{ submission.student.username }}</div>
               <div class="text-xs text-slate-400">{{ submission.student.email }}</div>
             </td>
-            <td class="py-4 text-slate-300 text-sm">
-              {{ submission.submitted_at|date:"M d, Y H:i" }}
-            </td>
-            <td class="py-4">
+            <td class="px-4 py-4 text-sm text-slate-300">{{ submission.submitted_at|date:"M d, Y H:i" }}</td>
+            <td class="px-4 py-4">
               {% if submission.score != None %}
-                <span class="inline-flex items-center rounded-md bg-emerald-900/20 px-2 py-1 text-sm font-bold text-emerald-300 ring-1 ring-inset ring-emerald-600/20">{{ submission.score }} / {{ assignment.max_score }}</span>
+              <span class="status-pill status-graded">{{ submission.score }} / {{ assignment.max_score }}</span>
               {% else %}
-                <span class="inline-flex items-center rounded-md bg-amber-900/20 px-2 py-1 text-sm font-medium text-amber-300 ring-1 ring-inset ring-amber-600/20">Pending Grade</span>
+              <span class="status-pill status-pending">Pending Grade</span>
               {% endif %}
             </td>
-            <td class="py-4 text-xs text-slate-400 max-w-xs">
-              {{ submission.ai_feedback|default:"No feedback yet" }}
+            <td class="px-4 py-4">
+              {% if submission.ai_feedback %}
+              <div class="feedback-card">
+                <div class="ai-output-render text-xs"></div>
+                <textarea class="ai-output-raw hidden">{{ submission.ai_feedback }}</textarea>
+              </div>
+              {% else %}
+              <span class="text-xs text-slate-500">No feedback yet</span>
+              {% endif %}
             </td>
-            <td class="py-4 text-right">
-              <div class="flex flex-col items-start gap-2 sm:items-end">
-                <a href="{{ submission.file.url }}" class="text-blue-300 font-semibold text-sm hover:underline" target="_blank">Open File</a>
-                <a href="{% url 'grade_file_submission' submission.id %}" class="text-emerald-300 font-semibold text-sm hover:underline">Grade</a>
+            <td class="px-4 py-4 text-right">
+              <div class="flex flex-col items-end gap-2">
+                <a href="{{ submission.file.url }}" class="text-blue-300 text-sm font-semibold hover:underline" target="_blank">Open File</a>
+                <a href="{% url 'grade_file_submission' submission.id %}" class="text-emerald-300 text-sm font-semibold hover:underline">Grade</a>
               </div>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="5" class="py-12 text-center text-slate-400">No submissions received yet.</td>
+            <td colspan="5" class="px-4 py-12 text-center text-slate-400">No submissions received yet.</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
+    </div>
+
+    <div class="space-y-3 md:hidden">
+      {% for submission in file_submissions %}
+      <article class="submission-shell">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="font-semibold text-slate-200">{{ submission.student.username }}</p>
+            <p class="text-xs text-slate-400">{{ submission.student.email }}</p>
+          </div>
+          {% if submission.score != None %}
+          <span class="status-pill status-graded">{{ submission.score }} / {{ assignment.max_score }}</span>
+          {% else %}
+          <span class="status-pill status-pending">Pending</span>
+          {% endif %}
+        </div>
+        <p class="mt-3 text-xs text-slate-400">Submitted {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
+        {% if submission.ai_feedback %}
+        <div class="feedback-card mt-3">
+          <div class="ai-output-render text-xs"></div>
+          <textarea class="ai-output-raw hidden">{{ submission.ai_feedback }}</textarea>
+        </div>
+        {% endif %}
+        <div class="mt-3 flex items-center gap-4">
+          <a href="{{ submission.file.url }}" class="text-blue-300 text-sm font-semibold hover:underline" target="_blank">Open File</a>
+          <a href="{% url 'grade_file_submission' submission.id %}" class="text-emerald-300 text-sm font-semibold hover:underline">Grade</a>
+        </div>
+      </article>
+      {% empty %}
+      <div class="rounded-xl border border-slate-700 bg-slate-900/45 px-4 py-10 text-center text-slate-400">No submissions received yet.</div>
+      {% endfor %}
     </div>
   </section>
   {% elif assignment.assignment_type == "quiz" %}
@@ -126,9 +171,7 @@
     <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h4 class="text-xl font-bold text-white">Assignment Questions</h4>
       <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <span class="text-sm rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-slate-300">
-          {{ quiz_questions.count }} questions | {{ quiz_attempt_count }} attempts
-        </span>
+        <span class="meta-pill">{{ quiz_questions.count }} questions | {{ quiz_attempt_count }} attempts</span>
         <form method="post" action="{% url 'auto_grade_quiz' assignment.id %}">
           {% csrf_token %}
           <button type="submit" class="btn-primary w-full px-3 py-1.5 text-sm sm:w-auto">Auto Grade</button>
@@ -155,29 +198,29 @@
       {% endfor %}
     </div>
 
-    <div class="mt-6 overflow-x-auto">
-      <table class="w-full min-w-[560px] text-left">
-        <thead>
-          <tr class="text-sm text-slate-400 border-b border-slate-700">
-            <th class="py-3 font-semibold">Student</th>
-            <th class="py-3 font-semibold">Correct</th>
-            <th class="py-3 font-semibold">Score</th>
-            <th class="py-3 font-semibold">Evaluated</th>
-            <th class="py-3 font-semibold">Feedback</th>
+    <div class="mt-6 table-wrap overflow-x-auto">
+      <table class="w-full min-w-[700px] text-left">
+        <thead class="bg-slate-900/65">
+          <tr class="text-sm text-slate-400">
+            <th class="px-4 py-3 font-semibold">Student</th>
+            <th class="px-4 py-3 font-semibold">Correct</th>
+            <th class="px-4 py-3 font-semibold">Score</th>
+            <th class="px-4 py-3 font-semibold">Evaluated</th>
+            <th class="px-4 py-3 font-semibold">Feedback</th>
           </tr>
         </thead>
         <tbody>
           {% for result in quiz_results %}
-          <tr class="table-row border-b border-slate-800">
-            <td class="py-3.5 text-slate-200">{{ result.student.username }}</td>
-            <td class="py-3.5 text-slate-300">{{ result.correct_answers }} / {{ result.total_questions }}</td>
-            <td class="py-3.5 text-emerald-300 font-semibold">{{ result.score }} / {{ assignment.max_score }}</td>
-            <td class="py-3.5 text-slate-300">{{ result.evaluated_at|date:"M d, Y H:i" }}</td>
-            <td class="py-3.5 text-xs text-slate-400">{{ result.feedback|default:"-" }}</td>
+          <tr class="border-t border-slate-800/85">
+            <td class="px-4 py-3.5 text-slate-200">{{ result.student.username }}</td>
+            <td class="px-4 py-3.5 text-slate-300">{{ result.correct_answers }} / {{ result.total_questions }}</td>
+            <td class="px-4 py-3.5 text-emerald-300 font-semibold">{{ result.score }} / {{ assignment.max_score }}</td>
+            <td class="px-4 py-3.5 text-slate-300">{{ result.evaluated_at|date:"M d, Y H:i" }}</td>
+            <td class="px-4 py-3.5 text-xs text-slate-400">{{ result.feedback|default:"-" }}</td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="5" class="py-10 text-center text-slate-400">No graded assignment attempts yet.</td>
+            <td colspan="5" class="px-4 py-10 text-center text-slate-400">No graded assignment attempts yet.</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -186,38 +229,52 @@
   </section>
   {% elif assignment.assignment_type == "code" %}
   <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-1">
-    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h4 class="text-xl font-bold text-white">Code Submissions</h4>
-      <span class="text-sm rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-slate-300">
-        {{ code_submissions.count }} total
-      </span>
+      <span class="meta-pill">{{ code_submissions.count }} total</span>
     </div>
 
     <div class="space-y-4">
       {% for submission in code_submissions %}
-      <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <p class="text-sm text-slate-400">{{ submission.student.username }} | {{ submission.language }} | {{ submission.submitted_at|date:"M d, Y H:i" }}</p>
+      <article class="submission-shell">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p class="text-base font-semibold text-slate-100">{{ submission.student.username }}</p>
+            <p class="text-xs text-slate-400">{{ submission.student.email }}</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <span class="meta-pill">{{ submission.language }}</span>
+              <span class="meta-pill">{{ submission.submitted_at|date:"M d, Y H:i" }}</span>
+            </div>
+          </div>
           <div class="flex items-center gap-3">
-            <span class="text-sm text-emerald-300 font-semibold">
-              {% if submission.score != None %}{{ submission.score }} / {{ assignment.max_score }}{% else %}Pending{% endif %}
-            </span>
-            <a href="{% url 'evaluate_code_submission' submission.id %}" class="text-emerald-300 font-semibold text-sm hover:underline">Evaluate</a>
+            {% if submission.score != None %}
+            <span class="status-pill status-graded">{{ submission.score }} / {{ assignment.max_score }}</span>
+            {% else %}
+            <span class="status-pill status-pending">Pending Grade</span>
+            {% endif %}
+            <a href="{% url 'evaluate_code_submission' submission.id %}" class="text-emerald-300 text-sm font-semibold hover:underline">Evaluate</a>
           </div>
         </div>
-        <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-800 bg-black/40 p-3 text-xs text-slate-200"><code>{{ submission.code }}</code></pre>
+
+        <pre class="mt-3 overflow-x-auto rounded-lg border border-slate-700 bg-black/50 p-3 text-xs text-slate-200"><code>{{ submission.code }}</code></pre>
+
         {% if submission.ai_feedback %}
-        <p class="mt-3 text-xs text-slate-400">{{ submission.ai_feedback }}</p>
+        <div class="feedback-card mt-3">
+          <p class="mb-1 text-[11px] uppercase tracking-[0.13em] text-slate-500">Feedback</p>
+          <div class="ai-output-render text-xs"></div>
+          <textarea class="ai-output-raw hidden">{{ submission.ai_feedback }}</textarea>
+        </div>
         {% endif %}
-      </div>
+      </article>
       {% empty %}
-      <p class="text-slate-400">No code submissions received yet.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/45 px-4 py-10 text-center text-slate-400">No code submissions received yet.</div>
       {% endfor %}
     </div>
   </section>
   {% endif %}
 </div>
 {% endblock %}
+
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -226,36 +283,45 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <script>
   (function () {
-    const output = document.getElementById("ai-output-render");
-    const raw = document.getElementById("ai-output-raw");
-    if (!output || !raw) return;
+    const outputs = document.querySelectorAll(".ai-output-render");
+    if (!outputs.length) return;
 
-    marked.setOptions({
-      breaks: true,
-      gfm: true,
-      highlight: function (code, lang) {
-        if (lang && hljs.getLanguage(lang)) {
-          return hljs.highlight(code, { language: lang }).value;
+    const hasMarked = !!(window.marked && typeof marked.parse === "function");
+    const hasSanitizer = !!(window.DOMPurify && typeof DOMPurify.sanitize === "function");
+    const hasHighlighter = !!(window.hljs && typeof hljs.highlightElement === "function");
+
+    if (hasMarked) {
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function (code, lang) {
+          if (hasHighlighter && lang && hljs.getLanguage(lang)) {
+            return hljs.highlight(code, { language: lang }).value;
+          }
+          if (hasHighlighter && typeof hljs.highlightAuto === "function") {
+            return hljs.highlightAuto(code).value;
+          }
+          return code;
         }
-        return hljs.highlightAuto(code).value;
-      }
-    });
+      });
+    }
 
-    const markdown = raw.value || "";
-    const parsed = marked.parse(markdown);
-    output.innerHTML = DOMPurify.sanitize(parsed);
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
-    output.querySelectorAll("pre code").forEach((block) => {
-      hljs.highlightElement(block);
-    });
-
-    if (window.renderMathInElement) {
+    function renderMathSafe(container) {
+      if (!container || !(window.renderMathInElement && window.katex)) return;
       try {
-        renderMathInElement(output, {
+        renderMathInElement(container, {
           throwOnError: false,
-          errorCallback: (msg, err) => {
-            console.warn('LaTeX rendering fallback triggered:', msg);
-          },
+          strict: "ignore",
+          trust: false,
           delimiters: [
             { left: "$$", right: "$$", display: true },
             { left: "$", right: "$", display: false },
@@ -263,10 +329,45 @@
             { left: "\\[", right: "\\]", display: true }
           ]
         });
-      } catch (e) {
-        console.error("Critical LaTeX rendering failure:", e);
+      } catch (error) {
+        console.warn("Skipped LaTeX render due to malformed content.", error);
       }
     }
+
+    outputs.forEach((output) => {
+      const raw = output.nextElementSibling && output.nextElementSibling.classList.contains("ai-output-raw")
+        ? output.nextElementSibling
+        : null;
+      const markdown = raw ? (raw.value || "") : "";
+      if (!markdown.trim()) {
+        output.innerHTML = '<p class="text-slate-500">No details available.</p>';
+        return;
+      }
+
+      try {
+        if (hasMarked) {
+          const parsed = marked.parse(markdown);
+          output.innerHTML = hasSanitizer ? DOMPurify.sanitize(parsed) : parsed;
+        } else {
+          output.innerHTML = "<p>" + escapeHtml(markdown) + "</p>";
+        }
+      } catch (error) {
+        output.innerHTML = "<p>" + escapeHtml(markdown) + "</p>";
+        console.warn("Markdown parse failed; rendered plain text fallback.", error);
+      }
+
+      if (hasHighlighter) {
+        output.querySelectorAll("pre code").forEach((block) => {
+          try {
+            hljs.highlightElement(block);
+          } catch (error) {
+            console.warn("Code highlight skipped for one block.", error);
+          }
+        });
+      }
+
+      renderMathSafe(output);
+    });
   })();
 </script>
 {% endblock %}
