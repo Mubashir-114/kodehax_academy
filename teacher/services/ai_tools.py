@@ -3,14 +3,73 @@ import re
 from chat.gemini_client import generate_text
 
 
-def generate_quiz(topic):
+_NUMBER_WORDS = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+    "ten": 10,
+    "eleven": 11,
+    "twelve": 12,
+    "thirteen": 13,
+    "fourteen": 14,
+    "fifteen": 15,
+    "sixteen": 16,
+    "seventeen": 17,
+    "eighteen": 18,
+    "nineteen": 19,
+    "twenty": 20,
+}
+
+
+def _extract_requested_question_count(topic, default=5):
+    text = (topic or "").strip().lower()
+    if not text:
+        return default
+
+    # Matches patterns like "10 questions", "10 mcqs", "10 quiz questions".
+    digit_match = re.search(r"\b(\d{1,2})\s*(?:question|questions|mcq|mcqs|quiz questions?)\b", text)
+    if digit_match:
+        value = int(digit_match.group(1))
+        return max(1, min(value, 30))
+
+    # Matches patterns like "ten questions" or "ten mcqs".
+    word_match = re.search(
+        r"\b(" + "|".join(_NUMBER_WORDS.keys()) + r")\s*(?:question|questions|mcq|mcqs|quiz questions?)\b",
+        text,
+    )
+    if word_match:
+        value = _NUMBER_WORDS[word_match.group(1)]
+        return max(1, min(value, 30))
+
+    return default
+
+
+def _count_generated_questions(text):
+    if not text:
+        return 0
+    matches = re.findall(r"(?im)^\s*Q\s*\d+\s*[\).:]", text)
+    return len(matches)
+
+
+def generate_quiz(topic, requested_count=None):
+    if isinstance(requested_count, int) and requested_count > 0:
+        question_count = max(1, min(requested_count, 30))
+    else:
+        question_count = _extract_requested_question_count(topic, default=5)
+    final_q_line = f"(continue until Q{question_count})"
 
     prompt = f"""
 You are generating a teacher-ready quiz.
 Topic: {topic}
 
 Requirements:
-- Write exactly 5 multiple-choice questions.
+- Write exactly {question_count} multiple-choice questions.
 - Difficulty: moderate.
 - Each question must have 4 options: A, B, C, D.
 - After all questions, provide a separate section named 'Answer Key'.
@@ -25,20 +84,38 @@ D) ...
 
 Q2. ...
 
-(continue until Q5)
+{final_q_line}
 
 Answer Key:
 1) <option letter>
 2) <option letter>
-3) <option letter>
-4) <option letter>
-5) <option letter>
+... (continue sequentially until {question_count})
 
-CRITICAL: Do NOT generate anything else other than these 5 multiple choice questions.
+CRITICAL:
+- Do NOT generate anything else other than these {question_count} multiple choice questions.
+- The output must contain exactly {question_count} questions and exactly {question_count} answer-key lines.
 """
 
     try:
-        return generate_text("gemini-2.5-flash", prompt)
+        first_pass = generate_text("gemini-2.5-flash", prompt)
+        if _count_generated_questions(first_pass) == question_count:
+            return first_pass
+
+        correction_prompt = f"""
+You produced the wrong number of quiz questions.
+Target count: exactly {question_count}.
+
+Rewrite the quiz from scratch in the same format, and return:
+- exactly {question_count} questions (Q1..Q{question_count})
+- exactly {question_count} answer-key lines
+- no extra commentary
+
+Topic: {topic}
+"""
+        second_pass = generate_text("gemini-2.5-flash", correction_prompt)
+        if _count_generated_questions(second_pass) == question_count:
+            return second_pass
+        return second_pass or first_pass
     except Exception as exc:
         print(f"Error generating quiz: {exc}")
         return ""

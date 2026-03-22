@@ -96,6 +96,18 @@
         <label class="block text-sm font-semibold text-slate-200 mb-2">Topic or Subject</label>
         <input type="text" name="topic" required value="{{ topic|default:'' }}" placeholder="Example: Neural Networks" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400 transition">
       </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-200 mb-2">Number of Quiz Questions</label>
+        <input
+          type="number"
+          name="question_count"
+          min="1"
+          max="30"
+          value="{{ question_count|default:'5' }}"
+          class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400 transition"
+        >
+        <p class="mt-1 text-xs text-slate-400">Used only for Quiz generation. Range: 1 to 30.</p>
+      </div>
 
       <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <button type="submit" name="tool" value="quiz" class="btn-primary h-11 px-6">Generate Quiz</button>

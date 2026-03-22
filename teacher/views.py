@@ -825,9 +825,13 @@ def ai_tools(request):
         else:
             topic = request.POST.get("topic", "").strip()
             tool_used = request.POST.get("tool")
+            raw_question_count = (request.POST.get("question_count") or "").strip()
+            question_count = None
+            if raw_question_count.isdigit():
+                question_count = max(1, min(int(raw_question_count), 30))
 
             if tool_used == "quiz" and topic:
-                result = generate_quiz(topic)
+                result = generate_quiz(topic, requested_count=question_count)
             elif tool_used == "notes" and topic:
                 result = generate_notes(topic)
             elif tool_used == "coding" and topic:
@@ -837,6 +841,7 @@ def ai_tools(request):
         "result": result,
         "tool_used": tool_used,
         "topic": topic,
+        "question_count": request.POST.get("question_count", "5") if request.method == "POST" else "5",
         "classes": classes,
         "upload_success": upload_success,
         "upload_error": upload_error,
