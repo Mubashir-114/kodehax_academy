@@ -7,7 +7,6 @@ class PlatformSettingsForm(forms.ModelForm):
         fields = [
             'platform_name',
             'support_email',
-            'maintenance_mode',
             'require_email_verification',
             'enable_otp_login',
             'max_login_attempts',

@@ -63,5 +63,10 @@ urlpatterns = [
         skill_assessment_views.adminpanel_skill_reset,
         name="adminpanel_skill_reset",
     ),
+    path(
+        "settings/toggle-maintenance/",
+        views.toggle_maintenance_mode,
+        name="adminpanel_toggle_maintenance_mode",
+    ),
     path("settings/", views.settings_view, name="adminpanel_settings"),
 ]

@@ -5,10 +5,12 @@ from datetime import timedelta
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
+from django.db.utils import DatabaseError, OperationalError, ProgrammingError
 from django.db.models import Avg, Count, Q, Sum
 from django.db.models.functions import TruncDate
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 from django.utils import timezone
 
 from accounts.forms import TeacherInvitationAdminForm, resend_teacher_invitation
@@ -24,7 +26,7 @@ from teacher.models import (
 from teacher.services.performance import get_admin_analytics_page, get_admin_dashboard_analytics
 
 from .decorators import admin_required
-from .models import AdminUserState
+from .models import AdminUserState, PlatformSettings, SiteSettings
 
 User = get_user_model()
 
@@ -469,13 +471,22 @@ def analytics(request):
 
 @admin_required
 def settings_view(request):
-    from .models import PlatformSettings
     from .forms import PlatformSettingsForm
 
-    settings_obj = PlatformSettings.load()
+    platform_settings = PlatformSettings.load()
+    maintenance_mode_enabled = False
+    try:
+        site_settings = SiteSettings.load()
+        maintenance_mode_enabled = site_settings.maintenance_mode
+    except (DatabaseError, OperationalError, ProgrammingError):
+        site_settings = None
+        messages.warning(
+            request,
+            "Site settings table is not ready yet. Run migrations to enable maintenance mode control.",
+        )
     
     if request.method == "POST":
-        form = PlatformSettingsForm(request.POST, instance=settings_obj)
+        form = PlatformSettingsForm(request.POST, instance=platform_settings)
         if form.is_valid():
             form.save()
             messages.success(request, "Platform settings updated successfully.")
@@ -483,12 +494,65 @@ def settings_view(request):
         else:
             messages.error(request, "Please correct the errors below.")
     else:
-        form = PlatformSettingsForm(instance=settings_obj)
+        form = PlatformSettingsForm(instance=platform_settings)
 
     context = {
         "current_section": "settings",
         "form": form,
+        "maintenance_mode_enabled": maintenance_mode_enabled,
     }
     return _render_admin(request, "adminpanel/settings.html", context)
+
+
+def maintenance_page(request):
+    response = render(request, "maintenance.html")
+    response.status_code = 503
+    response["Retry-After"] = "600"
+    response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+    return response
+
+
+@admin_required
+@require_POST
+def toggle_maintenance_mode(request):
+    enabled = request.POST.get("maintenance_mode") == "true"
+    try:
+        site_settings = SiteSettings.load()
+        was_enabled = site_settings.maintenance_mode
+        site_settings.maintenance_mode = enabled
+
+        # When maintenance ends, invalidate app user sessions created before this point.
+        if was_enabled and not enabled:
+            site_settings.force_logout_generation += 1
+            site_settings.save(
+                update_fields=["maintenance_mode", "force_logout_generation", "updated_at"]
+            )
+        else:
+            site_settings.save(update_fields=["maintenance_mode", "updated_at"])
+    except (DatabaseError, OperationalError, ProgrammingError):
+        return JsonResponse(
+            {
+                "success": False,
+                "maintenance_mode": False,
+                "message": "Site settings table is unavailable. Run migrations first.",
+            },
+            status=503,
+        )
+
+    # Keep existing platform settings value in sync for backward compatibility.
+    platform_settings = PlatformSettings.load()
+    if platform_settings.maintenance_mode != enabled:
+        platform_settings.maintenance_mode = enabled
+        platform_settings.save(update_fields=["maintenance_mode"])
+
+    return JsonResponse(
+        {
+            "success": True,
+            "maintenance_mode": enabled,
+            "message": "Maintenance mode updated successfully.",
+        }
+    )
 
 

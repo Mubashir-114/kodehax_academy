@@ -1,5 +1,37 @@
 from django.conf import settings
+from django.core.cache import cache
 from django.db import models
+
+
+class SiteSettings(models.Model):
+    CACHE_KEY = "site_settings_singleton"
+    CACHE_TTL_SECONDS = 30
+
+    maintenance_mode = models.BooleanField(default=False)
+    force_logout_generation = models.PositiveIntegerField(default=0)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Site Settings"
+        verbose_name_plural = "Site Settings"
+
+    def __str__(self):
+        state = "ON" if self.maintenance_mode else "OFF"
+        return f"Site Settings (maintenance: {state})"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super().save(*args, **kwargs)
+        cache.delete(self.CACHE_KEY)
+
+    @classmethod
+    def load(cls):
+        cached = cache.get(cls.CACHE_KEY)
+        if cached is not None:
+            return cached
+        obj, _ = cls.objects.get_or_create(pk=1)
+        cache.set(cls.CACHE_KEY, obj, timeout=cls.CACHE_TTL_SECONDS)
+        return obj
 
 
 class AdminUserState(models.Model):

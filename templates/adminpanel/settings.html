@@ -36,12 +36,18 @@
                     <script>document.querySelector('#id_support_email').className = "w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm p-2.5 border bg-white";</script>
                 </div>
                 <div class="flex items-center justify-between pt-2">
-                    <span class="text-sm font-medium text-slate-700">Maintenance Mode</span>
+                    <div>
+                        <span class="text-sm font-medium text-slate-700">Maintenance Mode</span>
+                        <p id="maintenance-status-text" class="text-xs {% if maintenance_mode_enabled %}text-rose-600{% else %}text-emerald-600{% endif %}">
+                            {% if maintenance_mode_enabled %}Currently ON: users are redirected to maintenance page.{% else %}Currently OFF: platform is live.{% endif %}
+                        </p>
+                    </div>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="maintenance_mode" id="id_maintenance_mode" class="sr-only peer" {% if form.maintenance_mode.value %}checked{% endif %}>
+                        <input type="checkbox" id="id_maintenance_mode" class="sr-only peer" {% if maintenance_mode_enabled %}checked{% endif %}>
                         <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                     </label>
                 </div>
+                <p id="maintenance-update-message" class="hidden text-xs text-slate-500"></p>
             </div>
         </div>
 
@@ -172,4 +178,60 @@
 
     </div>
 </form>
+<script>
+    (function () {
+        const maintenanceToggle = document.getElementById("id_maintenance_mode");
+        const statusText = document.getElementById("maintenance-status-text");
+        const updateMessage = document.getElementById("maintenance-update-message");
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]')?.value;
+        if (!maintenanceToggle || !statusText || !updateMessage || !csrfToken) return;
+
+        maintenanceToggle.addEventListener("change", async function () {
+            const desiredState = maintenanceToggle.checked;
+            maintenanceToggle.disabled = true;
+            updateMessage.classList.remove("hidden", "text-rose-600", "text-emerald-600");
+            updateMessage.classList.add("text-slate-500");
+            updateMessage.textContent = "Updating maintenance mode...";
+
+            try {
+                const payload = new URLSearchParams({ maintenance_mode: String(desiredState) });
+                const response = await fetch("{% url 'adminpanel_toggle_maintenance_mode' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfToken,
+                        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+                    },
+                    body: payload.toString(),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Request failed");
+                }
+
+                const data = await response.json();
+                if (!data.success) {
+                    throw new Error(data.message || "Unable to update maintenance mode.");
+                }
+
+                if (data.maintenance_mode) {
+                    statusText.className = "text-xs text-rose-600";
+                    statusText.textContent = "Currently ON: users are redirected to maintenance page.";
+                    updateMessage.className = "text-xs text-emerald-600";
+                    updateMessage.textContent = "Maintenance mode enabled.";
+                } else {
+                    statusText.className = "text-xs text-emerald-600";
+                    statusText.textContent = "Currently OFF: platform is live.";
+                    updateMessage.className = "text-xs text-emerald-600";
+                    updateMessage.textContent = "Maintenance mode disabled.";
+                }
+            } catch (error) {
+                maintenanceToggle.checked = !desiredState;
+                updateMessage.className = "text-xs text-rose-600";
+                updateMessage.textContent = "Failed to update maintenance mode. Please retry.";
+            } finally {
+                maintenanceToggle.disabled = false;
+            }
+        });
+    })();
+</script>
 {% endblock %}

@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance | Kodehax Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            70% { transform: scale(1.15); opacity: 0; }
+            100% { transform: scale(1.15); opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+    <main class="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.22),_transparent_35%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.16),_transparent_32%)]"></div>
+        <div class="relative z-10 w-full max-w-xl rounded-3xl border border-white/15 bg-white/5 p-8 text-center shadow-2xl backdrop-blur-xl sm:p-12">
+            <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-amber-300/50 bg-amber-300/15 text-3xl">
+                🚧
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight sm:text-4xl">We&rsquo;ll be back soon 🚧</h1>
+            <p class="mt-4 text-sm leading-relaxed text-slate-200 sm:text-base">
+                We are performing scheduled improvements to keep your learning experience faster and more reliable.
+                Please check back in a little while.
+            </p>
+
+            <div class="mt-8 flex items-center justify-center gap-4">
+                <div class="relative h-4 w-4">
+                    <span class="absolute inset-0 rounded-full bg-emerald-300" style="animation: pulse-ring 1.7s ease-out infinite;"></span>
+                    <span class="absolute inset-0 rounded-full bg-emerald-400"></span>
+                </div>
+                <p class="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-200">Maintenance in progress</p>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

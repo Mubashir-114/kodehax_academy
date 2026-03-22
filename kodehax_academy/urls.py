@@ -18,6 +18,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from adminpanel.views import maintenance_page
 from student.views import (
     chat_session_clear_api,
     chat_session_detail_api,
@@ -38,6 +39,7 @@ def health_check(request):
 
 urlpatterns = [
     path('health/', health_check, name='health_check'),
+    path("maintenance/", maintenance_page, name="maintenance_page"),
     path('admin/', admin.site.urls),
     path('admin-panel/', include('adminpanel.urls')),
     path("api/chat/start/", chat_start_api, name="api_chat_start"),
