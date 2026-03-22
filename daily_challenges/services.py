@@ -1397,6 +1397,17 @@ def challenge_dashboard_stats(challenge_date=None):
         total_attempts=Count("id"),
         hint_uses=Sum("hints_used"),
     )
+    recent_templates = list(
+        QuestionTemplate.objects.select_related("created_by", "approved_by").order_by("-updated_at")[:8]
+    )
+
+    for template in recent_templates:
+        preview_params = {}
+        for key, values in (template.parameter_schema or {}).items():
+            if not isinstance(values, list) or not values:
+                continue
+            preview_params[key] = values[0]
+        template.preview_title = _safe_format_string(template.title_template, preview_params)
 
     return {
         "sets": sets,
@@ -1414,5 +1425,5 @@ def challenge_dashboard_stats(challenge_date=None):
         "pending_template_count": QuestionTemplate.objects.filter(
             approval_status=QuestionTemplate.STATUS_PENDING
         ).count(),
-        "recent_template_rows": QuestionTemplate.objects.select_related("created_by", "approved_by").order_by("-updated_at")[:8],
+        "recent_template_rows": recent_templates,
     }

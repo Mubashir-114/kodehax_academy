@@ -119,6 +119,10 @@ def _remaining_workspace_challenges(challenge_set, current_challenge):
     return remaining
 
 
+def _build_workspace_editor_code(challenge):
+    return ""
+
+
 @login_required
 def today_challenges(request):
     redirect_response = _ensure_student(request)
@@ -173,7 +177,7 @@ def submit_solution(request, challenge_id):
 
     preview_payload = None
     submission_payload = None
-    editor_code = challenge.latest_code or ""
+    editor_code = _build_workspace_editor_code(challenge)
 
     if request.method == "POST":
         action = request.POST.get("action", "submit")
