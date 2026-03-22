@@ -19,12 +19,12 @@
         <div>
           <p class="text-sm text-slate-400">Welcome back,</p>
           <h2 class="mt-1 text-2xl font-black tracking-tight text-white sm:text-3xl">{{ request.user.username }}</h2>
-          <p class="mt-2 max-w-2xl text-sm text-slate-300">Stay focused on active challenges, quiz work, and class participation without jumping between disconnected screens.</p>
+          <p class="mt-2 max-w-2xl text-sm text-slate-300">Stay focused on active challenges, assignment work, and class participation without jumping between disconnected screens.</p>
         </div>
       </div>
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <a href="{% url 'daily_challenges_today' %}" class="btn-primary inline-flex h-11 items-center justify-center px-4 text-sm">Open Challenges</a>
-        <a href="{% url 'view_assignments' %}" class="btn-muted inline-flex h-11 items-center justify-center px-4 text-sm">Open Quiz</a>
+        <a href="{% url 'view_assignments' %}" class="btn-muted inline-flex h-11 items-center justify-center px-4 text-sm">Open Assignment</a>
       </div>
     </div>
   </section>

@@ -1,14 +1,14 @@
 {% extends "teacher/base.html" %}
 
-{% block title %}Create Quiz Assignment{% endblock %}
-{% block page_title %}New Quiz Assignment{% endblock %}
+{% block title %}Create Assignment{% endblock %}
+{% block page_title %}New Assignment{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-4xl">
   <section class="glass-card hover-lift p-4 sm:p-7 reveal">
     <div class="mb-6">
       <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Classroom: {{ classroom.name }}</p>
-      <h3 class="mt-1 text-2xl font-black text-white sm:text-3xl">Create Quiz Assignment</h3>
+      <h3 class="mt-1 text-2xl font-black text-white sm:text-3xl">Create Assignment</h3>
     </div>
 
     {% if error %}
@@ -64,7 +64,7 @@
 
       <button type="button" id="add-question" class="btn-muted w-full px-4 py-2 sm:w-auto">+ Add Question</button>
       <div class="pt-2">
-        <button type="submit" class="btn-primary w-full px-6 py-2.5 sm:w-auto">Create Quiz Assignment</button>
+        <button type="submit" class="btn-primary w-full px-6 py-2.5 sm:w-auto">Create Assignment</button>
       </div>
     </form>
   </section>

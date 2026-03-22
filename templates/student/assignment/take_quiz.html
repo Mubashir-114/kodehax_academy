@@ -1,8 +1,8 @@
 {% extends "student/base.html" %}
 
-{% block title %}Take Quiz{% endblock %}
-{% block header %}Take Quiz{% endblock %}
-{% block header_subtitle %}Answer one question at a time in a mobile-friendly stacked quiz flow with a clear submit action.{% endblock %}
+{% block title %}Take Assignment{% endblock %}
+{% block header %}Take Assignment{% endblock %}
+{% block header_subtitle %}Answer one question at a time in a mobile-friendly stacked assignment flow with a clear submit action.{% endblock %}
 
 {% block content %}
 <section class="space-y-5 reveal pb-28 md:pb-0">
@@ -17,7 +17,7 @@
 
   {% if not can_submit %}
   <div class="rounded-xl border border-amber-700 bg-amber-950/20 p-4 text-sm text-amber-200">
-    This quiz allows only one attempt. Your previous answers are shown below.
+    This assignment allows only one attempt. Your previous answers are shown below.
   </div>
   {% endif %}
 
@@ -84,17 +84,17 @@
     </div>
     {% endwith %}
     {% empty %}
-    <p class="text-sm text-slate-400">No quiz questions available.</p>
+    <p class="text-sm text-slate-400">No assignment questions available.</p>
     {% endfor %}
 
     {% if questions and can_submit %}
-    <button type="submit" class="btn-primary hidden w-full items-center justify-center px-5 py-2.5 sm:w-auto md:inline-flex">Submit Quiz</button>
+    <button type="submit" class="btn-primary hidden w-full items-center justify-center px-5 py-2.5 sm:w-auto md:inline-flex">Submit Assignment</button>
     {% endif %}
   </form>
 
   {% if questions and can_submit %}
   <div class="fixed inset-x-3 bottom-24 z-30 rounded-[1.25rem] border border-slate-700/80 bg-slate-950/92 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.45)] backdrop-blur md:hidden">
-    <button type="submit" form="student-quiz-form" class="btn-primary h-11 w-full px-5 text-sm">Submit Quiz</button>
+    <button type="submit" form="student-quiz-form" class="btn-primary h-11 w-full px-5 text-sm">Submit Assignment</button>
   </div>
   {% endif %}
 </section>

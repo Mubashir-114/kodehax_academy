@@ -170,7 +170,7 @@
                     Daily Challenges
                 </a>
                 <a href="{% url 'view_assignments' %}" class="nav-link {% if '/student/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-                    Quiz
+                    Assignment
                 </a>
                 <a href="{% url 'student_performance_dashboard' %}" class="nav-link {% if '/student/performance/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
                     Performance Dashboard
@@ -243,7 +243,7 @@
                             <div>
                                 <p class="text-xs uppercase tracking-[0.18em] text-slate-500 lg:block hidden">Student Workspace</p>
                                 <h1 class="text-xl font-black tracking-tight text-white md:text-2xl lg:text-3xl">{% block header %}Student Dashboard{% endblock %}</h1>
-                                <p class="mt-2 text-sm text-slate-400 md:text-base">{% block header_subtitle %}Stay on top of coding challenges, quizzes, classroom activity, and personal progress in one place.{% endblock %}</p>
+                                <p class="mt-2 text-sm text-slate-400 md:text-base">{% block header_subtitle %}Stay on top of coding challenges, assignments, classroom activity, and personal progress in one place.{% endblock %}</p>
                             </div>
                             <div class="hidden items-center gap-3 lg:flex">
                                 <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-11 items-center justify-center px-4 text-sm">AI Assistant</a>
@@ -281,7 +281,7 @@
         </a>
         <a href="{% url 'view_assignments' %}" class="mobile-tab {% if '/student/assignments/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h8"/><path d="M8 17h5"/></svg>
-            <span>Quiz</span>
+            <span>Assignment</span>
         </a>
         <a href="{% url 'student_performance_dashboard' %}" class="mobile-tab {% if '/student/performance/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16"/><path d="M7 16v-5"/><path d="M12 16V8"/><path d="M17 16v-9"/></svg>

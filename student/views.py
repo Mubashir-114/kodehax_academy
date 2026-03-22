@@ -862,16 +862,16 @@ def _build_assignment_rows(assignments, student):
                     row["action_label"] = "View Submission"
         else:
             row["submission"] = quiz_result_map.get(assignment.id)
-            row["action_label"] = "Take Quiz"
+            row["action_label"] = "Take Assignment"
             attempted = row["submission"] or assignment.id in quiz_attempted_ids
             if attempted:
                 row["status_class"] = "emerald"
                 if assignment.allows_multiple_attempts:
                     row["status_label"] = "Attempted"
-                    row["action_label"] = "Retake Quiz"
+                    row["action_label"] = "Retake Assignment"
                 else:
                     row["status_label"] = "Completed"
-                    row["action_label"] = "View Quiz"
+                    row["action_label"] = "View Assignment"
         rows.append(row)
     return rows
 
@@ -1127,7 +1127,7 @@ def take_quiz_assignment(request, assignment_id):
         assignment_type=Assignment.ASSIGNMENT_TYPE_QUIZ
     )
     if assignment.due_date < timezone.now():
-        messages.error(request, "This quiz deadline has passed.")
+        messages.error(request, "This assignment deadline has passed.")
         return redirect("view_assignments")
     questions = assignment.quiz_questions.all()
     if not questions.exists():
@@ -1162,17 +1162,17 @@ def take_quiz_assignment(request, assignment_id):
 
     if request.method == "POST":
         if not questions.exists():
-            messages.error(request, "No quiz questions configured yet.")
+            messages.error(request, "No assignment questions configured yet.")
             return redirect("view_assignments")
         if not can_submit:
-            messages.error(request, "This quiz allows only one attempt.")
+            messages.error(request, "This assignment allows only one attempt.")
             return redirect("take_quiz_assignment", assignment_id=assignment.id)
 
         selected_answers = {}
         for question in questions:
             selected_option = request.POST.get(f"question_{question.id}", "").strip().upper()
             if selected_option not in {"A", "B", "C", "D"}:
-                messages.error(request, "Please answer all quiz questions before submitting.")
+                messages.error(request, "Please answer all assignment questions before submitting.")
                 return redirect("take_quiz_assignment", assignment_id=assignment.id)
             selected_answers[question.id] = selected_option
 
@@ -1186,9 +1186,9 @@ def take_quiz_assignment(request, assignment_id):
         evaluate_quiz_for_student(assignment, request.user)
 
         if has_existing_attempt:
-            messages.success(request, "Quiz re-submitted successfully.")
+            messages.success(request, "Assignment re-submitted successfully.")
         else:
-            messages.success(request, "Quiz submitted successfully.")
+            messages.success(request, "Assignment submitted successfully.")
         return redirect("view_assignments")
 
     question_rows = [

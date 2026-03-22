@@ -57,7 +57,7 @@ class Assignment(models.Model):
     ASSIGNMENT_TYPE_CODE = "code"
     ASSIGNMENT_TYPE_CHOICES = (
         (ASSIGNMENT_TYPE_FILE, "File Upload"),
-        (ASSIGNMENT_TYPE_QUIZ, "Quiz (MCQ)"),
+        (ASSIGNMENT_TYPE_QUIZ, "Assignment (MCQ)"),
         (ASSIGNMENT_TYPE_CODE, "Coding"),
     )
     ATTEMPT_POLICY_ONCE = "once"
