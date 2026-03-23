@@ -1,0 +1,13 @@
+{
+  "name": "kodehax-tailwind",
+  "private": true,
+  "scripts": {
+    "tailwind:build": "tailwindcss -i ./static/src/input.css -o ./static/css/tailwind.css --minify",
+    "tailwind:watch": "tailwindcss -i ./static/src/input.css -o ./static/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17"
+  }
+}

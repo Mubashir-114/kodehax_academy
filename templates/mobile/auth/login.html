@@ -1,0 +1,37 @@
+{% extends "mobile/base.html" %}
+{% block title %}Sign In | Kodehax Academy{% endblock %}
+{% block content %}
+<main class="min-h-[82vh] flex items-center">
+    <section class="card w-full p-5 reveal-1">
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Kodehax Academy</p>
+        <h1 class="mt-2 text-2xl font-semibold">Student Login</h1>
+        <p class="mt-1 text-sm text-slate-500">Minimal mobile access to your learning workspace.</p>
+        <form method="post" class="mt-5 space-y-4">
+            {% csrf_token %}
+            {% if form %}
+                {% for field in form %}
+                    <div>
+                        <label class="mb-1 block text-sm text-slate-600">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<p class="mt-1 text-xs text-rose-600">{{ field.errors|join:", " }}</p>{% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div>
+                    <label class="mb-1 block text-sm text-slate-600">Username</label>
+                    <input name="username" required class="field">
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm text-slate-600">Password</label>
+                    <input type="password" name="password" required class="field">
+                </div>
+            {% endif %}
+            <button type="submit" class="btn-primary w-full px-4 py-3 text-sm">Continue</button>
+        </form>
+        <div class="mt-4 flex items-center justify-between text-sm">
+            <a href="{% url 'forgot_password' %}" class="text-slate-500">Forgot password?</a>
+            <a href="{% url 'register' %}" class="font-medium text-teal-700">Create account</a>
+        </div>
+    </section>
+</main>
+{% endblock %}

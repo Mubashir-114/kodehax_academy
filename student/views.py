@@ -11,6 +11,7 @@ import re
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from django.urls import reverse
 from chat.views import RESPONSE_STYLE_INSTRUCTION, format_ai_reply
 from chat.gemini_client import generate_text
 from daily_challenges.models import DailyChallengeSession, StudentPoints
@@ -43,6 +44,7 @@ from teacher.services.performance import (
     sync_code_submission_record,
     sync_file_submission_record,
 )
+from kodehax_academy.mobile import render_for_device
 
 MODEL = "gemini-flash-latest"
 
@@ -571,9 +573,9 @@ def llama_chat(request):
 
 def chat_page(request):
     cleanup_expired_sessions(delete=False)
-    return render(request, 'student/chat.html', {
+    return render_for_device(request, 'student/chat.html', {
         "memory_settings": get_memory_settings(),
-    })
+    }, mobile_template_name="mobile/student/notifications.html")
 
 
 @login_required
@@ -950,7 +952,7 @@ def student_dashboard(request):
     assignment_rows = _build_assignment_rows(assignments, request.user)
     submission_map = {row["assignment"].id: row for row in assignment_rows}
 
-    return render(request, "student/dashboard.html", {
+    return render_for_device(request, "student/dashboard.html", {
         "profile": profile,
         "joined_classes": joined_classes,
         "submission_map": submission_map,
@@ -1008,7 +1010,7 @@ def class_detail(request, class_id):
     ).order_by("due_date")
     assignment_rows = _build_assignment_rows(assignments, request.user)
 
-    return render(request, "student/class_detail.html", {
+    return render_for_device(request, "student/class_detail.html", {
         "classroom": classroom,
         "assignment_rows": assignment_rows,
     })
@@ -1027,7 +1029,7 @@ def view_assignments(request):
 
     assignment_rows = _build_assignment_rows(assignments, request.user)
 
-    return render(request, "student/assignment/view_assignment.html", {
+    return render_for_device(request, "student/assignment/view_assignment.html", {
         "assignment_rows": assignment_rows,
     })
 
@@ -1041,8 +1043,43 @@ def student_performance_dashboard(request):
     analytics = get_student_performance_summary(request.user)
     summary = analytics["summary"]
     charts = analytics["charts"]
+    upcoming_assignments = Assignment.objects.filter(
+        classroom__students=request.user,
+        due_date__gte=timezone.now(),
+    ).select_related("classroom").order_by("due_date")[:8]
+    recent_results = PerformanceRecord.objects.filter(
+        student=request.user
+    ).exclude(score__isnull=True).order_by("-submitted_at", "-recorded_at")[:8]
+    notifications = []
+    for assignment in upcoming_assignments:
+        if assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_QUIZ:
+            assignment_url = reverse("take_quiz_assignment", kwargs={"assignment_id": assignment.id})
+        elif assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_CODE:
+            assignment_url = reverse("submit_code_assignment", kwargs={"assignment_id": assignment.id})
+        else:
+            assignment_url = reverse("submit_assignment", kwargs={"assignment_id": assignment.id})
+        notifications.append(
+            {
+                "title": f"Due soon: {assignment.title}",
+                "body": f"{assignment.classroom.name} • {assignment.due_date:%b %d, %I:%M %p}",
+                "time": assignment.due_date,
+                "kind": "due",
+                "url": assignment_url,
+            }
+        )
+    for result in recent_results:
+        notifications.append(
+            {
+                "title": f"Scored {result.score:.0f}% in {result.assignment_title}",
+                "body": "Submission evaluated and added to your performance history.",
+                "time": result.recorded_at or result.submitted_at,
+                "kind": "result",
+                "url": None,
+            }
+        )
+    notifications.sort(key=lambda item: item["time"] or timezone.now(), reverse=True)
 
-    return render(request, "student/performance.html", {
+    return render_for_device(request, "student/performance.html", {
         "summary": summary,
         "records": analytics["records"],
         "score_progression_labels": json.dumps(charts["score_progression_labels"]),
@@ -1051,6 +1088,7 @@ def student_performance_dashboard(request):
         "assignment_score_values": json.dumps(charts["assignment_score_values"]),
         "submission_trend_labels": json.dumps(charts["submission_trend_labels"]),
         "submission_trend_values": json.dumps(charts["submission_trend_values"]),
+        "notifications": notifications[:20],
     })
 
 
@@ -1107,7 +1145,7 @@ def submit_assignment(request, assignment_id):
         messages.success(request, success_message)
         return redirect("view_assignments")
 
-    return render(request, "student/assignment/submit_assignment.html", {
+    return render_for_device(request, "student/assignment/submit_assignment.html", {
         "assignment": assignment,
         "existing_submission": existing_submission,
         "can_submit": can_submit,
@@ -1204,7 +1242,7 @@ def take_quiz_assignment(request, assignment_id):
             _parse_quiz_questions_from_description(assignment.description)
         )
 
-    return render(request, "student/assignment/take_quiz.html", {
+    return render_for_device(request, "student/assignment/take_quiz.html", {
         "assignment": assignment,
         "questions": questions,
         "question_rows": question_rows,
@@ -1310,7 +1348,7 @@ def submit_code_assignment(request, assignment_id):
             "code": existing_codes[i] if i < len(existing_codes) else ""
         })
 
-    return render(request, "student/assignment/submit_code.html", {
+    return render_for_device(request, "student/assignment/submit_code.html", {
         "assignment": assignment,
         "existing_submission": existing_submission,
         "can_submit": can_submit,
@@ -1324,7 +1362,7 @@ def student_profile(request):
 
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
 
-    return render(request, "student/profile.html", {"profile": profile})
+    return render_for_device(request, "student/profile.html", {"profile": profile})
 
 
 @login_required
@@ -1360,4 +1398,4 @@ def edit_student_profile(request):
 
         return redirect("student_profile")
 
-    return render(request, "student/update.html", {"profile": profile})
+    return render_for_device(request, "student/update.html", {"profile": profile})

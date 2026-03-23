@@ -1,0 +1,110 @@
+{% extends "mobile/base.html" %}
+{% block title %}Challenge Workspace | Kodehax Academy{% endblock %}
+{% block content %}
+<header class="mb-4">
+    <a href="{% url 'daily_challenges_today' %}" class="text-sm text-slate-500">&larr; Back</a>
+    <h1 class="mt-2 text-xl font-semibold">{{ challenge.title|default:challenge.problem.title }}</h1>
+    <p class="text-sm text-slate-500">Level {{ challenge.level }} &bull; {{ challenge.difficulty|title }} &bull; Attempts left: {{ attempts_remaining }}</p>
+</header>
+
+<section class="card p-5 mb-4 reveal-1">
+    <p class="whitespace-pre-line text-sm text-slate-700">{{ challenge.description|default:challenge.problem.description }}</p>
+    {% if visible_hints %}
+        <div class="mt-4 space-y-2">
+            {% for hint in visible_hints %}
+                <p class="rounded-2xl bg-amber-50 px-3 py-2 text-sm text-amber-700">{{ hint }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</section>
+
+<section class="card p-5 reveal-2">
+    <form method="post" class="space-y-3">
+        {% csrf_token %}
+        <div class="overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950 shadow-[0_14px_30px_rgba(2,6,23,0.38)]">
+            <div class="flex items-center justify-between border-b border-slate-800 bg-slate-900/90 px-3 py-2">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Code Editor</p>
+                <div class="flex items-center gap-2 text-[11px] text-slate-400">
+                    <span class="rounded-full bg-slate-800 px-2 py-1">Python</span>
+                    <span id="editor-lines" class="rounded-full bg-slate-800 px-2 py-1">1 lines</span>
+                    <span id="editor-chars" class="rounded-full bg-slate-800 px-2 py-1">0 chars</span>
+                </div>
+            </div>
+            <textarea
+                id="challenge-editor"
+                name="code"
+                rows="16"
+                spellcheck="false"
+                autocapitalize="off"
+                autocomplete="off"
+                autocorrect="off"
+                class="w-full resize-y border-0 bg-slate-950 p-4 font-mono text-[13px] leading-6 text-slate-100 outline-none placeholder:text-slate-500 focus:ring-0"
+                placeholder="# Write your solution here..."
+            >{{ editor_code|default:challenge.latest_code }}</textarea>
+            <div class="flex items-center justify-between border-t border-slate-800 bg-slate-900/85 px-3 py-2">
+                <p class="text-[11px] text-slate-400">Press <span class="rounded bg-slate-800 px-1.5 py-0.5 text-slate-200">Tab</span> for indentation</p>
+                <button type="button" id="editor-clear" class="rounded-lg border border-slate-700 px-2.5 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-slate-500 hover:text-white">
+                    Clear
+                </button>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+            <button name="action" value="run" class="btn-muted px-3 py-3 text-sm">Run</button>
+            <button name="action" value="hint" class="rounded-2xl border border-amber-300 bg-amber-50 px-3 py-3 text-sm font-semibold text-amber-700 transition hover:bg-amber-100">Hint</button>
+            <button name="action" value="submit" class="btn-primary px-3 py-3 text-sm">Submit</button>
+        </div>
+    </form>
+    {% if preview_payload %}
+        <div class="mt-4 rounded-2xl bg-slate-100 p-3 text-xs text-slate-700">
+            <p class="font-semibold mb-1">Run Result</p>
+            <pre class="whitespace-pre-wrap">{{ preview_payload }}</pre>
+        </div>
+    {% endif %}
+    {% if submission_payload %}
+        <div class="mt-4 rounded-2xl bg-emerald-50 p-3 text-xs text-emerald-700">
+            <p class="font-semibold mb-1">Submission Result</p>
+            <pre class="whitespace-pre-wrap">{{ submission_payload }}</pre>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const editor = document.getElementById("challenge-editor");
+        const lineEl = document.getElementById("editor-lines");
+        const charEl = document.getElementById("editor-chars");
+        const clearBtn = document.getElementById("editor-clear");
+        if (!editor || !lineEl || !charEl) return;
+
+        function updateStats() {
+            const value = editor.value || "";
+            const lines = value.length ? value.split("\n").length : 1;
+            lineEl.textContent = lines + (lines === 1 ? " line" : " lines");
+            charEl.textContent = value.length + " chars";
+        }
+
+        editor.addEventListener("keydown", function (e) {
+            if (e.key === "Tab") {
+                e.preventDefault();
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                editor.value = editor.value.substring(0, start) + "    " + editor.value.substring(end);
+                editor.selectionStart = editor.selectionEnd = start + 4;
+                updateStats();
+            }
+        });
+
+        editor.addEventListener("input", updateStats);
+        if (clearBtn) {
+            clearBtn.addEventListener("click", function () {
+                editor.value = "";
+                updateStats();
+                editor.focus();
+            });
+        }
+        updateStats();
+    })();
+</script>
+{% endblock %}

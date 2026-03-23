@@ -1,0 +1,25 @@
+{% extends "mobile/base.html" %}
+{% block title %}Notifications | Kodehax Academy{% endblock %}
+{% block content %}
+<header class="mb-4">
+    <h1 class="text-2xl font-semibold">Notifications</h1>
+    <p class="text-sm text-slate-500">Due tasks and recent results.</p>
+</header>
+
+<section class="space-y-3">
+    {% for item in notifications %}
+        <article class="card p-4 reveal-1">
+            <p class="text-base font-semibold">{{ item.title }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ item.body }}</p>
+            <div class="mt-2 flex items-center justify-between">
+                <span class="text-xs text-slate-500">{{ item.time|date:"M d, h:i A" }}</span>
+                {% if item.url %}
+                    <a href="{{ item.url }}" class="text-sm font-semibold text-teal-700">Open</a>
+                {% endif %}
+            </div>
+        </article>
+    {% empty %}
+        <article class="card p-5 text-sm text-slate-500">No updates right now.</article>
+    {% endfor %}
+</section>
+{% endblock %}

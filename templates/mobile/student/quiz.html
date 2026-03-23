@@ -1,0 +1,108 @@
+{% extends "mobile/base.html" %}
+{% block title %}Quiz | Kodehax Academy{% endblock %}
+{% block content %}
+<header class="mb-4">
+    <a href="{% url 'view_assignments' %}" class="text-sm text-slate-500">&larr; Back</a>
+    <h1 class="mt-2 text-2xl font-semibold">{{ assignment.title }}</h1>
+    <p class="text-sm text-slate-500">One question at a time.</p>
+</header>
+
+{% if can_submit %}
+<form method="post" id="quiz-form" class="space-y-4">
+    {% csrf_token %}
+    <div class="card p-4 reveal-1">
+        <div class="mb-3 flex items-center justify-between text-xs text-slate-500">
+            <span id="quiz-progress-text">Question 1 of {{ question_rows|length }}</span>
+            <span>{{ question_rows|length }} total</span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-slate-200">
+            <div id="quiz-progress-bar" class="h-full w-0 rounded-full bg-gradient-to-r from-teal-600 to-sky-500 transition-all duration-300"></div>
+        </div>
+    </div>
+
+    {% for row in question_rows %}
+        <article class="quiz-step card p-5 reveal-2 {% if not forloop.first %}hidden{% endif %}" data-step="{{ forloop.counter0 }}">
+            <p class="text-xs uppercase tracking-[0.16em] text-slate-500">Question {{ forloop.counter }}</p>
+            <h2 class="mt-2 text-lg font-semibold">{{ row.question.question }}</h2>
+            <div class="mt-4 space-y-2">
+                <label class="option-row block rounded-2xl border border-slate-200 bg-white/70 p-3 transition hover:border-cyan-300 hover:bg-cyan-50/40">
+                    <input type="radio" name="question_{{ row.question.id }}" value="A" {% if row.selected_option == 'A' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_a }}</span>
+                </label>
+                <label class="option-row block rounded-2xl border border-slate-200 bg-white/70 p-3 transition hover:border-cyan-300 hover:bg-cyan-50/40">
+                    <input type="radio" name="question_{{ row.question.id }}" value="B" {% if row.selected_option == 'B' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_b }}</span>
+                </label>
+                <label class="option-row block rounded-2xl border border-slate-200 bg-white/70 p-3 transition hover:border-cyan-300 hover:bg-cyan-50/40">
+                    <input type="radio" name="question_{{ row.question.id }}" value="C" {% if row.selected_option == 'C' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_c }}</span>
+                </label>
+                <label class="option-row block rounded-2xl border border-slate-200 bg-white/70 p-3 transition hover:border-cyan-300 hover:bg-cyan-50/40">
+                    <input type="radio" name="question_{{ row.question.id }}" value="D" {% if row.selected_option == 'D' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_d }}</span>
+                </label>
+            </div>
+        </article>
+    {% endfor %}
+
+    <div class="card p-4 flex items-center gap-2 reveal-3">
+        <button type="button" id="quiz-prev" class="btn-muted px-4 py-2 text-sm">Previous</button>
+        <button type="button" id="quiz-next" class="btn-muted ml-auto px-4 py-2 text-sm">Next</button>
+        <button type="submit" id="quiz-submit" class="btn-primary hidden ml-auto px-4 py-2 text-sm">Submit Quiz</button>
+    </div>
+</form>
+{% else %}
+<section class="card p-5">
+    <h2 class="text-lg font-semibold">Quiz Already Completed</h2>
+    <p class="mt-2 text-sm text-slate-500">This assignment allows one attempt only.</p>
+    <a href="{% url 'view_assignments' %}" class="mt-3 inline-flex rounded-2xl border border-slate-300 px-4 py-2 text-sm font-medium">Back to Courses</a>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if can_submit %}
+<script>
+    (function () {
+        const steps = Array.from(document.querySelectorAll(".quiz-step"));
+        const prev = document.getElementById("quiz-prev");
+        const next = document.getElementById("quiz-next");
+        const submit = document.getElementById("quiz-submit");
+        const bar = document.getElementById("quiz-progress-bar");
+        const text = document.getElementById("quiz-progress-text");
+        if (!steps.length) return;
+        function paintSelectedState() {
+            steps.forEach(function(stepEl) {
+                stepEl.querySelectorAll(".option-row").forEach(function(row) {
+                    var input = row.querySelector("input[type='radio']");
+                    if (!input) return;
+                    if (input.checked) {
+                        row.classList.add("border-teal-400", "bg-teal-50");
+                    } else {
+                        row.classList.remove("border-teal-400", "bg-teal-50");
+                    }
+                });
+            });
+        }
+        let current = 0;
+        function render() {
+            steps.forEach((el, idx) => el.classList.toggle("hidden", idx !== current));
+            prev.disabled = current === 0;
+            const isLast = current === steps.length - 1;
+            next.classList.toggle("hidden", isLast);
+            submit.classList.toggle("hidden", !isLast);
+            const pct = ((current + 1) / steps.length) * 100;
+            bar.style.width = pct + "%";
+            text.textContent = "Question " + (current + 1) + " of " + steps.length;
+            paintSelectedState();
+        }
+        prev.addEventListener("click", () => { if (current > 0) { current -= 1; render(); } });
+        next.addEventListener("click", () => { if (current < steps.length - 1) { current += 1; render(); } });
+        document.querySelectorAll("input[type='radio']").forEach(function (radio) {
+            radio.addEventListener("change", paintSelectedState);
+        });
+        render();
+    })();
+</script>
+{% endif %}
+{% endblock %}

@@ -24,6 +24,7 @@ from teacher.models import (
     Submission,
 )
 from teacher.services.performance import get_admin_analytics_page, get_admin_dashboard_analytics
+from kodehax_academy.mobile import render_for_device
 
 from .decorators import admin_required
 from .models import AdminUserState, PlatformSettings, SiteSettings
@@ -505,7 +506,7 @@ def settings_view(request):
 
 
 def maintenance_page(request):
-    response = render(request, "maintenance.html")
+    response = render_for_device(request, "maintenance.html")
     response.status_code = 503
     response["Retry-After"] = "600"
     response["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"

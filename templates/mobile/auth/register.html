@@ -1,0 +1,29 @@
+{% extends "mobile/base.html" %}
+{% block title %}Register | Kodehax Academy{% endblock %}
+{% block content %}
+<main class="min-h-[82vh] flex items-center">
+    <section class="card w-full p-5 reveal-1">
+        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Kodehax Academy</p>
+        <h1 class="mt-2 text-2xl font-semibold">Create Student Account</h1>
+        <form method="post" class="mt-5 space-y-4">
+            {% csrf_token %}
+            {% if form %}
+                {% for field in form %}
+                    <div>
+                        <label class="mb-1 block text-sm text-slate-600">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<p class="mt-1 text-xs text-rose-600">{{ field.errors|join:", " }}</p>{% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <input name="username" placeholder="Username" required class="field">
+                <input type="email" name="email" placeholder="Email" required class="field">
+                <input type="password" name="password1" placeholder="Password" required class="field">
+                <input type="password" name="password2" placeholder="Confirm password" required class="field">
+            {% endif %}
+            <button type="submit" class="btn-primary w-full px-4 py-3 text-sm">Create account</button>
+        </form>
+        <p class="mt-4 text-sm text-slate-500">Already registered? <a href="{% url 'student_login' %}" class="font-medium text-teal-700">Sign in</a></p>
+    </section>
+</main>
+{% endblock %}

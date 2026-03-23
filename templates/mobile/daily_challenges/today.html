@@ -1,0 +1,85 @@
+{% extends "mobile/base.html" %}
+{% block title %}Daily Challenge | Kodehax Academy{% endblock %}
+{% block content %}
+<header class="hero mb-4 p-5 reveal-1">
+    <h1 class="text-2xl font-semibold">Daily Challenge</h1>
+    <p class="text-sm text-cyan-100/90">Complete today's set before time ends.</p>
+</header>
+
+<section class="card p-5 mb-4 reveal-2">
+    <div class="flex items-center justify-between">
+        <p class="text-sm text-slate-500">Points</p>
+        <p class="text-lg font-semibold">{{ student_points.total_points }}</p>
+    </div>
+    <div class="mt-2 flex items-center justify-between">
+        <p class="text-sm text-slate-500">Expires in</p>
+        <p id="challenge-countdown"
+           data-seconds="{{ remaining_time_seconds }}"
+           class="rounded-full bg-sky-100 px-3 py-1 text-sm font-semibold text-sky-700 tabular-nums">
+            {{ remaining_time_label }}
+        </p>
+    </div>
+    {% if current_session %}
+        <p class="mt-2 text-xs text-slate-500">Solved today: {{ current_session.questions_solved }}</p>
+    {% endif %}
+</section>
+
+<section class="space-y-3">
+    {% for group in challenge_groups %}
+        <article class="card p-4 reveal-3">
+            <div class="flex items-center justify-between">
+                <h2 class="text-base font-semibold">{{ group.title }}</h2>
+                <span class="rounded-full px-2 py-1 text-xs {% if group.unlocked %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
+                    {{ group.difficulty }}
+                </span>
+            </div>
+            <p class="mt-1 text-xs text-slate-500">{{ group.required_text }}</p>
+            <div class="mt-3 space-y-2">
+                {% for challenge in group.challenges %}
+                    <a href="{% url 'daily_challenge_workspace' challenge.id %}" class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/80 px-3 py-2 text-sm transition hover:border-cyan-300 hover:bg-cyan-50/50 {% if not group.unlocked %}pointer-events-none opacity-50{% endif %}">
+                        <span>Q{{ challenge.question_number }}. {{ challenge.title|default:challenge.problem.title|truncatechars:52 }}</span>
+                        <span class="text-xs {% if challenge.status == 'solved' %}text-emerald-600{% else %}text-slate-500{% endif %}">{{ challenge.status|title }}</span>
+                    </a>
+                {% endfor %}
+            </div>
+        </article>
+    {% endfor %}
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const el = document.getElementById("challenge-countdown");
+        if (!el) return;
+        let seconds = parseInt(el.dataset.seconds || "0", 10);
+        if (isNaN(seconds) || seconds < 0) seconds = 0;
+
+        function pad(v) {
+            return String(v).padStart(2, "0");
+        }
+
+        function format(total) {
+            const h = Math.floor(total / 3600);
+            const m = Math.floor((total % 3600) / 60);
+            const s = total % 60;
+            return pad(h) + ":" + pad(m) + ":" + pad(s);
+        }
+
+        function render() {
+            el.textContent = format(seconds);
+        }
+
+        render();
+        const timer = setInterval(function () {
+            if (seconds <= 0) {
+                clearInterval(timer);
+                el.textContent = "00:00:00";
+                return;
+            }
+            seconds -= 1;
+            render();
+        }, 1000);
+    })();
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "mobile/base.html" %}
+{% block title %}Dashboard | Kodehax Academy{% endblock %}
+{% block content %}
+<header class="hero mb-4 p-5 reveal-1">
+    <div class="flex items-start justify-between gap-3">
+        <div>
+            <p class="text-xs uppercase tracking-[0.18em] text-cyan-100/80">Student Workspace</p>
+            <h1 class="mt-2 text-2xl font-semibold">{{ request.user.username }}</h1>
+            <p class="mt-1 text-sm text-cyan-100/85">Your focused learning dashboard</p>
+        </div>
+        <span class="chip chip-accent pulse-soft">{{ student_points.total_points }} pts</span>
+    </div>
+</header>
+
+<section class="card p-5 mb-4 reveal-2">
+    <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">Daily Challenge</h2>
+        <span class="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700">{{ solved_daily_count }}/{{ total_daily_count }}</span>
+    </div>
+    <p class="mt-2 text-sm text-slate-600">Keep your streak active and earn points.</p>
+    <a href="{% url 'daily_challenges_today' %}" class="btn-primary mt-4 inline-flex px-4 py-2 text-sm">Open Challenge</a>
+</section>
+
+<section class="card p-5 mb-4 reveal-3">
+    <div class="flex items-center justify-between">
+        <h2 class="text-lg font-semibold">My Courses</h2>
+        <a href="{% url 'view_assignments' %}" class="text-sm font-medium text-teal-700">See all</a>
+    </div>
+    <div class="mt-3 space-y-3">
+        {% for classroom in joined_classes|slice:":4" %}
+            <a href="{% url 'student_class_detail' classroom.id %}" class="block rounded-2xl border border-slate-200/80 bg-white/80 px-4 py-3 transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-cyan-50/50">
+                <p class="font-medium text-slate-900">{{ classroom.name }}</p>
+                <p class="mt-1 text-xs text-slate-500">{{ classroom.assignments.count }} modules</p>
+            </a>
+        {% empty %}
+            <p class="text-sm text-slate-500">No enrolled courses yet.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="card p-5 reveal-3">
+    <h2 class="text-lg font-semibold">Join Course</h2>
+    <form method="post" action="{% url 'join_classroom' %}" class="mt-3 flex gap-2">
+        {% csrf_token %}
+        <input name="class_code" placeholder="Class code" class="field uppercase tracking-[0.15em]">
+        <button class="btn-muted px-4 py-3 text-sm">Join</button>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{% block title %}Kodehax Academy{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'image/image.png' %}">
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <style>
+        :root {
+            --app-bg: #ecf5ff;
+            --app-bg-2: #f8fafc;
+            --app-ink: #0f172a;
+            --app-muted: #64748b;
+            --app-primary: #0f766e;
+            --app-primary-2: #0ea5e9;
+            --app-card: rgba(255, 255, 255, 0.92);
+            --app-border: rgba(148, 163, 184, 0.24);
+        }
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        body {
+            background:
+                radial-gradient(circle at 90% -10%, rgba(56, 189, 248, 0.25), transparent 34%),
+                radial-gradient(circle at 10% 0%, rgba(20, 184, 166, 0.2), transparent 30%),
+                linear-gradient(180deg, var(--app-bg) 0%, var(--app-bg-2) 100%);
+            color: var(--app-ink);
+        }
+        .mobile-shell {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+        }
+        .card {
+            border-radius: 1.2rem;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98), var(--app-card));
+            border: 1px solid var(--app-border);
+            box-shadow: 0 12px 35px rgba(15, 23, 42, 0.09);
+            animation: floatIn 420ms ease both;
+            transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+        }
+        .card:active {
+            transform: scale(0.995);
+        }
+        .btn-primary {
+            border-radius: 1rem;
+            background: linear-gradient(135deg, var(--app-primary), #0f766e 55%, #115e59);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 10px 24px rgba(15, 118, 110, 0.28);
+            transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.04);
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(15, 118, 110, 0.32);
+        }
+        .btn-muted {
+            border-radius: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.36);
+            background: rgba(255, 255, 255, 0.9);
+            color: #334155;
+            font-weight: 600;
+            transition: 180ms ease;
+        }
+        .btn-muted:hover {
+            border-color: rgba(14, 165, 233, 0.45);
+            background: rgba(240, 249, 255, 0.95);
+        }
+        .field {
+            width: 100%;
+            border-radius: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            background: rgba(255,255,255,0.94);
+            color: #0f172a;
+            padding: 0.78rem 0.9rem;
+            transition: 180ms ease;
+        }
+        .field::placeholder { color: #94a3b8; }
+        .field:focus {
+            outline: none;
+            border-color: rgba(14,165,233,0.7);
+            box-shadow: 0 0 0 4px rgba(14,165,233,0.15);
+        }
+        .hero {
+            border-radius: 1.2rem;
+            background:
+                radial-gradient(circle at top right, rgba(125, 211, 252, 0.22), transparent 35%),
+                linear-gradient(135deg, rgba(15,118,110,0.93), rgba(14,165,233,0.86));
+            color: #ecfeff;
+            box-shadow: 0 14px 30px rgba(14, 116, 144, 0.28);
+        }
+        .chip {
+            border-radius: 999px;
+            padding: 0.28rem 0.68rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .chip-accent {
+            background: rgba(255,255,255,0.18);
+            color: #ecfeff;
+            border: 1px solid rgba(236,254,255,0.26);
+        }
+        .pulse-soft {
+            animation: pulseSoft 2s ease-in-out infinite;
+        }
+        .reveal-1 { animation-delay: 40ms; }
+        .reveal-2 { animation-delay: 90ms; }
+        .reveal-3 { animation-delay: 140ms; }
+        .pill { border-radius: 999px; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="text-slate-900 antialiased">
+    <div class="mobile-shell px-4 pt-4 {% if request.user.is_authenticated and request.user.role == 'student' and not hide_mobile_nav %}pb-24{% else %}pb-8{% endif %}">
+        {% if messages %}
+            <div class="space-y-2 mb-4">
+                {% for message in messages %}
+                    <div class="card border {% if message.tags == 'error' %}border-rose-200 text-rose-700{% elif message.tags == 'success' %}border-emerald-200 text-emerald-700{% else %}border-slate-200 text-slate-700{% endif %} px-3 py-2 text-sm reveal-1">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+    {% if request.user.is_authenticated and request.user.role == 'student' and not hide_mobile_nav %}
+        {% include "mobile/components/bottom_nav.html" %}
+    {% endif %}
+
+    <script>
+        (function () {
+            try {
+                var bucket = window.innerWidth < 768 ? "mobile" : "desktop";
+                document.cookie = "viewport_bucket=" + bucket + ";path=/;max-age=604800;samesite=lax";
+            } catch (e) {}
+        })();
+        (function () {
+            var controls = document.querySelectorAll("input:not([type='radio']):not([type='checkbox']):not([type='file']), select, textarea");
+            controls.forEach(function (el) {
+                if (!el.classList.contains("field")) {
+                    el.classList.add("field");
+                }
+            });
+        })();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

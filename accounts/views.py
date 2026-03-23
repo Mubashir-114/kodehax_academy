@@ -11,6 +11,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils import timezone
 from datetime import timedelta
+from kodehax_academy.mobile import render_for_device
 
 from .forms import (
     ForgotPasswordForm,
@@ -48,7 +49,7 @@ def _decode_uid(uid):
 
 
 def _render(request, template_name, context=None, status=200):
-    return render(request, template_name, context or {}, status=status)
+    return render_for_device(request, template_name, context or {}, status=status)
 
 
 def _login_redirect_for_role(role):

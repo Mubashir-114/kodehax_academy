@@ -1,0 +1,23 @@
+{% extends "mobile/base.html" %}
+{% block title %}Edit Profile | Kodehax Academy{% endblock %}
+{% block content %}
+<header class="mb-4">
+    <a href="{% url 'student_profile' %}" class="text-sm text-slate-500">&larr; Back</a>
+    <h1 class="mt-2 text-2xl font-semibold">Edit Profile</h1>
+</header>
+
+<form method="post" enctype="multipart/form-data" class="space-y-4">
+    {% csrf_token %}
+    <section class="card p-5 space-y-3 reveal-1">
+        <input name="username" value="{{ request.user.username }}" class="field" placeholder="Username">
+        <input name="email" type="email" value="{{ request.user.email }}" class="field" placeholder="Email">
+        <input name="phone_number" value="{{ profile.phone_number }}" class="field" placeholder="Phone">
+        <input name="course" value="{{ profile.course }}" class="field" placeholder="Course">
+        <input name="batch" value="{{ profile.batch }}" class="field" placeholder="Batch">
+        <input name="student_id" value="{{ profile.student_id }}" class="field" placeholder="Student ID">
+        <textarea name="address" rows="3" class="field" placeholder="Address">{{ profile.address }}</textarea>
+        <input type="file" name="profile_picture" class="w-full rounded-2xl border border-slate-300 px-3 py-3 text-sm">
+    </section>
+    <button class="btn-primary w-full px-4 py-3 text-sm">Save Changes</button>
+</form>
+{% endblock %}

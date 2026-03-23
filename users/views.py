@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from kodehax_academy.mobile import render_for_device
 from .models import User
 
 def home(request):
-    return render(request, "user/base.html")
+    return render_for_device(request, "user/base.html")
 
 
 def _redirect_for_user(user):
@@ -69,7 +70,7 @@ def student_register(request):
         messages.success(request, "Student account created successfully")
         return redirect("student_login")
 
-    return render(request, "user/register/std_register.html")
+    return render_for_device(request, "user/register/std_register.html", mobile_template_name="mobile/auth/register.html")
 
 
 # -------------------------
@@ -106,7 +107,7 @@ def teacher_register(request):
         messages.success(request, "Teacher account created successfully")
         return redirect("teacher_login")
 
-    return render(request, "user/register/teacher_register.html")
+    return render_for_device(request, "user/register/teacher_register.html")
 
 
 # -------------------------
@@ -131,7 +132,7 @@ def student_login(request):
         login(request, user)
         return redirect("student_dashboard")
 
-    return render(request, "user/login/std_login.html")
+    return render_for_device(request, "user/login/std_login.html")
 
 
 # -------------------------
@@ -160,7 +161,7 @@ def teacher_login(request):
         login(request, user)
         return redirect("/teacher/dashboard/")
 
-    return render(request, "user/login/teacher_login.html")
+    return render_for_device(request, "user/login/teacher_login.html")
 
 
 def user_logout(request):

@@ -6,29 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Kodehax Academy{% endblock %}</title>
     <link rel="icon" type="image/png" href="{% static 'image/image.png' %}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        "float-slow": "float 8s ease-in-out infinite",
-                        "fade-up": "fadeUp 0.65s ease-out both"
-                    },
-                    keyframes: {
-                        float: {
-                            "0%, 100%": { transform: "translateY(0px)" },
-                            "50%": { transform: "translateY(-10px)" }
-                        },
-                        fadeUp: {
-                            "0%": { opacity: "0", transform: "translateY(14px)" },
-                            "100%": { opacity: "1", transform: "translateY(0)" }
-                        }
-                    }
-                }
-            }
-        };
-    </script>
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <style>
         :root {
             --bg: #020617;

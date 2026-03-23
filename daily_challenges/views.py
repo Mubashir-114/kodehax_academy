@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from adminpanel.decorators import admin_required
+from kodehax_academy.mobile import render_for_device
 
 from .forms import QuestionTemplateCSVImportForm, QuestionTemplateForm
 from .models import DailyChallenge, DailyChallengeSession, QuestionTemplate, StudentPoints
@@ -26,6 +27,13 @@ from .services import (
 )
 
 User = get_user_model()
+
+def _format_remaining_time(seconds):
+    total = max(int(seconds), 0)
+    hours = total // 3600
+    minutes = (total % 3600) // 60
+    secs = total % 60
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
 
 
 def _ensure_student(request):
@@ -138,6 +146,7 @@ def today_challenges(request):
         .get()
     )
     remaining_time = max(challenge_set.expires_at - timezone.now(), timedelta(0))
+    remaining_time_seconds = int(remaining_time.total_seconds())
 
     points, _ = StudentPoints.objects.get_or_create(student=request.user)
     current_session = DailyChallengeSession.objects.filter(
@@ -145,12 +154,14 @@ def today_challenges(request):
         date=challenge_set.date,
     ).first()
 
-    return render(
+    return render_for_device(
         request,
         "daily_challenges/today.html",
         {
             "challenge_set": challenge_set,
             "remaining_time": remaining_time,
+            "remaining_time_seconds": remaining_time_seconds,
+            "remaining_time_label": _format_remaining_time(remaining_time_seconds),
             "challenge_groups": _challenge_groups(challenge_set),
             "level_unlocks": level_unlock_state(challenge_set),
             "student_points": points,
@@ -230,16 +241,19 @@ def submit_solution(request, challenge_id):
     refresh_challenge_set(challenge.challenge_set)
     challenge.challenge_set.refresh_from_db()
     remaining_time = max(challenge.challenge_set.expires_at - timezone.now(), timedelta(0))
+    remaining_time_seconds = int(remaining_time.total_seconds())
     previous_challenge, next_challenge = _workspace_navigation(challenge.challenge_set, challenge)
     unlocks = level_unlock_state(challenge.challenge_set)
 
-    return render(
+    return render_for_device(
         request,
         "daily_challenges/workspace.html",
         {
             "challenge": challenge,
             "challenge_set": challenge.challenge_set,
             "remaining_time": remaining_time,
+            "remaining_time_seconds": remaining_time_seconds,
+            "remaining_time_label": _format_remaining_time(remaining_time_seconds),
             "preview_payload": preview_payload,
             "submission_payload": submission_payload,
             "editor_code": editor_code,
