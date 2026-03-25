@@ -23,80 +23,74 @@
         </div>
       </div>
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <a href="{% url 'daily_challenges_today' %}" class="btn-primary inline-flex h-12 items-center justify-center px-4 text-sm">Open Challenges</a>
-        <a href="{% url 'view_assignments' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4 text-sm">Open Assignment</a>
+        <a href="{% url 'daily_challenges_today' %}" class="btn-primary inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm text-center">Open Challenges</a>
+        <a href="{% url 'view_assignments' %}" class="btn-muted inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm text-center">Open Assignment</a>
       </div>
     </div>
   </section>
 
-  <section class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-    <article class="glass-card hover-lift p-5 reveal delay-1">
+  <section class="flex gap-4 overflow-x-auto pb-1 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible lg:grid-cols-4">
+    <article class="glass-card hover-lift p-5 reveal delay-1 shrink-0 md:shrink" style="min-width:220px;">
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Global Points</p>
       <p class="mt-2 text-2xl font-black text-teal-200">{{ student_points.total_points }}</p>
       <p class="mt-2 text-xs text-slate-400">Spendable: {{ student_points.points_remaining }}</p>
     </article>
-    <article class="glass-card hover-lift p-5 reveal delay-2">
+    <article class="glass-card hover-lift p-5 reveal delay-2 shrink-0 md:shrink" style="min-width:220px;">
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Today's Challenge Status</p>
       <p class="mt-2 text-2xl font-black text-white">{{ current_session.questions_solved|default:0 }} / {{ total_daily_count }}</p>
       <p class="mt-2 text-xs text-slate-400">Points earned today: {{ current_session.points_earned|default:0 }}</p>
     </article>
-    <article class="glass-card hover-lift p-5 reveal delay-3">
+    <article class="glass-card hover-lift p-5 reveal delay-3 shrink-0 md:shrink" style="min-width:220px;">
       <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Completed Challenges</p>
       <p class="mt-2 text-2xl font-black text-cyan-200">{{ solved_daily_count }}</p>
       <p class="mt-2 text-xs text-slate-400">Easy {{ daily_challenge_set.easy_solved_count }} &bull; Medium {{ daily_challenge_set.medium_solved_count }} &bull; Hard {{ daily_challenge_set.hard_solved_count }}</p>
     </article>
-    <article class="glass-card hover-lift p-5 reveal delay-2">
-      <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Leaderboard Rank</p>
-      <p class="mt-2 text-2xl font-black text-amber-200">View</p>
-      <p class="mt-2 text-xs text-slate-400">Open the leaderboard for your placement and recent performance.</p>
-    </article>
   </section>
 
-  <section class="grid grid-cols-1 gap-6 xl:grid-cols-[1.3fr_0.7fr]">
-    <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-2">
-      <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">Daily Coding Challenge</p>
-          <h3 class="mt-2 text-2xl font-black text-white">{{ solved_daily_count }} / {{ total_daily_count }} solved</h3>
-          <p class="mt-2 text-sm text-slate-300">Your daily set includes easy, medium, and hard coding tasks for the next 24 hours.</p>
+  <section class="space-y-6">
+      <section class="hidden lg:block glass-card hover-lift p-4 sm:p-6 reveal delay-2">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300/80">Daily Coding Challenge</p>
+            <h3 class="mt-2 text-2xl font-black text-white">{{ solved_daily_count }} / {{ total_daily_count }} solved</h3>
+            <p class="mt-2 text-sm text-slate-300">Your daily set includes easy, medium, and hard coding tasks for the next 24 hours.</p>
+          </div>
+          <a href="{% url 'daily_challenges_today' %}" class="btn-primary w-full px-4 py-2 text-center text-sm sm:w-auto">Open Daily Challenges</a>
         </div>
-        <a href="{% url 'daily_challenges_today' %}" class="btn-primary w-full px-4 py-2 text-center text-sm sm:w-auto">Open Daily Challenges</a>
-      </div>
 
-      <div class="mt-5 h-3 rounded-full bg-slate-900/70">
-        <div class="h-3 rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-teal-300" style="width: {% if total_daily_count %}{% widthratio solved_daily_count total_daily_count 100 %}{% else %}0{% endif %}%;"></div>
-      </div>
+        <div class="mt-5 h-3 rounded-full bg-slate-900/70">
+          <div class="h-3 rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-teal-300" style="width: {% if total_daily_count %}{% widthratio solved_daily_count total_daily_count 100 %}{% else %}0{% endif %}%;"></div>
+        </div>
 
-      <div class="mt-4 flex flex-wrap gap-3 text-xs text-slate-400">
-        <span class="rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1">{{ total_daily_count }} total tasks</span>
-        <span class="rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1">Today's score: {{ student_points.daily_points }}</span>
-        <span class="rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1">Deducted today: {{ current_session.points_deducted|default:0 }}</span>
-      </div>
+        <div class="mt-4 flex flex-wrap gap-3 text-xs text-slate-400">
+          <span class="rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1">{{ total_daily_count }} total tasks</span>
+          <span class="rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1">Today's score: {{ student_points.daily_points }}</span>
+          <span class="rounded-full border border-slate-700 bg-slate-900/40 px-3 py-1">Deducted today: {{ current_session.points_deducted|default:0 }}</span>
+        </div>
 
-      <div class="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-3">
-        {% for challenge in daily_challenge_set.challenges.all|slice:":3" %}
-        <article class="rounded-2xl border border-slate-700 bg-slate-950/35 p-4">
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              <p class="text-xs uppercase tracking-[0.16em] text-slate-500">{{ challenge.problem.topic|title }} &bull; {{ challenge.problem.get_difficulty_display }}</p>
-              <h4 class="mt-2 font-semibold text-white">{{ challenge.problem.title }}</h4>
+        <div class="mt-5 grid grid-cols-1 gap-4 xl:grid-cols-3">
+          {% for challenge in daily_challenge_set.challenges.all|slice:":3" %}
+          <article class="rounded-2xl border border-slate-700 bg-slate-950/35 p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <p class="text-xs uppercase tracking-[0.16em] text-slate-500">{{ challenge.problem.topic|title }} &bull; {{ challenge.problem.get_difficulty_display }}</p>
+                <h4 class="mt-2 font-semibold text-white">{{ challenge.problem.title }}</h4>
+              </div>
+              <span class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] {% if challenge.status == 'solved' %}bg-emerald-400/10 text-emerald-200{% elif challenge.status == 'failed' %}bg-rose-400/10 text-rose-200{% else %}bg-amber-400/10 text-amber-100{% endif %}">
+                {{ challenge.status }}
+              </span>
             </div>
-            <span class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] {% if challenge.status == 'solved' %}bg-emerald-400/10 text-emerald-200{% elif challenge.status == 'failed' %}bg-rose-400/10 text-rose-200{% else %}bg-amber-400/10 text-amber-100{% endif %}">
-              {{ challenge.status }}
-            </span>
-          </div>
-          <p class="mt-3 text-sm text-slate-400">Attempts: {{ challenge.attempts }} / 3</p>
-          <div class="mt-4">
-            <a href="{% url 'daily_challenge_workspace' challenge.id %}" class="btn-muted inline-flex w-full items-center justify-center px-4 py-2 text-sm">
-              {% if challenge.status == 'pending' %}Solve{% else %}View{% endif %}
-            </a>
-          </div>
-        </article>
-        {% endfor %}
-      </div>
-    </section>
+            <p class="mt-3 text-sm text-slate-400">Attempts: {{ challenge.attempts }} / 3</p>
+            <div class="mt-4">
+              <a href="{% url 'daily_challenge_workspace' challenge.id %}" class="btn-muted inline-flex w-full items-center justify-center px-4 py-2 text-sm">
+                {% if challenge.status == 'pending' %}Solve{% else %}View{% endif %}
+              </a>
+            </div>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
 
-    <div class="space-y-6">
       <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-2">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -139,15 +133,14 @@
         </div>
       </section>
 
-      <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-3">
+      <section class="hidden md:block glass-card hover-lift p-4 sm:p-6 reveal delay-3">
         <h3 class="text-xl font-bold text-white">Quick Actions</h3>
-        <div class="mt-4 grid grid-cols-1 gap-3">
-          <a href="{% url 'view_assignments' %}" class="btn-primary inline-flex h-12 items-center justify-center px-4 text-sm">Go to Assignments</a>
-          <a href="{% url 'student_performance_dashboard' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4 text-sm">Open Leaderboard</a>
-          <a href="{% url 'student_profile' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4 text-sm">View Profile</a>
+        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <a href="{% url 'view_assignments' %}" class="btn-primary w-full text-sm">Go to Assignments</a>
+          <a href="{% url 'student_performance_dashboard' %}" class="btn-muted w-full text-sm">Open Leaderboard</a>
+          <a href="{% url 'student_profile' %}" class="btn-muted w-full text-sm sm:col-span-2">View Profile</a>
         </div>
       </section>
-    </div>
   </section>
 
   <section class="grid grid-cols-1 gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -162,7 +155,7 @@
           placeholder="Enter class code"
           class="w-full rounded-xl border border-slate-600 bg-slate-900/60 px-4 py-3 text-slate-200 focus:border-teal-400 focus:outline-none focus:ring-4 focus:ring-teal-500/25"
         />
-        <button type="submit" class="btn-primary h-12 w-full px-4 text-sm md:w-auto">Join</button>
+        <button type="submit" class="btn-primary w-full text-sm md:w-auto">Join</button>
       </form>
     </section>
 

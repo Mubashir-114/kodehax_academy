@@ -51,6 +51,14 @@
         color: #03111f;
         border-radius: 0.875rem;
         font-weight: 700;
+        min-height: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 1rem;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
         transition: 180ms ease;
         box-shadow: 0 12px 24px rgba(20, 184, 166, 0.22);
       }
@@ -66,6 +74,14 @@
         color: var(--text);
         border-radius: 0.875rem;
         font-weight: 600;
+        min-height: 2.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 1rem;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
         transition: 180ms ease;
       }
 
@@ -99,6 +115,55 @@
         color: #ffffff;
         background: rgba(20, 184, 166, 0.16);
         box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.34);
+      }
+
+      .mobile-tab {
+        min-width: 0;
+      }
+
+      .mobile-tab span {
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: center;
+        line-height: 1.1;
+      }
+
+      .mobile-action-btn {
+        min-height: 2.75rem;
+        padding-inline: 0.85rem;
+        text-align: center;
+        line-height: 1;
+      }
+
+      .mobile-action-btn-full {
+        width: 100%;
+      }
+
+      @media (max-width: 380px) {
+        .mobile-top-action-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .mobile-action-btn {
+          min-height: 2.625rem;
+          font-size: 0.8125rem;
+        }
+
+        .mobile-tab {
+          min-height: 3.1rem;
+          gap: 0.2rem;
+          padding: 0.35rem 0.15rem;
+          border-radius: 0.9rem;
+        }
+
+        .mobile-tab span {
+          font-size: 10px;
+          line-height: 1.1;
+          text-align: center;
+        }
       }
 
       .mobile-drawer-overlay {
@@ -249,7 +314,7 @@
                     aria-label="Close menu"
                 ></button>
                 <aside class="mobile-drawer absolute right-0 top-0 h-full w-[min(88vw,360px)] border-l border-slate-800 bg-slate-950/95 p-4 shadow-[0_20px_45px_rgba(2,6,23,0.45)]">
-                    <div class="mb-4 flex items-center justify-between">
+                    <div class="mb-4 flex items-center justify-between gap-3">
                         <p class="text-sm font-semibold text-white">Workspace Menu</p>
                         <button
                             type="button"
@@ -266,17 +331,17 @@
                             <p class="mt-1 break-all text-xs text-slate-400">{{ request.user.email }}</p>
                         </div>
                         <div class="grid grid-cols-1 gap-2 text-sm">
-                            <a href="{% url 'skill_assessment_profile' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4">Skill Profile</a>
-                            <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4">AI Assistant</a>
+                            <a href="{% url 'skill_assessment_profile' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4 mobile-action-btn mobile-action-btn-full">Skill Profile</a>
+                            <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4 mobile-action-btn mobile-action-btn-full">AI Assistant</a>
                             {% block mobile_workspace_sidebar %}{% endblock %}
-                            <a href="{% url 'logout' %}" class="inline-flex h-12 items-center justify-center rounded-2xl bg-rose-600/90 px-4 font-semibold text-white">Logout</a>
+                            <a href="{% url 'logout' %}" class="inline-flex h-12 items-center justify-center rounded-2xl bg-rose-600/90 px-4 font-semibold text-white mobile-action-btn mobile-action-btn-full">Logout</a>
                         </div>
                     </div>
                 </aside>
             </div>
-            <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
-                <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-11 items-center justify-center px-4">AI Assistant</a>
-                <a href="{% url 'student_profile' %}" class="btn-primary inline-flex h-11 items-center justify-center px-4">Profile</a>
+            <div class="mobile-top-action-grid mt-4 grid grid-cols-2 gap-2 text-sm">
+                <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-11 items-center justify-center px-4 mobile-action-btn mobile-action-btn-full">AI Assistant</a>
+                <a href="{% url 'student_profile' %}" class="btn-primary inline-flex h-11 items-center justify-center px-4 mobile-action-btn mobile-action-btn-full">Profile</a>
             </div>
             <div class="mt-3 rounded-2xl border border-slate-800 bg-slate-900/55 px-4 py-2 text-xs text-slate-400">
                 {% module_breadcrumbs "student" %}
@@ -321,22 +386,22 @@
 </div>
 
 <nav class="fixed inset-x-3 bottom-3 z-40 rounded-[1.35rem] border border-slate-700/80 bg-slate-950/92 p-2 shadow-[0_20px_45px_rgba(2,6,23,0.45)] backdrop-blur lg:hidden">
-    <div class="grid grid-cols-5 gap-1 text-[11px]">
+    <div class="grid grid-cols-5 gap-1 text-[9px] sm:text-[10px]">
         <a href="{% url 'student_dashboard' %}" class="mobile-tab {% if '/student/dashboard/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V20h14v-9.5"/></svg>
             <span>Dashboard</span>
         </a>
         <a href="{% url 'daily_challenges_today' %}" class="mobile-tab {% if '/daily-challenges/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M7 21h10"/></svg>
-            <span>Challenges</span>
+            <span>Challenge</span>
         </a>
         <a href="{% url 'view_assignments' %}" class="mobile-tab {% if '/student/assignments/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h8"/><path d="M8 17h5"/></svg>
-            <span>Assignment</span>
+            <span>Assign</span>
         </a>
         <a href="{% url 'student_performance_dashboard' %}" class="mobile-tab {% if '/student/performance/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16"/><path d="M7 16v-5"/><path d="M12 16V8"/><path d="M17 16v-9"/></svg>
-            <span>Leaderboard</span>
+            <span>Progress</span>
         </a>
         <a href="{% url 'student_profile' %}" class="mobile-tab {% if '/student/profile/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>

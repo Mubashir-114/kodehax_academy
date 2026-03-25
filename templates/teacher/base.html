@@ -114,6 +114,34 @@
       box-shadow: inset 0 0 0 1px rgba(129, 140, 248, 0.34);
     }
 
+    .mobile-action-btn {
+      width: 100%;
+      min-height: 2.75rem;
+      padding-inline: 0.85rem;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    @media (max-width: 380px) {
+      .mobile-action-btn {
+        min-height: 2.625rem;
+        font-size: 0.8125rem;
+      }
+
+      .mobile-tab {
+        min-height: 3.1rem;
+        gap: 0.2rem;
+        padding: 0.35rem 0.15rem;
+        border-radius: 0.9rem;
+      }
+
+      .mobile-tab span {
+        font-size: 10px;
+        line-height: 1.1;
+        text-align: center;
+      }
+    }
+
     .nav-link-disabled {
       opacity: 0.55;
       cursor: not-allowed;
@@ -318,7 +346,7 @@
         </div>
         <button
           type="button"
-          class="inline-flex h-11 items-center justify-center rounded-2xl border border-slate-700 px-4 text-sm font-semibold text-slate-100"
+          class="inline-flex h-11 items-center justify-center rounded-2xl border border-slate-700 px-4 text-sm font-semibold text-slate-100 mobile-action-btn"
           data-mobile-nav-toggle="teacher-mobile-menu"
           aria-controls="teacher-mobile-menu"
           aria-expanded="false"
@@ -333,10 +361,10 @@
           <p class="mt-1 text-xs text-slate-400">Create classes and track student outcomes.</p>
         </div>
         <div class="grid grid-cols-1 gap-2 text-sm">
-          <a href="{% url 'create_class' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4">Create Class</a>
-          <a href="{% url 'teacher_profile' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4">Profile</a>
-          <a href="{% url 'ai_tools' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4">AI Tools</a>
-          <a href="{% url 'logout' %}" class="inline-flex min-h-11 items-center justify-center rounded-2xl bg-rose-600/90 px-4 font-semibold text-white">Logout</a>
+          <a href="{% url 'create_class' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 mobile-action-btn">Create Class</a>
+          <a href="{% url 'teacher_profile' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 mobile-action-btn">Profile</a>
+          <a href="{% url 'ai_tools' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 mobile-action-btn">AI Tools</a>
+          <a href="{% url 'logout' %}" class="inline-flex min-h-11 items-center justify-center rounded-2xl bg-rose-600/90 px-4 font-semibold text-white mobile-action-btn">Logout</a>
         </div>
       </div>
     </header>
@@ -379,7 +407,7 @@
 </div>
 
 <nav class="fixed inset-x-3 bottom-3 z-40 rounded-[1.35rem] border border-slate-700/80 bg-slate-950/92 p-2 shadow-[0_20px_45px_rgba(2,6,23,0.45)] backdrop-blur lg:hidden">
-  <div class="grid grid-cols-4 gap-1 text-[11px]">
+  <div class="grid grid-cols-4 gap-1 text-[10px]">
     <a href="{% url 'teacher_dashboard' %}" class="mobile-tab {% if '/teacher/dashboard/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V20h14v-9.5"/></svg>
       <span>Dashboard</span>
