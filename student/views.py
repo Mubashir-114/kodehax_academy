@@ -575,7 +575,7 @@ def chat_page(request):
     cleanup_expired_sessions(delete=False)
     return render_for_device(request, 'student/chat.html', {
         "memory_settings": get_memory_settings(),
-    }, mobile_template_name="mobile/student/notifications.html")
+    })
 
 
 @login_required

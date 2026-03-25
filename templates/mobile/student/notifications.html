@@ -1,25 +1,224 @@
 {% extends "mobile/base.html" %}
-{% block title %}Notifications | Kodehax Academy{% endblock %}
+{% block title %}Performance | Kodehax Academy{% endblock %}
+{% block extra_head %}
+<style>
+    body.performance-page {
+        background:
+            radial-gradient(circle at 8% -5%, rgba(20, 184, 166, 0.14), transparent 26%),
+            radial-gradient(circle at 92% 0%, rgba(34, 211, 238, 0.1), transparent 22%),
+            linear-gradient(180deg, #020617 0%, #081120 100%);
+        color: #e2e8f0;
+    }
+    .perf-hero,
+    .perf-panel {
+        border-radius: 1.25rem;
+        border: 1px solid rgba(51, 65, 85, 0.72);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.9));
+        box-shadow: 0 16px 30px rgba(2, 6, 23, 0.3);
+    }
+    .perf-chip {
+        border-radius: 999px;
+        border: 1px solid rgba(45, 212, 191, 0.2);
+        background: rgba(20, 184, 166, 0.12);
+        color: #99f6e4;
+    }
+    .perf-mini-card {
+        border-radius: 1rem;
+        border: 1px solid rgba(51, 65, 85, 0.72);
+        background: rgba(2, 6, 23, 0.4);
+    }
+    .perf-bar {
+        height: 0.55rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        overflow: hidden;
+    }
+    .perf-bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #14b8a6 0%, #22d3ee 100%);
+    }
+    .perf-insight-good {
+        border-color: rgba(16, 185, 129, 0.28);
+        background: rgba(6, 78, 59, 0.18);
+    }
+    .perf-insight-warn {
+        border-color: rgba(245, 158, 11, 0.28);
+        background: rgba(120, 53, 15, 0.18);
+    }
+    .perf-insight-cool {
+        border-color: rgba(56, 189, 248, 0.28);
+        background: rgba(8, 47, 73, 0.22);
+    }
+</style>
+{% endblock %}
 {% block content %}
-<header class="mb-4">
-    <h1 class="text-2xl font-semibold">Notifications</h1>
-    <p class="text-sm text-slate-500">Due tasks and recent results.</p>
+<header class="perf-hero mb-4 p-5 reveal-1">
+    <p class="text-[11px] uppercase tracking-[0.18em] text-cyan-300/80">Student Hub</p>
+    <div class="mt-2 flex items-start justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-white">Performance</h1>
+            <p class="mt-1 text-sm text-slate-300">A mobile-friendly breakdown of how you are doing.</p>
+        </div>
+        <span class="perf-chip px-3 py-1 text-xs font-semibold">Live</span>
+    </div>
 </header>
 
-<section class="space-y-3">
-    {% for item in notifications %}
-        <article class="card p-4 reveal-1">
-            <p class="text-base font-semibold">{{ item.title }}</p>
-            <p class="mt-1 text-sm text-slate-600">{{ item.body }}</p>
-            <div class="mt-2 flex items-center justify-between">
-                <span class="text-xs text-slate-500">{{ item.time|date:"M d, h:i A" }}</span>
-                {% if item.url %}
-                    <a href="{{ item.url }}" class="text-sm font-semibold text-teal-700">Open</a>
-                {% endif %}
-            </div>
-        </article>
-    {% empty %}
-        <article class="card p-5 text-sm text-slate-500">No updates right now.</article>
-    {% endfor %}
+<section class="grid grid-cols-2 gap-3 mb-4">
+    <article class="perf-mini-card p-4 reveal-2">
+        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Average Score</p>
+        <p class="mt-2 text-2xl font-black text-teal-200">{{ summary.average_score }}</p>
+    </article>
+    <article class="perf-mini-card p-4 reveal-2">
+        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Completed</p>
+        <p class="mt-2 text-2xl font-black text-white">{{ summary.assignments_completed }} / {{ summary.total_assignments }}</p>
+    </article>
+    <article class="perf-mini-card p-4 reveal-3">
+        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Submission Rate</p>
+        <p class="mt-2 text-2xl font-black text-white">{{ summary.submission_rate }}%</p>
+    </article>
+    <article class="perf-mini-card p-4 reveal-3">
+        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">On-Time Rate</p>
+        <p class="mt-2 text-2xl font-black text-white">{{ summary.on_time_submission_rate }}%</p>
+    </article>
 </section>
+
+<section class="perf-panel mb-4 p-4 reveal-2">
+    <div class="flex items-center justify-between gap-3">
+        <h2 class="text-base font-semibold text-white">Performance Pulse</h2>
+        <span class="text-xs text-slate-500">Mobile view</span>
+    </div>
+    <div class="mt-4 space-y-4">
+        <div>
+            <div class="mb-2 flex items-center justify-between text-sm">
+                <span class="text-slate-300">Score strength</span>
+                <span class="text-cyan-200">{{ summary.average_score }}%</span>
+            </div>
+            <div class="perf-bar"><span style="width: {{ summary.average_score|default:0 }}%"></span></div>
+        </div>
+        <div>
+            <div class="mb-2 flex items-center justify-between text-sm">
+                <span class="text-slate-300">Submission consistency</span>
+                <span class="text-cyan-200">{{ summary.submission_rate }}%</span>
+            </div>
+            <div class="perf-bar"><span style="width: {{ summary.submission_rate|default:0 }}%"></span></div>
+        </div>
+        <div>
+            <div class="mb-2 flex items-center justify-between text-sm">
+                <span class="text-slate-300">Deadline discipline</span>
+                <span class="text-cyan-200">{{ summary.on_time_submission_rate }}%</span>
+            </div>
+            <div class="perf-bar"><span style="width: {{ summary.on_time_submission_rate|default:0 }}%"></span></div>
+        </div>
+    </div>
+</section>
+
+<section class="grid grid-cols-1 gap-3 mb-4">
+    <article class="perf-mini-card perf-insight-good p-4 reveal-2">
+        <p class="text-[11px] uppercase tracking-[0.16em] text-emerald-200/80">Strength</p>
+        <p class="mt-2 text-sm text-slate-100">
+            {% if summary.average_score >= 80 %}
+                Strong scoring rhythm. Your results suggest solid understanding across recent work.
+            {% elif summary.on_time_submission_rate >= 80 %}
+                Strong deadline discipline. You are staying reliable with submissions.
+            {% else %}
+                You have a base to build on. The best next win is making your strong days more consistent.
+            {% endif %}
+        </p>
+    </article>
+    <article class="perf-mini-card perf-insight-warn p-4 reveal-3">
+        <p class="text-[11px] uppercase tracking-[0.16em] text-amber-200/80">Focus Area</p>
+        <p class="mt-2 text-sm text-slate-100">
+            {% if summary.average_score < 60 %}
+                Focus on accuracy first. Slow down on tricky assignments and review mistakes before the next attempt.
+            {% elif summary.on_time_submission_rate < 70 %}
+                Focus on timing. Submitting a little earlier will improve both momentum and confidence.
+            {% else %}
+                Focus on raising consistency so strong scores happen more often, not just occasionally.
+            {% endif %}
+        </p>
+    </article>
+    <article class="perf-mini-card perf-insight-cool p-4 reveal-3">
+        <p class="text-[11px] uppercase tracking-[0.16em] text-sky-200/80">Next Move</p>
+        <p class="mt-2 text-sm text-slate-100">
+            {% if notifications %}
+                Prioritize the next due task to keep momentum high and avoid last-minute score drops.
+            {% else %}
+                Review your latest scored work and repeat one weak pattern while it is still fresh.
+            {% endif %}
+        </p>
+    </article>
+</section>
+
+<section class="perf-panel mb-4 p-4 reveal-3">
+    <div class="flex items-center justify-between gap-3">
+        <h2 class="text-base font-semibold text-white">Recent Results</h2>
+        <span class="text-xs text-slate-500">{{ records|length }} items</span>
+    </div>
+    <div class="mt-4 space-y-3">
+        {% for record in records|slice:":5" %}
+            <article class="perf-mini-card p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="truncate text-sm font-semibold text-slate-100">{{ record.assignment_title }}</p>
+                        <p class="mt-1 text-xs text-slate-500">{{ record.assignment_type|title }}{% if record.classroom %} • {{ record.classroom.name }}{% endif %}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-black text-cyan-200">
+                            {% if record.score != None %}{{ record.score }}{% else %}-{% endif %}
+                        </p>
+                        <p class="text-[11px] text-slate-500">/ {{ record.max_score|default:"-" }}</p>
+                    </div>
+                </div>
+                <div class="mt-3 flex items-center justify-between text-xs">
+                    <span class="{% if record.was_on_time %}text-emerald-200{% else %}text-amber-200{% endif %}">
+                        {% if record.was_on_time %}On Time{% else %}Late{% endif %}
+                    </span>
+                    <span class="text-slate-500">{{ record.submitted_at|date:"M d, h:i A"|default:"-" }}</span>
+                </div>
+            </article>
+        {% empty %}
+            <article class="perf-mini-card p-5 text-sm text-slate-400">No performance records yet.</article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="perf-panel p-4 reveal-3">
+    <div class="flex items-center justify-between gap-3">
+        <h2 class="text-base font-semibold text-white">Priority Queue</h2>
+        <span class="text-xs text-slate-500">{{ notifications|length }} updates</span>
+    </div>
+    <div class="mt-4 space-y-3">
+        {% for item in notifications|slice:":6" %}
+            <article class="perf-mini-card p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-sm font-semibold text-slate-100">{{ item.title }}</p>
+                        <p class="mt-1 text-sm text-slate-400">{{ item.body }}</p>
+                    </div>
+                    <span class="rounded-full px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] {% if item.kind == 'due' %}bg-amber-400/10 text-amber-100{% else %}bg-emerald-400/10 text-emerald-200{% endif %}">
+                        {{ item.kind }}
+                    </span>
+                </div>
+                <div class="mt-3 flex items-center justify-between gap-3">
+                    <p class="text-xs text-slate-500">{{ item.time|date:"M d, h:i A" }}</p>
+                    {% if item.url %}
+                        <a href="{{ item.url }}" class="btn-primary inline-flex h-10 items-center justify-center px-4 text-xs">Open</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% empty %}
+            <article class="perf-mini-card p-5 text-sm text-slate-400">No updates right now.</article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        document.body.classList.add("performance-page");
+    })();
+</script>
 {% endblock %}

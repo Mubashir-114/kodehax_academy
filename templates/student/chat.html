@@ -25,6 +25,7 @@
         <div class="chat-session-meta">
             <p class="chat-session-label">Current Session</p>
             <h3 id="active-session-title" class="chat-session-title">New Chat</h3>
+            <span class="chat-mobile-status">Online • Fast AI</span>
         </div>
         <div class="chat-session-actions">
             <button type="button" class="session-action-btn" onclick="renameActiveSession()">Rename</button>
@@ -40,7 +41,19 @@
     </div>
 
     <div id="chat-box" class="chat-shell">
-        <div class="placeholder" id="placeholder">Ask me anything about your course.</div>
+        <div class="placeholder" id="placeholder">
+            <div class="mobile-empty-state">
+                <div class="mobile-empty-avatar">AI</div>
+                <h3>Ask me anything about your course</h3>
+                <p>Get explanations, quizzes, summaries, and quick doubt support.</p>
+                <div class="mobile-suggestion-row">
+                    <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('Explain binary search in simple words')">Explain Topic</button>
+                    <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('Generate a quiz on Python loops')">Generate Quiz</button>
+                    <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('Summarize recursion for revision')">Summarize</button>
+                    <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('I have a doubt in linked list insertion')">Ask Doubt</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="image-preview-row" class="image-preview-row hidden"></div>
@@ -49,7 +62,7 @@
         <input id="image-input" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" class="hidden" />
         <button type="button" class="upload-btn" onclick="document.getElementById('image-input').click()" title="Upload image">Attach</button>
         <input id="user-input" type="text" placeholder="Type your question and press Enter..." onkeydown="if(event.key==='Enter') sendMessage()" />
-        <button onclick="sendMessage()" id="send-btn" class="send-btn">Send</button>
+        <button onclick="sendMessage()" id="send-btn" class="send-btn" disabled>Send</button>
     </div>
 </div>
 </div>
@@ -91,6 +104,18 @@
     margin: 0.2rem 0 0;
     color: #f8fafc;
     font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .chat-mobile-status {
+    display: inline-flex;
+    margin-top: 0.38rem;
+    border: 1px solid rgba(45, 212, 191, 0.18);
+    background: rgba(20, 184, 166, 0.08);
+    color: #99f6e4;
+    border-radius: 999px;
+    padding: 0.22rem 0.55rem;
+    font-size: 0.68rem;
     font-weight: 700;
   }
 
@@ -247,6 +272,65 @@
     color: var(--chat-muted);
     margin-top: 2.4rem;
     font-size: 0.92rem;
+  }
+
+  .mobile-empty-state {
+    border-radius: 1.4rem;
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(2, 6, 23, 0.88));
+    box-shadow: 0 18px 34px rgba(2, 6, 23, 0.28);
+    padding: 1.1rem;
+  }
+
+  .mobile-empty-avatar {
+    width: 3.4rem;
+    height: 3.4rem;
+    margin: 0 auto 0.85rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.22), rgba(34, 211, 238, 0.16));
+    border: 1px solid rgba(45, 212, 191, 0.24);
+    color: #99f6e4;
+    font-size: 1.25rem;
+    font-weight: 800;
+  }
+
+  .mobile-empty-state h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #f8fafc;
+  }
+
+  .mobile-empty-state p {
+    margin: 0.45rem 0 0;
+    color: #94a3b8;
+    line-height: 1.55;
+  }
+
+  .mobile-suggestion-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+    justify-content: center;
+    margin-top: 0.95rem;
+  }
+
+  .mobile-suggestion-btn {
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    background: rgba(255, 255, 255, 0.05);
+    color: #dbeafe;
+    border-radius: 999px;
+    padding: 0.48rem 0.8rem;
+    font-size: 0.78rem;
+    transition: 180ms ease;
+  }
+
+  .mobile-suggestion-btn:hover {
+    border-color: rgba(45, 212, 191, 0.55);
+    color: #f8fafc;
   }
 
   .chat-bubble {
@@ -742,38 +826,154 @@
 
   @media (max-width: 767px) {
     .chat-page-layout {
-      min-height: auto;
+      min-height: calc(100vh - 10rem);
     }
 
     .chat-card {
-      min-height: calc(100vh - 15rem);
+      min-height: calc(100vh - 10.5rem);
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      padding: 0 !important;
     }
 
     .chat-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
       flex-direction: column;
       align-items: flex-start;
+      gap: 0.7rem;
+      margin: -0.15rem 0 0.7rem;
+      padding: 0.9rem 0 0.75rem;
+      background: linear-gradient(180deg, rgba(2, 6, 23, 0.94), rgba(2, 6, 23, 0.8));
+      backdrop-filter: blur(14px);
     }
 
-    .chat-input-row {
-      flex-direction: column;
-    }
-
-    .chat-input-row input,
-    .send-btn,
-    .upload-btn {
-      min-height: 2.75rem;
+    .chat-session-actions {
       width: 100%;
+      overflow-x: auto;
+      flex-wrap: nowrap;
+      scrollbar-width: none;
     }
 
-    .chat-shell {
-      min-height: 20rem;
-      padding-bottom: 1rem;
+    .chat-session-actions::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mode-row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      margin-bottom: 0.95rem;
+      padding-bottom: 0.15rem;
+      scrollbar-width: none;
+    }
+
+    .mode-row::-webkit-scrollbar {
+      display: none;
     }
 
     .mode-btn {
-      min-height: 2.75rem;
-      flex: 1 1 calc(50% - 0.5rem);
+      min-height: 0;
+      flex: 0 0 auto;
       text-align: center;
+      white-space: nowrap;
+      padding-inline: 0.9rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .chat-shell {
+      min-height: calc(100vh - 24rem);
+      padding: 0.35rem 0 10.75rem;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      margin-bottom: 0;
+    }
+
+    .chat-bubble {
+      max-width: 88%;
+      padding: 0.82rem 0.92rem;
+      border-radius: 1.2rem;
+    }
+
+    .user-bubble {
+      border-radius: 1.2rem 1.2rem 0.35rem 1.2rem;
+    }
+
+    .assistant-bubble {
+      border-radius: 1.2rem 1.2rem 1.2rem 0.35rem;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .image-preview-row {
+      margin: 0 0 0.7rem;
+    }
+
+    .chat-input-row {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(5.9rem + env(safe-area-inset-bottom));
+      width: min(calc(100% - 2rem), 448px);
+      z-index: 35;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(18px);
+      border-radius: 999px;
+      padding: 0.45rem 0.45rem 0.45rem 0.8rem;
+      box-shadow: 0 20px 38px rgba(2, 6, 23, 0.34);
+    }
+
+    .chat-input-row input {
+      min-height: 2.75rem;
+      width: auto;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .chat-input-row input:focus {
+      box-shadow: none;
+    }
+
+    .send-btn,
+    .upload-btn {
+      min-height: 2.75rem;
+      width: 2.75rem;
+      flex: 0 0 2.75rem;
+      padding: 0;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-btn {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.08);
+    }
+
+    .send-btn {
+      font-size: 0;
+      position: relative;
+    }
+
+    .send-btn::before {
+      content: "➤";
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+
+    .placeholder {
+      margin-top: 1.2rem;
     }
 
     .image-preview-card {
@@ -817,6 +1017,34 @@
     }
   };
 
+  function mobilePlaceholderHtml(message) {
+    if (window.innerWidth > 767) {
+      return `<div class="placeholder" id="placeholder">${message}</div>`;
+    }
+    return `
+      <div class="placeholder" id="placeholder">
+        <div class="mobile-empty-state">
+          <div class="mobile-empty-avatar">AI</div>
+          <h3>${escapeHtml(message)}</h3>
+          <p>Get explanations, quizzes, summaries, and quick doubt support.</p>
+          <div class="mobile-suggestion-row">
+            <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('Explain binary search in simple words')">Explain Topic</button>
+            <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('Generate a quiz on Python loops')">Generate Quiz</button>
+            <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('Summarize recursion for revision')">Summarize</button>
+            <button type="button" class="mobile-suggestion-btn" onclick="applyFollowUp('I have a doubt in linked list insertion')">Ask Doubt</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function syncSendButton() {
+    const input = document.getElementById("user-input");
+    const sendBtn = document.getElementById("send-btn");
+    if (!input || !sendBtn) return;
+    sendBtn.disabled = !input.value.trim() && !pendingImageFile;
+  }
+
   function setMode(mode) {
     currentMode = mode;
     const config = modeCopy[mode] || modeCopy.tutor;
@@ -825,9 +1053,9 @@
     document.querySelectorAll(".mode-btn").forEach(btn => btn.classList.remove("active-mode"));
     document.getElementById("btn-" + mode).classList.add("active-mode");
     if (!activeSessionId && !document.querySelector("#chat-box .chat-bubble")) {
-      document.getElementById("chat-box").innerHTML =
-        `<div class="placeholder" id="placeholder">${config.intro}</div>`;
+      document.getElementById("chat-box").innerHTML = mobilePlaceholderHtml(config.intro);
     }
+    syncSendButton();
   }
 
   function nowTime() {
@@ -867,8 +1095,7 @@
 
   function clearChatWindow(introText = null) {
     const config = modeCopy[currentMode] || modeCopy.tutor;
-    document.getElementById("chat-box").innerHTML =
-      `<div class="placeholder" id="placeholder">${introText || config.intro}</div>`;
+    document.getElementById("chat-box").innerHTML = mobilePlaceholderHtml(introText || config.intro);
     chatHistory = [];
   }
 
@@ -1129,6 +1356,48 @@
           difficulty: extractJsonStringValue(remainder, "difficulty") || "medium",
           tags: extractJsonArray(remainder, "tags")
         };
+      }
+    }
+
+    const sectionMatches = Array.from(content.matchAll(/^(#{2,3})\s+(.+)$/gm));
+    if (sectionMatches.length) {
+      const extracted = {
+        type: "explanation",
+        title: sectionMatches[0][2].trim() || "Assistant Response",
+        content: "",
+        examples: [],
+        quiz: [],
+        follow_up: [],
+        difficulty: "medium",
+        tags: []
+      };
+
+      for (let i = 0; i < sectionMatches.length; i++) {
+        const current = sectionMatches[i];
+        const start = current.index + current[0].length;
+        const end = i + 1 < sectionMatches.length ? sectionMatches[i + 1].index : content.length;
+        const heading = current[2].trim().toLowerCase();
+        const block = content.slice(start, end).trim();
+        if (!block) continue;
+
+        if (heading.includes("next step")) {
+          extracted.follow_up = block
+            .split("\n")
+            .map(line => line.replace(/^[-*\d.\s]+/, "").trim())
+            .filter(Boolean);
+        } else if (heading.includes("tag")) {
+          extracted.tags = block
+            .replace(/^tags:\s*/i, "")
+            .split(",")
+            .map(item => item.trim())
+            .filter(Boolean);
+        } else if (!extracted.content) {
+          extracted.content = block;
+        }
+      }
+
+      if (extracted.content || extracted.follow_up.length || extracted.tags.length) {
+        return extracted;
       }
     }
 
@@ -1484,6 +1753,7 @@
   function applyFollowUp(text) {
     const input = document.getElementById("user-input");
     input.value = text;
+    syncSendButton();
     input.focus();
   }
 
@@ -1503,6 +1773,7 @@
     if (!pendingImageFile || !pendingImageUrl) {
       previewRow.classList.add("hidden");
       previewRow.innerHTML = "";
+      syncSendButton();
       return;
     }
 
@@ -1520,6 +1791,7 @@
         </div>
       </div>
     `;
+    syncSendButton();
   }
 
   function clearPendingImage() {
@@ -1637,6 +1909,7 @@
     if (!message) return;
 
     input.value = "";
+    syncSendButton();
     input.disabled = true;
     document.getElementById("send-btn").disabled = true;
     if (!activeSessionId) {
@@ -1679,17 +1952,22 @@
       appendMessage("assistant", "Could not connect to the AI service. Check your Gemini API key and server logs.");
     } finally {
       input.disabled = false;
-      document.getElementById("send-btn").disabled = false;
+      syncSendButton();
       input.focus();
     }
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     const imageInput = document.getElementById("image-input");
+    const userInput = document.getElementById("user-input");
     if (imageInput) {
       imageInput.addEventListener("change", onImageSelected);
     }
+    if (userInput) {
+      userInput.addEventListener("input", syncSendButton);
+    }
     setMode(currentMode);
+    syncSendButton();
     fetchSessions(true).catch(() => {
       clearChatWindow();
     });

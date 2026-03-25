@@ -39,6 +39,8 @@ def _resolve_mobile_template(desktop_template_name, explicit_mobile_template=Non
                 "MOBILE_TEMPLATE_ALLOWLIST",
                 {
                     "user/base.html",
+                    "student/chat.html",
+                    "student/performance.html",
                     "daily_challenges/today.html",
                     "daily_challenges/workspace.html",
                 },
