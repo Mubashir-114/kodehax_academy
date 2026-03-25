@@ -30,9 +30,12 @@ MOBILE_TEMPLATE_MAP = {
 
 
 def _resolve_mobile_template(desktop_template_name, explicit_mobile_template=None):
-    # Keep one consistent UI/theme across desktop and mobile by default.
+    # Keep one consistent UI/theme across desktop and mobile by default,
+    # with optional allowlisted templates that can still use a mobile variant.
     if getattr(settings, "FORCE_DESKTOP_UI_ON_MOBILE", True):
-        return None
+        allowlist = set(getattr(settings, "MOBILE_TEMPLATE_ALLOWLIST", {"user/base.html"}))
+        if desktop_template_name not in allowlist:
+            return None
 
     candidate = explicit_mobile_template or MOBILE_TEMPLATE_MAP.get(desktop_template_name)
     if not candidate:

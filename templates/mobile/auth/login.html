@@ -1,17 +1,39 @@
 {% extends "mobile/base.html" %}
 {% block title %}Sign In | Kodehax Academy{% endblock %}
+{% block extra_head %}
+<style>
+    .auth-card {
+        background: linear-gradient(180deg, #141833 0%, #0d1026 100%);
+        border: 1px solid #2a2d4b;
+        box-shadow: 0 20px 40px rgba(2, 4, 12, 0.5);
+        color: #e8e7f7;
+    }
+
+    .auth-btn {
+        border-radius: 1rem;
+        background: linear-gradient(90deg, #524dd3 0%, #6e68e3 52%, #8e89f1 100%);
+        color: #fff;
+        font-weight: 800;
+        box-shadow: 0 12px 24px rgba(82, 77, 211, 0.34);
+    }
+
+    .auth-link {
+        color: #a9adff;
+    }
+</style>
+{% endblock %}
 {% block content %}
 <main class="min-h-[82vh] flex items-center">
-    <section class="card w-full p-5 reveal-1">
-        <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Kodehax Academy</p>
+    <section class="card auth-card w-full p-5 reveal-1">
+        <p class="text-xs uppercase tracking-[0.2em] text-indigo-200/80">Kodehax Academy</p>
         <h1 class="mt-2 text-2xl font-semibold">Student Login</h1>
-        <p class="mt-1 text-sm text-slate-500">Minimal mobile access to your learning workspace.</p>
+        <p class="mt-1 text-sm text-slate-300">Minimal mobile access to your learning workspace.</p>
         <form method="post" class="mt-5 space-y-4">
             {% csrf_token %}
             {% if form %}
                 {% for field in form %}
                     <div>
-                        <label class="mb-1 block text-sm text-slate-600">{{ field.label }}</label>
+                        <label class="mb-1 block text-sm text-slate-300">{{ field.label }}</label>
                         {{ field }}
                         {% if field.errors %}<p class="mt-1 text-xs text-rose-600">{{ field.errors|join:", " }}</p>{% endif %}
                     </div>
@@ -26,11 +48,11 @@
                     <input type="password" name="password" required class="field">
                 </div>
             {% endif %}
-            <button type="submit" class="btn-primary w-full px-4 py-3 text-sm">Continue</button>
+            <button type="submit" class="auth-btn w-full px-4 py-3 text-sm">Continue</button>
         </form>
         <div class="mt-4 flex items-center justify-between text-sm">
-            <a href="{% url 'forgot_password' %}" class="text-slate-500">Forgot password?</a>
-            <a href="{% url 'register' %}" class="font-medium text-teal-700">Create account</a>
+            <a href="{% url 'forgot_password' %}" class="text-slate-300">Forgot password?</a>
+            <a href="{% url 'register' %}" class="font-medium auth-link">Create account</a>
         </div>
     </section>
 </main>
