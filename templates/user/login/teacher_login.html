@@ -3,62 +3,34 @@
 {% block title %}Teacher Login{% endblock %}
 {% block extra_head %}
 <style>
-    .auth-wrap {
-        max-width: 1120px;
-        margin: 0 auto;
-    }
-
     .auth-card {
-        background: linear-gradient(180deg, #141833 0%, #0d1026 100%);
-        border: 1px solid #2a2d4b;
-        border-radius: 1.2rem;
-        box-shadow: 0 26px 55px rgba(2, 4, 12, 0.5);
-    }
-
-    .auth-badge {
-        border: 1px solid #353a66;
-        background: #171a34;
-        color: #c2c6eb;
-        border-radius: 999px;
-        padding: 0.35rem 0.7rem;
-        font-size: 0.7rem;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        font-weight: 700;
+        background: rgba(2, 6, 23, 0.82);
+        border: 1px solid rgba(71, 85, 105, 0.7);
+        border-radius: 1rem;
     }
 
     .auth-btn {
         width: 100%;
-        border-radius: 1rem;
-        padding: 0.85rem 1rem;
-        font-weight: 800;
-        color: #fff;
-        background: linear-gradient(90deg, #524dd3 0%, #6e68e3 52%, #8e89f1 100%);
-        border: 1px solid rgba(142, 137, 241, 0.45);
-        transition: transform 160ms ease, filter 160ms ease;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        font-weight: 700;
+        color: #e2e8f0;
+        background: rgba(30, 41, 59, 0.9);
+        border: 1px solid rgba(99, 102, 241, 0.5);
+        transition: background 160ms ease, border-color 160ms ease;
     }
 
     .auth-btn:hover {
-        filter: brightness(1.05);
-        transform: translateY(-1px);
-    }
-
-    .auth-link {
-        color: #a9adff;
-        text-underline-offset: 2px;
-    }
-
-    .auth-link:hover {
-        color: #c8cbff;
-        text-decoration: underline;
+        background: rgba(51, 65, 85, 0.95);
+        border-color: rgba(129, 140, 248, 0.75);
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="auth-wrap reveal">
+<div class="mx-auto w-full max-w-md reveal">
     <div class="auth-card p-7 md:p-8">
-        <p class="auth-badge text-center mb-3 inline-flex">Welcome Back</p>
+        <p class="text-xs font-semibold tracking-[0.2em] text-cyan-300 text-center mb-2">WELCOME BACK</p>
         <h2 class="text-2xl font-black text-center mb-6 text-white">Teacher Login</h2>
 
         <form method="POST" class="space-y-4">
@@ -71,7 +43,7 @@
         </form>
 
         <p class="text-center text-sm mt-4 text-slate-300">
-            <a href="{% url 'forgot_password' %}" class="auth-link">Forgot password?</a>
+            <a href="{% url 'forgot_password' %}" class="text-cyan-300 hover:text-cyan-200 underline-offset-2 hover:underline">Forgot password?</a>
         </p>
 
         <p class="text-center text-sm mt-4 text-slate-300">

@@ -1,45 +1,211 @@
 {% extends "mobile/base.html" %}
 {% block title %}Daily Challenge | Kodehax Academy{% endblock %}
+{% block extra_head %}
+<style>
+    .dc-hero {
+        border-radius: 1.35rem;
+        border: 1px solid rgba(45, 212, 191, 0.22);
+        background:
+            radial-gradient(circle at top right, rgba(34, 211, 238, 0.18), transparent 34%),
+            linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(2, 6, 23, 0.94));
+        box-shadow: 0 18px 34px rgba(2, 6, 23, 0.34);
+    }
+    .dc-panel {
+        border-radius: 1.1rem;
+        border: 1px solid rgba(51, 65, 85, 0.72);
+        background:
+            linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.88));
+        box-shadow: 0 14px 28px rgba(2, 6, 23, 0.28);
+    }
+    .dc-countdown {
+        border: 1px solid rgba(14, 165, 233, 0.25);
+        background: rgba(8, 47, 73, 0.52);
+        color: #7dd3fc;
+    }
+    .dc-group-card {
+        border-radius: 1rem;
+        border: 1px solid rgba(45, 212, 191, 0.2);
+        background:
+            radial-gradient(120% 100% at 100% 0%, rgba(14, 165, 233, 0.18), transparent 55%),
+            linear-gradient(180deg, #041128 0%, #051232 50%, #040f2a 100%);
+        box-shadow: 0 14px 30px rgba(2, 6, 23, 0.45);
+    }
+    .dc-availability-pill {
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.28), rgba(14, 165, 233, 0.22));
+        border: 1px solid rgba(45, 212, 191, 0.2);
+    }
+    .dc-question-chip {
+        border-radius: 999px;
+        border: 1px solid rgba(153, 246, 228, 0.58);
+        background: rgba(15, 23, 42, 0.44);
+        color: #d1fae5;
+    }
+    .dc-question-chip:hover {
+        border-color: rgba(45, 212, 191, 0.9);
+        background: rgba(8, 47, 73, 0.7);
+    }
+    .dc-question-chip-solved {
+        border-color: rgba(52, 211, 153, 0.92);
+        background: rgba(6, 78, 59, 0.64);
+        color: #a7f3d0;
+    }
+    .dc-question-chip-locked {
+        border-color: rgba(148, 163, 184, 0.45);
+        background: rgba(30, 41, 59, 0.48);
+        color: rgba(203, 213, 225, 0.8);
+    }
+    .dc-group-meta {
+        color: #67e8f9;
+    }
+    .dc-group-count {
+        color: #ecfeff;
+    }
+    .dc-stats-shell {
+        border-radius: 1rem;
+        border: 1px solid rgba(51, 65, 85, 0.7);
+        background:
+            radial-gradient(100% 120% at 100% 0%, rgba(8, 47, 73, 0.35), transparent 65%),
+            linear-gradient(180deg, #020b1f 0%, #020818 100%);
+        box-shadow: 0 12px 24px rgba(2, 6, 23, 0.36);
+    }
+    .dc-stat-tile {
+        border-radius: 0.9rem;
+        border: 1px solid rgba(51, 65, 85, 0.72);
+        background: rgba(2, 6, 23, 0.34);
+    }
+    .dc-stat-tile-earn {
+        border-color: rgba(16, 185, 129, 0.35);
+        background: rgba(6, 78, 59, 0.25);
+    }
+    .dc-stat-tile-loss {
+        border-color: rgba(251, 113, 133, 0.35);
+        background: rgba(76, 5, 25, 0.25);
+    }
+    .dc-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.45rem;
+    }
+    .dc-stat-grid .dc-stat-tile {
+        min-width: 0;
+    }
+    .dc-stat-grid .dc-stat-tile p:first-child {
+        font-size: 9px;
+        line-height: 1.2;
+        letter-spacing: 0.14em;
+    }
+    body.dc-page-theme {
+        background:
+            radial-gradient(circle at 10% -5%, rgba(20, 184, 166, 0.14), transparent 28%),
+            radial-gradient(circle at 92% 0%, rgba(34, 211, 238, 0.12), transparent 22%),
+            linear-gradient(180deg, #020617 0%, #06111f 100%);
+        color: #e2e8f0;
+    }
+</style>
+{% endblock %}
 {% block content %}
-<header class="hero mb-4 p-5 reveal-1">
-    <h1 class="text-2xl font-semibold">Daily Challenge</h1>
-    <p class="text-sm text-cyan-100/90">Complete today's set before time ends.</p>
+<header class="dc-hero mb-4 p-5 reveal-1">
+    <p class="text-[11px] uppercase tracking-[0.18em] text-cyan-300/80">Student Hub</p>
+    <h1 class="mt-2 text-2xl font-bold text-white">Daily Challenge</h1>
+    <p class="mt-1 text-sm text-slate-300">Complete today's set before time ends.</p>
 </header>
 
-<section class="card p-5 mb-4 reveal-2">
+<section class="dc-panel p-5 mb-4 reveal-2">
     <div class="flex items-center justify-between">
-        <p class="text-sm text-slate-500">Points</p>
-        <p class="text-lg font-semibold">{{ student_points.total_points }}</p>
+        <p class="text-sm text-slate-400">Points</p>
+        <p class="text-lg font-semibold text-white">{{ student_points.total_points }}</p>
     </div>
     <div class="mt-2 flex items-center justify-between">
-        <p class="text-sm text-slate-500">Expires in</p>
+        <p class="text-sm text-slate-400">Expires in</p>
         <p id="challenge-countdown"
            data-seconds="{{ remaining_time_seconds }}"
-           class="rounded-full bg-sky-100 px-3 py-1 text-sm font-semibold text-sky-700 tabular-nums">
+           class="dc-countdown rounded-full px-3 py-1 text-sm font-semibold tabular-nums">
             {{ remaining_time_label }}
         </p>
     </div>
     {% if current_session %}
-        <p class="mt-2 text-xs text-slate-500">Solved today: {{ current_session.questions_solved }}</p>
+        <p class="mt-2 text-xs text-slate-400">Solved today: {{ current_session.questions_solved }}</p>
     {% endif %}
+</section>
+
+<section class="dc-stats-shell mb-4 p-4 reveal-2 text-slate-100">
+    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-400">Session Summary</p>
+    <div class="dc-stat-grid mt-3">
+        <div class="dc-stat-tile p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Attempted</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ current_session.questions_attempted|default:0 }}</p>
+        </div>
+        <div class="dc-stat-tile p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Solved</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ current_session.questions_solved|default:0 }}</p>
+        </div>
+        <div class="dc-stat-tile dc-stat-tile-earn p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-emerald-200/80">Earned</p>
+            <p class="mt-1.5 text-xl font-black text-emerald-200">{{ current_session.points_earned|default:0 }}</p>
+        </div>
+        <div class="dc-stat-tile dc-stat-tile-loss p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-rose-200/80">Deducted</p>
+            <p class="mt-1.5 text-xl font-black text-rose-200">{{ current_session.points_deducted|default:0 }}</p>
+        </div>
+    </div>
+</section>
+
+<section class="dc-stats-shell mb-4 p-4 reveal-2 text-slate-100">
+    <p class="text-[11px] uppercase tracking-[0.18em] text-slate-400">Progress Breakdown</p>
+    <div class="dc-stat-grid mt-3">
+        <div class="dc-stat-tile p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Solved</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.solved_count|default:0 }} / 9</p>
+        </div>
+        <div class="dc-stat-tile p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Easy Cleared</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.easy_solved_count|default:0 }} / 3</p>
+        </div>
+        <div class="dc-stat-tile p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Medium Cleared</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.medium_solved_count|default:0 }} / 3</p>
+        </div>
+        <div class="dc-stat-tile p-2.5">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Hard Cleared</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.hard_solved_count|default:0 }} / 3</p>
+        </div>
+    </div>
 </section>
 
 <section class="space-y-3">
     {% for group in challenge_groups %}
-        <article class="card p-4 reveal-3">
-            <div class="flex items-center justify-between">
-                <h2 class="text-base font-semibold">{{ group.title }}</h2>
-                <span class="rounded-full px-2 py-1 text-xs {% if group.unlocked %}bg-emerald-100 text-emerald-700{% else %}bg-slate-200 text-slate-500{% endif %}">
-                    {{ group.difficulty }}
-                </span>
+        <article class="dc-group-card p-4 text-cyan-50 reveal-3">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <p class="dc-group-meta text-[11px] font-semibold uppercase tracking-[0.18em]">
+                        {{ group.title }} - {{ group.difficulty }}
+                    </p>
+                    <h2 class="dc-group-count mt-2 text-4xl font-bold leading-none">
+                        {{ group.challenges|length }} Questions
+                    </h2>
+                </div>
             </div>
-            <p class="mt-1 text-xs text-slate-500">{{ group.required_text }}</p>
-            <div class="mt-3 space-y-2">
+            <div class="dc-availability-pill mt-4 px-3 py-2">
+                <p class="text-xs font-semibold uppercase tracking-[0.16em] {% if group.unlocked %}text-emerald-200{% else %}text-slate-300{% endif %}">
+                    {% if group.unlocked %}
+                        Available now
+                    {% else %}
+                        {{ group.required_text }}
+                    {% endif %}
+                </p>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
                 {% for challenge in group.challenges %}
-                    <a href="{% url 'daily_challenge_workspace' challenge.id %}" class="flex items-center justify-between rounded-2xl border border-slate-200 bg-white/80 px-3 py-2 text-sm transition hover:border-cyan-300 hover:bg-cyan-50/50 {% if not group.unlocked %}pointer-events-none opacity-50{% endif %}">
-                        <span>Q{{ challenge.question_number }}. {{ challenge.title|default:challenge.problem.title|truncatechars:52 }}</span>
-                        <span class="text-xs {% if challenge.status == 'solved' %}text-emerald-600{% else %}text-slate-500{% endif %}">{{ challenge.status|title }}</span>
-                    </a>
+                    {% if group.unlocked %}
+                        <a href="{% url 'daily_challenge_workspace' challenge.id %}" class="dc-question-chip inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold transition {% if challenge.status == 'solved' %}dc-question-chip-solved{% endif %}">
+                            Q{{ challenge.question_number }}
+                        </a>
+                    {% else %}
+                        <span class="dc-question-chip dc-question-chip-locked inline-flex items-center justify-center px-3 py-1.5 text-sm font-semibold">
+                            Q{{ challenge.question_number }}
+                        </span>
+                    {% endif %}
                 {% endfor %}
             </div>
         </article>
@@ -49,6 +215,9 @@
 
 {% block extra_js %}
 <script>
+    (function () {
+        document.body.classList.add("dc-page-theme");
+    })();
     (function () {
         const el = document.getElementById("challenge-countdown");
         if (!el) return;

@@ -1,26 +1,39 @@
 {% with view_name=request.resolver_match.view_name %}
-<nav class="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200/80 bg-white/92 backdrop-blur-xl">
-    <div class="mx-auto flex max-w-[480px] items-center justify-between gap-1 px-3 py-2">
-        <a href="{% url 'student_dashboard' %}" class="group flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-2 text-[11px] transition {% if view_name == 'student_dashboard' or view_name == 'student_class_detail' %}text-teal-700 bg-teal-50{% else %}text-slate-500 hover:text-slate-700{% endif %}">
-            <span class="mb-1 h-1.5 w-8 rounded-full {% if view_name == 'student_dashboard' or view_name == 'student_class_detail' %}bg-teal-500{% else %}bg-transparent group-hover:bg-slate-300{% endif %}"></span>
-            Home
+<nav class="fixed bottom-0 left-0 right-0 z-40 bg-transparent px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2">
+    <div class="mx-auto max-w-[480px] rounded-[1.35rem] border border-cyan-300/20 bg-[#020b22]/92 p-2 shadow-[0_16px_34px_rgba(2,6,23,0.45)] backdrop-blur-xl">
+        <div class="grid grid-cols-5 gap-1.5">
+        <a href="{% url 'student_dashboard' %}" class="group flex min-w-0 flex-col items-center rounded-2xl px-1 py-2 text-[11px] transition {% if view_name == 'student_dashboard' or view_name == 'student_class_detail' %}border border-teal-400/50 bg-teal-500/20 text-cyan-100{% else %}border border-transparent text-slate-400 hover:text-slate-200{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mb-1 h-4 w-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 10.5L12 3l9 7.5M5.25 9.75V21h13.5V9.75"/>
+            </svg>
+            <span class="truncate">Home</span>
         </a>
-        <a href="{% url 'view_assignments' %}" class="group flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-2 text-[11px] transition {% if view_name == 'view_assignments' or view_name == 'submit_assignment' or view_name == 'take_quiz_assignment' or view_name == 'submit_code_assignment' %}text-teal-700 bg-teal-50{% else %}text-slate-500 hover:text-slate-700{% endif %}">
-            <span class="mb-1 h-1.5 w-8 rounded-full {% if view_name == 'view_assignments' or view_name == 'submit_assignment' or view_name == 'take_quiz_assignment' or view_name == 'submit_code_assignment' %}bg-teal-500{% else %}bg-transparent group-hover:bg-slate-300{% endif %}"></span>
-            Courses
+        <a href="{% url 'view_assignments' %}" class="group flex min-w-0 flex-col items-center rounded-2xl px-1 py-2 text-[11px] transition {% if view_name == 'view_assignments' or view_name == 'submit_assignment' or view_name == 'take_quiz_assignment' or view_name == 'submit_code_assignment' %}border border-teal-400/50 bg-teal-500/20 text-cyan-100{% else %}border border-transparent text-slate-400 hover:text-slate-200{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mb-1 h-4 w-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5h7.5M5.25 8.25h13.5M7.5 12h9M9.75 15.75h4.5M6 3.75h12A1.5 1.5 0 0 1 19.5 5.25v13.5A1.5 1.5 0 0 1 18 20.25H6A1.5 1.5 0 0 1 4.5 18.75V5.25A1.5 1.5 0 0 1 6 3.75Z"/>
+            </svg>
+            <span class="truncate">Courses</span>
         </a>
-        <a href="{% url 'daily_challenges_today' %}" class="group flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-2 text-[11px] transition {% if view_name == 'daily_challenges_today' or view_name == 'daily_challenge_workspace' %}text-teal-700 bg-teal-50{% else %}text-slate-500 hover:text-slate-700{% endif %}">
-            <span class="mb-1 h-1.5 w-8 rounded-full {% if view_name == 'daily_challenges_today' or view_name == 'daily_challenge_workspace' %}bg-teal-500{% else %}bg-transparent group-hover:bg-slate-300{% endif %}"></span>
-            Challenge
+        <a href="{% url 'daily_challenges_today' %}" class="group flex min-w-0 flex-col items-center rounded-2xl px-1 py-2 text-[11px] transition {% if view_name == 'daily_challenges_today' or view_name == 'daily_challenge_workspace' %}border border-teal-400/50 bg-teal-500/20 text-cyan-100{% else %}border border-transparent text-slate-400 hover:text-slate-200{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mb-1 h-4 w-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 4.5h9A1.5 1.5 0 0 1 18 6v12a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 18V6a1.5 1.5 0 0 1 1.5-1.5Z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 8.25h6M9 12h6M9 15.75h4.5"/>
+            </svg>
+            <span class="truncate">Challenge</span>
         </a>
-        <a href="{% url 'student_performance_dashboard' %}" class="group flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-2 text-[11px] transition {% if view_name == 'student_performance_dashboard' %}text-teal-700 bg-teal-50{% else %}text-slate-500 hover:text-slate-700{% endif %}">
-            <span class="mb-1 h-1.5 w-8 rounded-full {% if view_name == 'student_performance_dashboard' %}bg-teal-500{% else %}bg-transparent group-hover:bg-slate-300{% endif %}"></span>
-            Alerts
+        <a href="{% url 'student_performance_dashboard' %}" class="group flex min-w-0 flex-col items-center rounded-2xl px-1 py-2 text-[11px] transition {% if view_name == 'student_performance_dashboard' %}border border-teal-400/50 bg-teal-500/20 text-cyan-100{% else %}border border-transparent text-slate-400 hover:text-slate-200{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mb-1 h-4 w-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5.25 17.25h13.5M7.5 13.5h2.25M11.25 10.5h2.25M15 7.5h1.5"/>
+            </svg>
+            <span class="truncate">Alerts</span>
         </a>
-        <a href="{% url 'student_profile' %}" class="group flex min-w-0 flex-1 flex-col items-center rounded-2xl px-2 py-2 text-[11px] transition {% if view_name == 'student_profile' or view_name == 'edit_student_profile' %}text-teal-700 bg-teal-50{% else %}text-slate-500 hover:text-slate-700{% endif %}">
-            <span class="mb-1 h-1.5 w-8 rounded-full {% if view_name == 'student_profile' or view_name == 'edit_student_profile' %}bg-teal-500{% else %}bg-transparent group-hover:bg-slate-300{% endif %}"></span>
-            Profile
+        <a href="{% url 'student_profile' %}" class="group flex min-w-0 flex-col items-center rounded-2xl px-1 py-2 text-[11px] transition {% if view_name == 'student_profile' or view_name == 'edit_student_profile' %}border border-teal-400/50 bg-teal-500/20 text-cyan-100{% else %}border border-transparent text-slate-400 hover:text-slate-200{% endif %}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="mb-1 h-4 w-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 7.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 19.5a7.5 7.5 0 0 1 15 0"/>
+            </svg>
+            <span class="truncate">Profile</span>
         </a>
+        </div>
     </div>
 </nav>
 {% endwith %}

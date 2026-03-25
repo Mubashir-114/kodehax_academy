@@ -235,7 +235,7 @@
 {% with current_path=request.path %}
 <div class="min-h-screen flex flex-col lg:flex-row">
     <aside class="hidden lg:block w-64 shrink-0 border-r border-slate-800/90 bg-slate-950/85 backdrop-blur-xl">
-        <div class="flex h-screen flex-col px-5 py-6">
+        <div class="flex min-h-full flex-col px-5 py-6">
             <div class="reveal">
                 <div class="flex items-center gap-3">
                     <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-11 w-11 rounded-2xl object-cover">
@@ -385,30 +385,9 @@
     </div>
 </div>
 
-<nav class="fixed inset-x-3 bottom-3 z-40 rounded-[1.35rem] border border-slate-700/80 bg-slate-950/92 p-2 shadow-[0_20px_45px_rgba(2,6,23,0.45)] backdrop-blur lg:hidden">
-    <div class="grid grid-cols-5 gap-1 text-[9px] sm:text-[10px]">
-        <a href="{% url 'student_dashboard' %}" class="mobile-tab {% if '/student/dashboard/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V20h14v-9.5"/></svg>
-            <span>Dashboard</span>
-        </a>
-        <a href="{% url 'daily_challenges_today' %}" class="mobile-tab {% if '/daily-challenges/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18"/><path d="M5 8h14"/><path d="M7 21h10"/></svg>
-            <span>Challenge</span>
-        </a>
-        <a href="{% url 'view_assignments' %}" class="mobile-tab {% if '/student/assignments/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8"/><path d="M8 12h8"/><path d="M8 17h5"/></svg>
-            <span>Assign</span>
-        </a>
-        <a href="{% url 'student_performance_dashboard' %}" class="mobile-tab {% if '/student/performance/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19h16"/><path d="M7 16v-5"/><path d="M12 16V8"/><path d="M17 16v-9"/></svg>
-            <span>Progress</span>
-        </a>
-        <a href="{% url 'student_profile' %}" class="mobile-tab {% if '/student/profile/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
-            <span>Profile</span>
-        </a>
-    </div>
-</nav>
+<div class="lg:hidden">
+    {% include "mobile/components/bottom_nav.html" %}
+</div>
 {% endwith %}
 
 <script>

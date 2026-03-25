@@ -1,11 +1,15 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from adminpanel.decorators import admin_required
+from daily_challenges.models import DailyChallengeSet
 
 from .forms import CodingAssessmentForm, MCQAssessmentForm, SelfAssessmentForm
 from .models import AssessmentQuestion, CodingProblem, StudentAssessment, StudentSkill
@@ -30,6 +34,53 @@ def _ensure_student(request):
 
 def _get_student_assessment(student):
     return StudentAssessment.objects.get_or_create(student=student)[0]
+
+
+def _build_daily_heatmap(student, window_days=42):
+    today = timezone.localdate()
+    start_date = today - timedelta(days=window_days - 1)
+    challenge_sets = DailyChallengeSet.objects.filter(
+        student=student,
+        date__range=(start_date, today),
+    ).values("date", "solved_count")
+
+    solved_by_date = {row["date"]: int(row["solved_count"] or 0) for row in challenge_sets}
+    dates = [start_date + timedelta(days=offset) for offset in range(window_days)]
+    total_solved = 0
+    active_days = 0
+    best_day = None
+    cells = []
+    for day in dates:
+        solved = solved_by_date.get(day, 0)
+        total_solved += solved
+        if solved > 0:
+            active_days += 1
+            if not best_day or solved > best_day["count"]:
+                best_day = {"date": day, "count": solved}
+        if solved == 0:
+            level = 0
+        elif solved <= 2:
+            level = 1
+        elif solved <= 4:
+            level = 2
+        elif solved <= 6:
+            level = 3
+        else:
+            level = 4
+        cells.append({"date": day, "count": solved, "level": level})
+
+    heatmap_weeks = [cells[index : index + 7] for index in range(0, len(cells), 7)]
+    consistency = int(round((active_days / window_days) * 100)) if window_days else 0
+    return {
+        "weeks": heatmap_weeks,
+        "summary": {
+            "active_days": active_days,
+            "consistency": consistency,
+            "total_solved": total_solved,
+            "best_day": best_day,
+            "window_days": window_days,
+        },
+    }
 
 
 @login_required
@@ -174,6 +225,7 @@ def assessment_profile(request):
     if not skill_profile or not assessment or not assessment.completed:
         return redirect("skill_assessment_entry")
 
+    heatmap = _build_daily_heatmap(request.user)
     return render(
         request,
         "skill_assessment/skill_profile.html",
@@ -185,6 +237,8 @@ def assessment_profile(request):
                 "coding_breakdown",
                 {},
             ),
+            "daily_heatmap_weeks": heatmap["weeks"],
+            "daily_heatmap_summary": heatmap["summary"],
         },
     )
 

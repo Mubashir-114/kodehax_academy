@@ -1,46 +1,200 @@
 {% extends "mobile/base.html" %}
 {% block title %}Challenge Workspace | Kodehax Academy{% endblock %}
+{% block extra_head %}
+<style>
+    body.dc-page-theme {
+        background:
+            radial-gradient(circle at 10% -5%, rgba(20, 184, 166, 0.14), transparent 28%),
+            radial-gradient(circle at 92% 0%, rgba(34, 211, 238, 0.12), transparent 22%),
+            linear-gradient(180deg, #020617 0%, #06111f 100%);
+        color: #e2e8f0;
+    }
+    .dc-work-hero {
+        border-radius: 1.2rem;
+        border: 1px solid rgba(51, 65, 85, 0.72);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.88));
+        box-shadow: 0 16px 30px rgba(2, 6, 23, 0.3);
+    }
+    .dc-work-panel {
+        border-radius: 1.2rem;
+        border: 1px solid rgba(51, 65, 85, 0.72);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.88));
+        box-shadow: 0 14px 28px rgba(2, 6, 23, 0.28);
+    }
+    .dc-work-chip {
+        border-radius: 999px;
+        border: 1px solid rgba(51, 65, 85, 0.9);
+        background: rgba(15, 23, 42, 0.78);
+        color: #cbd5e1;
+    }
+    .dc-work-chip-accent {
+        border-color: rgba(45, 212, 191, 0.32);
+        background: rgba(20, 184, 166, 0.12);
+        color: #99f6e4;
+    }
+    .dc-work-chip-warn {
+        border-color: rgba(251, 191, 36, 0.28);
+        background: rgba(120, 53, 15, 0.22);
+        color: #fde68a;
+    }
+    .dc-problem-box {
+        border: 1px solid rgba(51, 65, 85, 0.9);
+        background: rgba(2, 6, 23, 0.56);
+    }
+    .dc-back-link {
+        border: 1px solid rgba(51, 65, 85, 0.86);
+        background: rgba(15, 23, 42, 0.74);
+        color: #cbd5e1;
+    }
+    .dc-code-shell {
+        overflow: hidden;
+        border-radius: 1rem;
+        border: 1px solid rgba(71, 85, 105, 0.9);
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.94));
+        box-shadow: 0 24px 50px rgba(2, 6, 23, 0.38);
+    }
+    .dc-code-shell:focus-within {
+        border-color: rgba(34, 211, 238, 0.75);
+        box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1), 0 24px 50px rgba(2, 6, 23, 0.38);
+    }
+    .dc-editor-toolbar {
+        border-bottom: 1px solid rgba(51, 65, 85, 0.9);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.82));
+    }
+    .dc-editor-dot {
+        width: 0.7rem;
+        height: 0.7rem;
+        border-radius: 999px;
+    }
+    .dc-editor-pill {
+        border-radius: 999px;
+        border: 1px solid rgba(51, 65, 85, 0.88);
+        background: rgba(15, 23, 42, 0.72);
+        color: #cbd5e1;
+    }
+    .dc-editor-pill-accent {
+        color: #67e8f9;
+    }
+    .dc-editor-stack {
+        position: relative;
+        min-height: 25rem;
+        display: grid;
+    }
+    .dc-editor-stack > * {
+        grid-area: 1 / 1;
+    }
+    .dc-editor-highlight,
+    .dc-editor-input {
+        min-height: 25rem;
+        padding: 1rem;
+        white-space: pre;
+        overflow: auto;
+        tab-size: 4;
+        font-family: "Cascadia Code", "Fira Code", monospace;
+        font-size: 0.92rem;
+        line-height: 1.6;
+    }
+    .dc-editor-highlight {
+        margin: 0;
+        color: #dbeafe;
+        pointer-events: none;
+        z-index: 1;
+    }
+    .dc-editor-input {
+        resize: vertical;
+        border: 0;
+        background: transparent;
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+        caret-color: #67e8f9;
+        text-shadow: none;
+        outline: none;
+        z-index: 2;
+    }
+    .dc-editor-input::placeholder {
+        color: transparent;
+        -webkit-text-fill-color: transparent;
+    }
+    .dc-editor-input::selection {
+        background: rgba(59, 130, 246, 0.28);
+        text-shadow: none;
+    }
+    .dc-editor-highlight .token-keyword { color: #c084fc; }
+    .dc-editor-highlight .token-builtin { color: #67e8f9; }
+    .dc-editor-highlight .token-string { color: #86efac; }
+    .dc-editor-highlight .token-number { color: #f9a8d4; }
+    .dc-editor-highlight .token-comment { color: #64748b; font-style: italic; }
+    .dc-editor-highlight .token-function { color: #fbbf24; }
+    .dc-editor-highlight .token-operator { color: #fda4af; }
+    .dc-editor-highlight .token-constant { color: #fde68a; }
+    .dc-editor-highlight .token-bracket { color: #93c5fd; }
+    .dc-editor-highlight .token-plain { color: #dbeafe; }
+</style>
+{% endblock %}
 {% block content %}
-<header class="mb-4">
-    <a href="{% url 'daily_challenges_today' %}" class="text-sm text-slate-500">&larr; Back</a>
-    <h1 class="mt-2 text-xl font-semibold">{{ challenge.title|default:challenge.problem.title }}</h1>
-    <p class="text-sm text-slate-500">Level {{ challenge.level }} &bull; {{ challenge.difficulty|title }} &bull; Attempts left: {{ attempts_remaining }}</p>
+<header class="dc-work-hero mb-3 p-4 reveal-1">
+    <a href="{% url 'daily_challenges_today' %}" class="dc-back-link inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold">
+        &larr; Back to Challenge List
+    </a>
+    <h1 class="mt-3 text-xl font-semibold leading-tight text-white">{{ challenge.title|default:challenge.problem.title }}</h1>
+    <div class="mt-2 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-[0.12em]">
+        <span class="dc-work-chip px-2.5 py-1">Level {{ challenge.level }}</span>
+        <span class="dc-work-chip dc-work-chip-accent px-2.5 py-1">{{ challenge.difficulty|title }}</span>
+        <span class="dc-work-chip dc-work-chip-warn px-2.5 py-1">{{ attempts_remaining }} attempts left</span>
+    </div>
 </header>
 
-<section class="card p-5 mb-4 reveal-1">
-    <p class="whitespace-pre-line text-sm text-slate-700">{{ challenge.description|default:challenge.problem.description }}</p>
+<section class="dc-work-panel p-4 mb-4 reveal-2">
+    <div class="mb-3 flex items-center justify-between">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">Problem Statement</p>
+        <span class="dc-work-chip px-2.5 py-1 text-[11px] font-semibold">Read Carefully</span>
+    </div>
+    <div class="dc-problem-box max-h-[34vh] overflow-y-auto rounded-2xl px-3 py-3">
+        <p class="whitespace-pre-line text-[15px] leading-7 text-slate-200">{{ challenge.description|default:challenge.problem.description }}</p>
+    </div>
     {% if visible_hints %}
-        <div class="mt-4 space-y-2">
-            {% for hint in visible_hints %}
-                <p class="rounded-2xl bg-amber-50 px-3 py-2 text-sm text-amber-700">{{ hint }}</p>
-            {% endfor %}
-        </div>
+        <details class="mt-3 rounded-2xl border border-amber-400/20 bg-amber-950/20 p-3">
+            <summary class="cursor-pointer text-xs font-semibold uppercase tracking-[0.12em] text-amber-200">Show hints</summary>
+            <div class="mt-3 space-y-2">
+                {% for hint in visible_hints %}
+                    <p class="rounded-xl border border-amber-400/20 bg-slate-950/40 px-3 py-2 text-sm text-amber-100">{{ hint }}</p>
+                {% endfor %}
+            </div>
+        </details>
     {% endif %}
 </section>
 
-<section class="card p-5 reveal-2">
+<section class="dc-work-panel p-4 reveal-3">
     <form method="post" class="space-y-3">
         {% csrf_token %}
-        <div class="overflow-hidden rounded-2xl border border-slate-800/80 bg-slate-950 shadow-[0_14px_30px_rgba(2,6,23,0.38)]">
-            <div class="flex items-center justify-between border-b border-slate-800 bg-slate-900/90 px-3 py-2">
-                <p class="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Code Editor</p>
+        <div class="dc-code-shell">
+            <div class="dc-editor-toolbar flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                <div class="flex items-center gap-2">
+                    <span class="dc-editor-dot bg-rose-400"></span>
+                    <span class="dc-editor-dot bg-amber-400"></span>
+                    <span class="dc-editor-dot bg-emerald-400"></span>
+                </div>
                 <div class="flex items-center gap-2 text-[11px] text-slate-400">
-                    <span class="rounded-full bg-slate-800 px-2 py-1">Python</span>
-                    <span id="editor-lines" class="rounded-full bg-slate-800 px-2 py-1">1 lines</span>
-                    <span id="editor-chars" class="rounded-full bg-slate-800 px-2 py-1">0 chars</span>
+                    <span class="dc-editor-pill px-3 py-1 font-medium uppercase tracking-[0.16em]">solution.py</span>
+                    <span class="dc-editor-pill dc-editor-pill-accent px-3 py-1 uppercase tracking-[0.16em]">{{ challenge.function_name|default:"solve" }}()</span>
+                    <span id="editor-lines" class="dc-editor-pill px-2 py-1">1 line</span>
+                    <span id="editor-chars" class="dc-editor-pill px-2 py-1">0 chars</span>
                 </div>
             </div>
-            <textarea
-                id="challenge-editor"
-                name="code"
-                rows="16"
-                spellcheck="false"
-                autocapitalize="off"
-                autocomplete="off"
-                autocorrect="off"
-                class="w-full resize-y border-0 bg-slate-950 p-4 font-mono text-[13px] leading-6 text-slate-100 outline-none placeholder:text-slate-500 focus:ring-0"
-                placeholder="# Write your solution here..."
-            >{{ editor_code|default:challenge.latest_code }}</textarea>
+            <div class="dc-editor-stack">
+                <pre id="challenge-editor-highlight" class="dc-editor-highlight" aria-hidden="true"></pre>
+                <textarea
+                    id="challenge-editor"
+                    name="code"
+                    rows="16"
+                    spellcheck="false"
+                    autocapitalize="off"
+                    autocomplete="off"
+                    autocorrect="off"
+                    class="dc-editor-input"
+                    placeholder="# Write your solution here..."
+                >{{ editor_code|default:challenge.latest_code }}</textarea>
+            </div>
             <div class="flex items-center justify-between border-t border-slate-800 bg-slate-900/85 px-3 py-2">
                 <p class="text-[11px] text-slate-400">Press <span class="rounded bg-slate-800 px-1.5 py-0.5 text-slate-200">Tab</span> for indentation</p>
                 <button type="button" id="editor-clear" class="rounded-lg border border-slate-700 px-2.5 py-1 text-[11px] font-semibold text-slate-300 transition hover:border-slate-500 hover:text-white">
@@ -49,19 +203,19 @@
             </div>
         </div>
         <div class="grid grid-cols-3 gap-2">
-            <button name="action" value="run" class="btn-muted px-3 py-3 text-sm">Run</button>
-            <button name="action" value="hint" class="rounded-2xl border border-amber-300 bg-amber-50 px-3 py-3 text-sm font-semibold text-amber-700 transition hover:bg-amber-100">Hint</button>
+            <button name="action" value="run" class="rounded-2xl border border-amber-400/20 bg-amber-950/20 px-3 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-900/30">Run</button>
+            <button name="action" value="hint" class="rounded-2xl border border-amber-400/20 bg-amber-950/20 px-3 py-3 text-sm font-semibold text-amber-200 transition hover:bg-amber-900/30">Hint</button>
             <button name="action" value="submit" class="btn-primary px-3 py-3 text-sm">Submit</button>
         </div>
     </form>
     {% if preview_payload %}
-        <div class="mt-4 rounded-2xl bg-slate-100 p-3 text-xs text-slate-700">
+        <div class="mt-4 rounded-2xl border border-slate-700 bg-slate-950/55 p-3 text-xs text-slate-200">
             <p class="font-semibold mb-1">Run Result</p>
             <pre class="whitespace-pre-wrap">{{ preview_payload }}</pre>
         </div>
     {% endif %}
     {% if submission_payload %}
-        <div class="mt-4 rounded-2xl bg-emerald-50 p-3 text-xs text-emerald-700">
+        <div class="mt-4 rounded-2xl border border-emerald-400/20 bg-emerald-950/20 p-3 text-xs text-emerald-200">
             <p class="font-semibold mb-1">Submission Result</p>
             <pre class="whitespace-pre-wrap">{{ submission_payload }}</pre>
         </div>
@@ -72,17 +226,123 @@
 {% block extra_js %}
 <script>
     (function () {
+        document.body.classList.add("dc-page-theme");
+    })();
+    (function () {
         const editor = document.getElementById("challenge-editor");
+        const highlight = document.getElementById("challenge-editor-highlight");
         const lineEl = document.getElementById("editor-lines");
         const charEl = document.getElementById("editor-chars");
         const clearBtn = document.getElementById("editor-clear");
-        if (!editor || !lineEl || !charEl) return;
+        if (!editor || !highlight || !lineEl || !charEl) return;
+
+        const KEYWORDS = new Set(["def", "return", "if", "elif", "else", "for", "while", "in", "try", "except", "finally", "class", "import", "from", "as", "with", "pass", "break", "continue", "and", "or", "not", "lambda", "yield", "True", "False", "None"]);
+        const BUILTINS = new Set(["print", "len", "range", "enumerate", "map", "filter", "sum", "min", "max", "sorted", "list", "dict", "set", "tuple", "int", "float", "str", "input", "zip", "any", "all", "abs"]);
+        const OPERATORS = new Set(["+", "-", "*", "/", "%", "=", "<", ">", "!", ":"]);
+        const BLOCK_START = /:\s*$/;
+
+        function escapeHtml(value) {
+            return value
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        }
+
+        function renderHighlight(value) {
+            const source = value || "";
+            if (!source) {
+                highlight.innerHTML = '<span class="token-comment"># Write your solution here...</span>';
+                return;
+            }
+
+            let html = "";
+            let i = 0;
+
+            while (i < source.length) {
+                const char = source[i];
+
+                if (char === "#") {
+                    let j = i;
+                    while (j < source.length && source[j] !== "\n") j += 1;
+                    html += '<span class="token-comment">' + escapeHtml(source.slice(i, j)) + "</span>";
+                    i = j;
+                    continue;
+                }
+
+                if (char === '"' || char === "'") {
+                    const quote = char;
+                    let j = i + 1;
+                    while (j < source.length) {
+                        if (source[j] === "\\" && j + 1 < source.length) {
+                            j += 2;
+                            continue;
+                        }
+                        if (source[j] === quote) {
+                            j += 1;
+                            break;
+                        }
+                        j += 1;
+                    }
+                    html += '<span class="token-string">' + escapeHtml(source.slice(i, j)) + "</span>";
+                    i = j;
+                    continue;
+                }
+
+                if (/[A-Za-z_]/.test(char)) {
+                    let j = i + 1;
+                    while (j < source.length && /[A-Za-z0-9_]/.test(source[j])) j += 1;
+                    const word = source.slice(i, j);
+                    let tokenClass = "token-plain";
+                    if (KEYWORDS.has(word)) {
+                        tokenClass = "token-keyword";
+                    } else if (BUILTINS.has(word)) {
+                        tokenClass = "token-builtin";
+                    } else if (source.slice(j).match(/^\s*\(/)) {
+                        tokenClass = "token-function";
+                    }
+                    html += '<span class="' + tokenClass + '">' + escapeHtml(word) + "</span>";
+                    i = j;
+                    continue;
+                }
+
+                if (/\d/.test(char)) {
+                    let j = i + 1;
+                    while (j < source.length && /[\d.]/.test(source[j])) j += 1;
+                    html += '<span class="token-number">' + escapeHtml(source.slice(i, j)) + "</span>";
+                    i = j;
+                    continue;
+                }
+
+                if ("(){}[]".indexOf(char) !== -1) {
+                    html += '<span class="token-bracket">' + escapeHtml(char) + "</span>";
+                    i += 1;
+                    continue;
+                }
+
+                if (OPERATORS.has(char)) {
+                    html += '<span class="token-operator">' + escapeHtml(char) + "</span>";
+                    i += 1;
+                    continue;
+                }
+
+                html += escapeHtml(char);
+                i += 1;
+            }
+
+            highlight.innerHTML = html;
+        }
 
         function updateStats() {
             const value = editor.value || "";
             const lines = value.length ? value.split("\n").length : 1;
             lineEl.textContent = lines + (lines === 1 ? " line" : " lines");
             charEl.textContent = value.length + " chars";
+            renderHighlight(value);
+        }
+
+        function syncScroll() {
+            highlight.scrollTop = editor.scrollTop;
+            highlight.scrollLeft = editor.scrollLeft;
         }
 
         editor.addEventListener("keydown", function (e) {
@@ -93,18 +353,42 @@
                 editor.value = editor.value.substring(0, start) + "    " + editor.value.substring(end);
                 editor.selectionStart = editor.selectionEnd = start + 4;
                 updateStats();
+                return;
+            }
+
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                const value = editor.value;
+                const beforeCursor = value.substring(0, start);
+                const currentLine = beforeCursor.split("\n").pop() || "";
+                const indentMatch = currentLine.match(/^\s+/);
+                let nextIndent = indentMatch ? indentMatch[0] : "";
+
+                if (BLOCK_START.test(currentLine.trim())) {
+                    nextIndent += "    ";
+                }
+
+                editor.value = value.substring(0, start) + "\n" + nextIndent + value.substring(end);
+                editor.selectionStart = editor.selectionEnd = start + 1 + nextIndent.length;
+                updateStats();
+                syncScroll();
             }
         });
 
         editor.addEventListener("input", updateStats);
+        editor.addEventListener("scroll", syncScroll);
         if (clearBtn) {
             clearBtn.addEventListener("click", function () {
                 editor.value = "";
                 updateStats();
+                syncScroll();
                 editor.focus();
             });
         }
         updateStats();
+        syncScroll();
     })();
 </script>
 {% endblock %}
