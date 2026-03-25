@@ -181,17 +181,17 @@
         Problem <span id="current-problem-indicator">1</span> of {{ problem_data|length }}
       </div>
       <div class="flex items-center gap-3">
-        <button type="button" id="btn-prev-problem" class="btn-muted hidden px-5 py-2.5 text-sm font-medium">Previous</button>
-        <button type="button" id="btn-next-problem" class="btn-primary px-5 py-2.5 text-sm font-medium {% if problem_data|length <= 1 %}hidden{% endif %}">Next</button>
+        <button type="button" id="btn-prev-problem" class="btn-muted hidden h-12 px-5 text-sm font-medium">Previous</button>
+        <button type="button" id="btn-next-problem" class="btn-primary h-12 px-5 text-sm font-medium {% if problem_data|length <= 1 %}hidden{% endif %}">Next</button>
         {% if can_submit %}
-        <button type="submit" id="btn-submit-code" class="btn-primary px-5 py-2.5 text-sm font-medium {% if problem_data|length > 1 %}hidden{% endif %}">Submit Code</button>
+        <button type="submit" id="btn-submit-code" class="btn-primary h-12 px-5 text-sm font-medium {% if problem_data|length > 1 %}hidden{% endif %}">Submit Code</button>
         {% endif %}
       </div>
     </div>
   </form>
   {% if can_submit %}
   <div class="fixed inset-x-3 bottom-24 z-30 rounded-[1.25rem] border border-slate-700/80 bg-slate-950/92 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.45)] backdrop-blur md:hidden">
-    <button type="submit" form="student-code-form" class="btn-primary h-11 w-full px-5 text-sm">Submit Code</button>
+    <button type="submit" form="student-code-form" class="btn-primary h-12 w-full px-5 text-sm">Submit Code</button>
   </div>
   {% endif %}
 </section>

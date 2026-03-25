@@ -88,13 +88,13 @@
     {% endfor %}
 
     {% if questions and can_submit %}
-    <button type="submit" class="btn-primary hidden w-full items-center justify-center px-5 py-2.5 sm:w-auto md:inline-flex">Submit Assignment</button>
+    <button type="submit" class="btn-primary hidden h-12 w-full items-center justify-center px-5 text-sm sm:w-auto md:inline-flex">Submit Assignment</button>
     {% endif %}
   </form>
 
   {% if questions and can_submit %}
   <div class="fixed inset-x-3 bottom-24 z-30 rounded-[1.25rem] border border-slate-700/80 bg-slate-950/92 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.45)] backdrop-blur md:hidden">
-    <button type="submit" form="student-quiz-form" class="btn-primary h-11 w-full px-5 text-sm">Submit Assignment</button>
+    <button type="submit" form="student-quiz-form" class="btn-primary h-12 w-full px-5 text-sm">Submit Assignment</button>
   </div>
   {% endif %}
 </section>

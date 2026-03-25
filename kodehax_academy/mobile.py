@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from django.conf import settings
 from django.shortcuts import render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
@@ -29,6 +30,10 @@ MOBILE_TEMPLATE_MAP = {
 
 
 def _resolve_mobile_template(desktop_template_name, explicit_mobile_template=None):
+    # Keep one consistent UI/theme across desktop and mobile by default.
+    if getattr(settings, "FORCE_DESKTOP_UI_ON_MOBILE", True):
+        return None
+
     candidate = explicit_mobile_template or MOBILE_TEMPLATE_MAP.get(desktop_template_name)
     if not candidate:
         return None

@@ -51,12 +51,12 @@
       <input type="file" name="file" {% if can_submit %}required{% else %}disabled{% endif %} class="block w-full cursor-pointer rounded-xl border border-slate-600 bg-slate-900/60 text-sm text-slate-200 file:mr-4 file:rounded-lg file:border-0 file:bg-teal-500 file:px-4 file:py-2 file:font-semibold file:text-slate-900 hover:file:bg-teal-400 focus:outline-none focus:ring-4 focus:ring-teal-500/25">
     </div>
     {% if can_submit %}
-    <button type="submit" class="btn-primary hidden w-full items-center justify-center px-5 py-2.5 sm:w-auto md:inline-flex">Submit</button>
+    <button type="submit" class="btn-primary hidden h-12 w-full items-center justify-center px-5 text-sm sm:w-auto md:inline-flex">Submit</button>
     {% endif %}
   </form>
   {% if can_submit %}
   <div class="fixed inset-x-3 bottom-24 z-30 rounded-[1.25rem] border border-slate-700/80 bg-slate-950/92 p-3 shadow-[0_18px_40px_rgba(2,6,23,0.45)] backdrop-blur md:hidden">
-    <button type="submit" form="student-file-form" class="btn-primary h-11 w-full px-5 text-sm">Submit</button>
+    <button type="submit" form="student-file-form" class="btn-primary h-12 w-full px-5 text-sm">Submit</button>
   </div>
   {% endif %}
 </section>

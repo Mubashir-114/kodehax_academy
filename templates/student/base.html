@@ -101,6 +101,30 @@
         box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.34);
       }
 
+      .mobile-drawer-overlay {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms ease;
+      }
+
+      .mobile-drawer {
+        transform: translateX(100%);
+        transition: transform 260ms ease;
+      }
+
+      body.mobile-drawer-open {
+        overflow: hidden;
+      }
+
+      body.mobile-drawer-open .mobile-drawer-overlay {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      body.mobile-drawer-open .mobile-drawer {
+        transform: translateX(0);
+      }
+
       .custom-scroll {
         scrollbar-width: thin;
         scrollbar-color: rgba(45, 212, 191, 0.9) rgba(15, 23, 42, 0.24);
@@ -198,7 +222,7 @@
     </aside>
 
     <div class="flex min-h-screen flex-1 flex-col">
-        <header class="border-b border-slate-800/90 bg-slate-950/70 px-4 py-4 backdrop-blur-xl sm:px-6 lg:hidden">
+        <header class="sticky top-0 z-30 border-b border-slate-800/90 bg-slate-950/70 px-4 py-4 backdrop-blur-xl sm:px-6 lg:hidden">
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
                     <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-10 w-10 rounded-2xl object-cover">
@@ -217,18 +241,45 @@
                     Menu
                 </button>
             </div>
-            <div id="student-mobile-menu" class="mt-4 hidden space-y-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-4">
-                <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-                    <p class="text-xs uppercase tracking-[0.16em] text-slate-500">Logged in as</p>
-                    <p class="mt-2 text-sm font-semibold text-slate-100">{{ request.user.username }}</p>
-                    <p class="mt-1 break-all text-xs text-slate-400">{{ request.user.email }}</p>
-                </div>
-                <div class="grid grid-cols-1 gap-2 text-sm">
-                    <a href="{% url 'skill_assessment_profile' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4">Skill Profile</a>
-                    <a href="{% url 'chat_page' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4">AI Assistant</a>
-                    {% block mobile_workspace_sidebar %}{% endblock %}
-                    <a href="{% url 'logout' %}" class="inline-flex min-h-11 items-center justify-center rounded-2xl bg-rose-600/90 px-4 font-semibold text-white">Logout</a>
-                </div>
+            <div id="student-mobile-menu" class="mobile-drawer-overlay fixed inset-0 z-50 lg:hidden" hidden>
+                <button
+                    type="button"
+                    class="h-full w-full bg-slate-950/60 backdrop-blur-sm"
+                    data-mobile-drawer-close
+                    aria-label="Close menu"
+                ></button>
+                <aside class="mobile-drawer absolute right-0 top-0 h-full w-[min(88vw,360px)] border-l border-slate-800 bg-slate-950/95 p-4 shadow-[0_20px_45px_rgba(2,6,23,0.45)]">
+                    <div class="mb-4 flex items-center justify-between">
+                        <p class="text-sm font-semibold text-white">Workspace Menu</p>
+                        <button
+                            type="button"
+                            class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-700 px-3 text-sm font-semibold text-slate-200"
+                            data-mobile-drawer-close
+                        >
+                            Close
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                            <p class="text-xs uppercase tracking-[0.16em] text-slate-500">Logged in as</p>
+                            <p class="mt-2 text-sm font-semibold text-slate-100">{{ request.user.username }}</p>
+                            <p class="mt-1 break-all text-xs text-slate-400">{{ request.user.email }}</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2 text-sm">
+                            <a href="{% url 'skill_assessment_profile' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4">Skill Profile</a>
+                            <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4">AI Assistant</a>
+                            {% block mobile_workspace_sidebar %}{% endblock %}
+                            <a href="{% url 'logout' %}" class="inline-flex h-12 items-center justify-center rounded-2xl bg-rose-600/90 px-4 font-semibold text-white">Logout</a>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-11 items-center justify-center px-4">AI Assistant</a>
+                <a href="{% url 'student_profile' %}" class="btn-primary inline-flex h-11 items-center justify-center px-4">Profile</a>
+            </div>
+            <div class="mt-3 rounded-2xl border border-slate-800 bg-slate-900/55 px-4 py-2 text-xs text-slate-400">
+                {% module_breadcrumbs "student" %}
             </div>
         </header>
 
@@ -301,10 +352,32 @@
     const menu = document.getElementById("student-mobile-menu");
     if (!toggle || !menu) return;
 
+    const closeControls = menu.querySelectorAll("[data-mobile-drawer-close]");
+    const closeDrawer = () => {
+      document.body.classList.remove("mobile-drawer-open");
+      menu.setAttribute("hidden", "");
+      toggle.setAttribute("aria-expanded", "false");
+    };
+
     toggle.addEventListener("click", () => {
-      const isOpen = !menu.classList.contains("hidden");
-      menu.classList.toggle("hidden", isOpen);
-      toggle.setAttribute("aria-expanded", String(!isOpen));
+      const isOpen = document.body.classList.contains("mobile-drawer-open");
+      if (isOpen) {
+        closeDrawer();
+        return;
+      }
+      menu.removeAttribute("hidden");
+      document.body.classList.add("mobile-drawer-open");
+      toggle.setAttribute("aria-expanded", "true");
+    });
+
+    closeControls.forEach((control) => {
+      control.addEventListener("click", closeDrawer);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeDrawer();
+      }
     });
   })();
 </script>
