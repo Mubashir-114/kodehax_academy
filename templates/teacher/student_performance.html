@@ -2,6 +2,32 @@
 
 {% block title %}Performance - {{ student.username }}{% endblock %}
 {% block page_title %}Student Detail{% endblock %}
+{% block extra_head %}
+<style>
+  .mobile-metric-rail {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0.9rem;
+    padding: 0 0.15rem 0.25rem;
+    margin-inline: -0.15rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .mobile-metric-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobile-metric-card {
+    flex: 0 0 calc(100% - 2.5rem);
+    width: calc(100% - 2.5rem);
+    scroll-snap-align: start;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
@@ -25,7 +51,24 @@
     </div>
   </section>
 
-  <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+  <section class="md:hidden">
+    <div class="mobile-metric-rail">
+      {% for meter in analytics.meters %}
+      <article class="mobile-metric-card glass-card p-5 reveal">
+        <p class="text-xs uppercase tracking-[0.1em] text-slate-400">{{ meter.label }}</p>
+        <div class="mt-3 flex items-end justify-between gap-3">
+          <p class="text-3xl font-black text-white">{{ meter.display }}</p>
+          <p class="text-xs text-slate-400">{{ meter.helper }}</p>
+        </div>
+        <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
+          <div class="h-full rounded-full bg-{{ meter.tone }}-400" style="width: {{ meter.value }}%"></div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
     {% for meter in analytics.meters %}
     <article class="glass-card p-5 reveal">
       <p class="text-xs uppercase tracking-[0.1em] text-slate-400">{{ meter.label }}</p>

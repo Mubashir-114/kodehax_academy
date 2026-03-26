@@ -2,6 +2,50 @@
 
 {% block title %}Teacher Dashboard{% endblock %}
 {% block page_title %}Dashboard{% endblock %}
+{% block extra_head %}
+<style>
+  .teacher-meter-rail {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 1rem;
+    padding: 0 0.1rem 0.35rem;
+    margin-inline: -0.1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .teacher-meter-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .teacher-meter-card {
+    flex: 0 0 calc(100% - 2rem);
+    width: calc(100% - 2rem);
+    scroll-snap-align: start;
+  }
+
+  .teacher-summary-card {
+    flex: 0 0 calc(100% - 2rem);
+    width: calc(100% - 2rem);
+    scroll-snap-align: start;
+  }
+
+  .teacher-compact-card {
+    flex: 0 0 calc(100% - 2rem);
+    width: calc(100% - 2rem);
+    scroll-snap-align: start;
+  }
+
+  .teacher-mini-card {
+    flex: 0 0 calc(100% - 4rem);
+    width: calc(100% - 4rem);
+    scroll-snap-align: start;
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
@@ -23,7 +67,33 @@
     </div>
   </section>
 
-  <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+  <section class="md:hidden">
+    <div class="teacher-meter-rail">
+      {% for meter in analytics.meters %}
+      <article class="teacher-meter-card glass-card p-5 reveal">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-[0.12em] text-slate-400">{{ meter.label }}</p>
+            <p class="mt-2 text-3xl font-black text-white">{{ meter.display }}</p>
+            <p class="mt-1 text-sm text-slate-400">{{ meter.helper }}</p>
+          </div>
+          <div class="h-14 w-14 rounded-2xl bg-slate-900/70 p-1">
+            <div class="flex h-full items-end gap-1 rounded-xl bg-slate-950/70 px-2 py-2">
+              <span class="w-2 rounded-full bg-{{ meter.tone }}-500/50" style="height: 35%"></span>
+              <span class="w-2 rounded-full bg-{{ meter.tone }}-400/70" style="height: 60%"></span>
+              <span class="w-2 rounded-full bg-{{ meter.tone }}-300" style="height: {{ meter.value }}%"></span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
+          <div class="h-full rounded-full bg-{{ meter.tone }}-400" style="width: {{ meter.value }}%"></div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
     {% for meter in analytics.meters %}
     <article class="glass-card p-5 reveal">
       <div class="flex items-start justify-between gap-4">
@@ -80,7 +150,36 @@
             <span>More</span>
           </div>
         </div>
-        <div class="space-y-3">
+        <div class="md:hidden">
+          <div class="teacher-meter-rail">
+            <div class="teacher-summary-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+              <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Active Days</p>
+              <p class="mt-2 text-2xl font-black text-white">{{ analytics.heatmap_summary.active_days }}</p>
+              <p class="mt-1 text-xs text-slate-400">days with at least one class activity</p>
+            </div>
+            <div class="teacher-summary-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+              <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Consistency</p>
+              <p class="mt-2 text-2xl font-black text-white">{{ analytics.heatmap_summary.consistency }}%</p>
+              <p class="mt-1 text-xs text-slate-400">coverage across the visible 12-week window</p>
+            </div>
+            <div class="teacher-summary-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+              <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Peak Day</p>
+              {% if analytics.heatmap_summary.best_day %}
+              <p class="mt-2 text-lg font-bold text-white">{{ analytics.heatmap_summary.best_day.date|date:"d M Y" }}</p>
+              <p class="mt-1 text-xs text-slate-400">{{ analytics.heatmap_summary.best_day.count }} coding events</p>
+              {% else %}
+              <p class="mt-2 text-lg font-bold text-white">No activity yet</p>
+              <p class="mt-1 text-xs text-slate-400">heatmap insights appear after submissions</p>
+              {% endif %}
+            </div>
+            <div class="teacher-summary-card rounded-2xl bg-slate-900/80 p-4">
+              <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Total Activity</p>
+              <p class="mt-2 text-2xl font-black text-white">{{ analytics.heatmap_summary.total_activity }}</p>
+              <p class="mt-1 text-xs text-slate-400">combined challenge and submission events</p>
+            </div>
+          </div>
+        </div>
+        <div class="hidden space-y-3 md:block">
           <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
             <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Active Days</p>
             <p class="mt-2 text-2xl font-black text-white">{{ analytics.heatmap_summary.active_days }}</p>
@@ -118,7 +217,23 @@
         </div>
         <span class="rounded-full bg-slate-900/70 px-3 py-1 text-xs text-slate-300">{{ analytics.challenge_balance.label }}</span>
       </div>
-      <div class="mt-5 space-y-4">
+      <div class="mt-5 md:hidden">
+        <div class="teacher-meter-rail">
+          {% for card in analytics.daily_challenge_cards %}
+          <div class="teacher-compact-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <p class="font-semibold text-white">{{ card.label }}</p>
+              <span class="text-sm font-bold text-{{ card.tone }}-300">{{ card.rate }}%</span>
+            </div>
+            <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+              <div class="h-full rounded-full bg-{{ card.tone }}-400" style="width: {{ card.rate }}%"></div>
+            </div>
+            <p class="mt-2 text-xs text-slate-400">{{ card.solved }} solved out of {{ card.total }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mt-5 hidden space-y-4 md:block">
         {% for card in analytics.daily_challenge_cards %}
         <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
           <div class="flex items-center justify-between gap-3">
@@ -139,7 +254,25 @@
     <article class="glass-card p-6 reveal">
       <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Needs Attention</p>
       <h4 class="mt-1 text-xl font-bold text-white">Students who need follow-up</h4>
-      <div class="mt-5 space-y-3">
+      <div class="mt-5 md:hidden">
+        {% if analytics.needs_attention %}
+        <div class="teacher-meter-rail">
+          {% for row in analytics.needs_attention %}
+          <div class="teacher-compact-card rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <p class="font-semibold text-white">{{ row.student.username }}</p>
+              <span class="rounded-full bg-slate-950/60 px-2.5 py-1 text-xs text-rose-200">{{ row.skill_score }}</span>
+            </div>
+            <p class="mt-2 text-sm text-rose-100">{{ row.reason|title }}</p>
+            <p class="mt-1 text-xs text-slate-300">Accuracy {{ row.accuracy }}% · Fails {{ row.failed_attempts }} · Compile errors {{ row.compile_errors }}</p>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-100">No urgent attention flags right now.</div>
+        {% endif %}
+      </div>
+      <div class="mt-5 hidden space-y-3 md:block">
         {% for row in analytics.needs_attention %}
         <div class="rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4">
           <div class="flex items-center justify-between gap-3">
@@ -158,7 +291,20 @@
     <article class="glass-card p-6 reveal delay-1">
       <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Teacher Insights</p>
       <h4 class="mt-1 text-xl font-bold text-white">Automated cohort signals</h4>
-      <div class="mt-5 space-y-3">
+      <div class="mt-5 md:hidden">
+        <div class="teacher-meter-rail">
+          {% for insight in analytics.teacher_insights %}
+          <div class="teacher-compact-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <p class="font-semibold text-white">{{ insight.title }}</p>
+              <span class="text-sm font-bold text-{{ insight.tone }}-300">{{ insight.value }}</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-300">{{ insight.description }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mt-5 hidden space-y-3 md:block">
         {% for insight in analytics.teacher_insights %}
         <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
           <div class="flex items-center justify-between gap-3">
@@ -174,7 +320,22 @@
     <article class="glass-card p-6 reveal delay-2">
       <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Class Skill Distribution</p>
       <h4 class="mt-1 text-xl font-bold text-white">Current level mix</h4>
-      <div class="mt-5 space-y-3">
+      <div class="mt-5 md:hidden">
+        <div class="teacher-meter-rail">
+          {% for bucket in analytics.skill_distribution %}
+          <div class="teacher-compact-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+            <div class="flex items-center justify-between gap-3">
+              <p class="font-semibold text-white">{{ bucket.label }}</p>
+              <span class="text-sm font-bold text-{{ bucket.tone }}-300">{{ bucket.count }}</span>
+            </div>
+            <div class="mt-3 h-2 overflow-hidden rounded-full bg-slate-800">
+              <div class="h-full rounded-full bg-{{ bucket.tone }}-400" style="width: {% if analytics.overview.students %}{% widthratio bucket.count analytics.overview.students 100 %}{% else %}0{% endif %}%"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mt-5 hidden space-y-3 md:block">
         {% for bucket in analytics.skill_distribution %}
         <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
           <div class="flex items-center justify-between gap-3">
@@ -198,7 +359,32 @@
           <h4 class="mt-1 text-xl font-bold text-white">Why the top students are leading</h4>
         </div>
       </div>
-      <div class="mt-5 space-y-3">
+      <div class="mt-5 md:hidden">
+        {% if analytics.leaderboard %}
+        <div class="teacher-meter-rail">
+          {% for entry in analytics.leaderboard %}
+          <div class="teacher-compact-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+            <div class="flex items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-sm font-black text-white">#{{ entry.rank }}</div>
+                <div>
+                  <p class="font-semibold text-white">{{ entry.student.username }}</p>
+                  <p class="text-xs text-slate-400">{{ entry.achievement_tag }}</p>
+                </div>
+              </div>
+              <div class="text-right">
+                <p class="text-lg font-black text-emerald-300">{{ entry.points }}</p>
+                <p class="text-xs text-slate-400">Today {{ entry.daily_points }} | Accuracy {{ entry.accuracy }}%</p>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-sm text-slate-400">No leaderboard data available yet.</p>
+        {% endif %}
+      </div>
+      <div class="mt-5 hidden space-y-3 md:block">
         {% for entry in analytics.leaderboard %}
         <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
           <div class="flex items-center justify-between gap-4">
@@ -224,18 +410,39 @@
     <article class="glass-card p-6 reveal delay-1">
       <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Coding Behavior Insights</p>
       <h4 class="mt-1 text-xl font-bold text-white">Compact behavior metrics</h4>
-      <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div class="mt-5 md:hidden">
+        <div class="teacher-meter-rail">
+          {% for metric in analytics.behavior_metrics %}
+          <div class="teacher-mini-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+            <p class="text-xs uppercase tracking-[0.1em] text-slate-400">{{ metric.label }}</p>
+            <p class="mt-2 text-2xl font-black text-{{ metric.tone }}-300">{{ metric.value }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="mt-5 hidden grid-cols-1 gap-3 sm:grid-cols-2 md:grid">
         {% for metric in analytics.behavior_metrics %}
         <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
           <p class="text-xs uppercase tracking-[0.1em] text-slate-400">{{ metric.label }}</p>
           <p class="mt-2 text-2xl font-black text-{{ metric.tone }}-300">{{ metric.value }}</p>
         </div>
-        {% endfor %}
+      {% endfor %}
       </div>
       <div class="mt-5 rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
         <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Difficulty Balance</p>
         <p class="mt-2 text-lg font-bold text-white">{{ analytics.challenge_balance.label }}</p>
-        <div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div class="mt-4 md:hidden">
+          <div class="teacher-meter-rail">
+            {% for segment in analytics.challenge_balance.segments %}
+            <div class="teacher-mini-card rounded-xl bg-slate-900/70 p-3 text-center">
+              <p class="text-xs text-slate-400">{{ segment.label }}</p>
+              <p class="mt-1 font-black text-white">{{ segment.value }}</p>
+              <p class="text-xs text-slate-400">{{ segment.percent }}%</p>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="mt-4 hidden grid-cols-1 gap-2 sm:grid-cols-3 md:grid">
           {% for segment in analytics.challenge_balance.segments %}
           <div class="rounded-xl bg-slate-900/70 p-3 text-center">
             <p class="text-xs text-slate-400">{{ segment.label }}</p>
