@@ -21,9 +21,19 @@
           </details>
         </div>
       </div>
-      <div class="w-full rounded-xl border border-blue-800 bg-blue-900/30 px-3 py-2.5 text-left md:max-w-[180px] md:px-4 md:py-3 md:text-right">
-        <p class="text-xs uppercase tracking-[0.1em] text-blue-400 font-semibold">Class Code</p>
-        <p class="mt-1 text-xl font-black text-blue-300 md:text-2xl">{{ classroom.class_code }}</p>
+      <div class="flex w-full flex-col gap-3 md:max-w-[220px]">
+        <div class="rounded-xl border border-blue-800 bg-blue-900/30 px-3 py-2.5 text-left md:px-4 md:py-3 md:text-right">
+          <p class="text-xs uppercase tracking-[0.1em] text-blue-400 font-semibold">Class Code</p>
+          <p class="mt-1 text-xl font-black text-blue-300 md:text-2xl">{{ classroom.class_code }}</p>
+        </div>
+        <a href="{% url 'course_readme_view' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">
+          Open README
+        </a>
+        {% if not request.is_mobile %}
+        <a href="{% url 'course_readme_edit' classroom.id %}" class="btn-primary inline-flex min-h-11 items-center justify-center px-4 text-sm">
+          Edit README
+        </a>
+        {% endif %}
       </div>
     </div>
     <p class="mt-3 text-xs text-slate-500 md:mt-5 md:text-sm">Created on {{ classroom.created_at|date:"M d, Y" }}</p>

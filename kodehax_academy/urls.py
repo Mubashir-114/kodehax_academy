@@ -28,6 +28,7 @@ from student.views import (
     chat_start_api,
     image_query_api,
 )
+from teacher.readme_views import course_readme_edit, course_readme_view
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -42,6 +43,8 @@ urlpatterns = [
     path("maintenance/", maintenance_page, name="maintenance_page"),
     path('admin/', admin.site.urls),
     path('admin-panel/', include('adminpanel.urls')),
+    path("course/<int:id>/readme/", course_readme_view, name="course_readme_view"),
+    path("course/<int:id>/readme/edit/", course_readme_edit, name="course_readme_edit"),
     path("api/chat/start/", chat_start_api, name="api_chat_start"),
     path("api/chat/sessions/", chat_sessions_api, name="api_chat_sessions"),
     path("api/chat/<int:session_id>/", chat_session_detail_api, name="api_chat_session_detail"),

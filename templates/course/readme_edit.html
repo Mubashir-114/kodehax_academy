@@ -1,0 +1,373 @@
+{% extends base_template %}
+
+{% block title %}Edit Course README{% endblock %}
+{% block page_title %}Edit Course README{% endblock %}
+{% block page_subtitle %}Write and maintain markdown documentation for the classroom with a live preview and safe server-side rendering.{% endblock %}
+{% block header %}Edit Course README{% endblock %}
+{% block header_subtitle %}Write and maintain markdown documentation for the classroom with a live preview and safe server-side rendering.{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css">
+<style>
+  .readme-shell {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.78));
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 48px rgba(2, 6, 23, 0.28);
+    overflow: hidden;
+  }
+
+  .readme-prose {
+    color: #dbe4f0;
+    font-size: 0.96rem;
+    line-height: 1.8;
+  }
+
+  .readme-prose h1,
+  .readme-prose h2,
+  .readme-prose h3,
+  .readme-prose h4,
+  .readme-prose h5,
+  .readme-prose h6 {
+    color: #f8fafc;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-top: 1.6em;
+    margin-bottom: 0.75em;
+  }
+
+  .readme-prose h1 { font-size: 1.9rem; }
+  .readme-prose h2 { font-size: 1.5rem; }
+  .readme-prose h3 { font-size: 1.15rem; }
+
+  .readme-prose p,
+  .readme-prose ul,
+  .readme-prose ol,
+  .readme-prose table,
+  .readme-prose pre,
+  .readme-prose blockquote {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  .readme-prose ul,
+  .readme-prose ol {
+    padding-left: 1.35rem;
+  }
+
+  .readme-prose a {
+    color: #818cf8;
+    text-decoration: none;
+  }
+
+  .readme-prose a:hover {
+    color: #a5b4fc;
+    text-decoration: underline;
+  }
+
+  .readme-prose code {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(15, 23, 42, 0.88);
+    color: #c4b5fd;
+    border-radius: 0.5rem;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.9em;
+  }
+
+  .readme-prose pre {
+    overflow-x: auto;
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    background: #020617;
+    border-radius: 1rem;
+    padding: 1rem;
+  }
+
+  .readme-prose pre code {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .readme-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .readme-prose th,
+  .readme-prose td {
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    padding: 0.75rem 0.9rem;
+    text-align: left;
+  }
+
+  .readme-prose th {
+    background: rgba(15, 23, 42, 0.92);
+    color: #f8fafc;
+  }
+
+  .readme-prose blockquote {
+    border-left: 4px solid rgba(129, 140, 248, 0.85);
+    background: rgba(15, 23, 42, 0.54);
+    border-radius: 0 0.9rem 0.9rem 0;
+    padding: 0.9rem 1rem;
+    color: #cbd5e1;
+  }
+
+  .readme-prose img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    margin: 1rem 0;
+  }
+
+  .readme-prose hr {
+    border: 0;
+    border-top: 1px solid rgba(71, 85, 105, 0.72);
+    margin: 1.5rem 0;
+  }
+
+  #readme-editor {
+    appearance: none;
+    -webkit-appearance: none;
+    color-scheme: dark;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.96), rgba(15, 23, 42, 0.94));
+    color: #e2e8f0;
+    caret-color: #818cf8;
+    border: 1px solid rgba(71, 85, 105, 0.78);
+    box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.05);
+    resize: vertical;
+  }
+
+  #readme-editor::placeholder {
+    color: #64748b;
+    opacity: 1;
+  }
+
+  #readme-editor::selection {
+    background: rgba(129, 140, 248, 0.28);
+    color: #f8fafc;
+  }
+
+  #readme-editor::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  #readme-editor::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 999px;
+  }
+
+  #readme-editor::-webkit-scrollbar-thumb {
+    background: rgba(129, 140, 248, 0.78);
+    border-radius: 999px;
+  }
+
+  #readme-editor:-webkit-autofill,
+  #readme-editor:-webkit-autofill:hover,
+  #readme-editor:-webkit-autofill:focus {
+    -webkit-text-fill-color: #e2e8f0;
+    -webkit-box-shadow: 0 0 0 1000px rgba(2, 6, 23, 0.96) inset;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="space-y-6">
+  {% if desktop_only %}
+  <div class="readme-shell reveal">
+    <div class="px-5 py-5 sm:px-6">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-amber-400">Desktop Only</p>
+      <h2 class="mt-2 text-2xl font-black text-white">README editing is available only on desktop</h2>
+      <p class="mt-3 max-w-2xl text-sm leading-7 text-slate-300">
+        You can still review the current course README on mobile, but editing tools are intentionally hidden on smaller devices.
+      </p>
+      <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+        <a href="{% url 'course_readme_view' classroom.id %}" class="btn-primary inline-flex min-h-11 items-center justify-center px-4 text-sm">
+          View README
+        </a>
+        <a href="{% url 'class_detail' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">
+          Back to Classroom
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="readme-shell reveal delay-1">
+    <div class="border-b border-slate-700/80 px-5 py-4 sm:px-6">
+      <h3 class="text-lg font-bold text-white">Current README</h3>
+      <p class="mt-2 text-sm text-slate-400">{{ classroom.name }}</p>
+    </div>
+    <div class="px-5 py-5 sm:px-6">
+      <div class="prose max-w-none readme-prose">
+        {{ readme_html|safe }}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="readme-shell reveal">
+    <div class="border-b border-slate-700/80 px-5 py-4 sm:px-6">
+      <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Editing Classroom</p>
+          <h2 class="mt-2 text-2xl font-black text-white">{{ classroom.name }}</h2>
+          <p class="mt-2 text-sm text-slate-400">Write markdown on the left and review the rendered README on the right.</p>
+        </div>
+        <div class="flex flex-col gap-3 sm:flex-row">
+          <a href="{% url 'course_readme_view' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">
+            View README
+          </a>
+          <button type="button" id="readme-save-btn" class="btn-primary inline-flex min-h-11 items-center justify-center px-5 text-sm">
+            Save README
+          </button>
+        </div>
+      </div>
+      <p id="readme-save-status" class="mt-3 text-sm text-slate-400">Changes are saved manually.</p>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2">
+      <div class="border-b border-slate-700/80 xl:border-b-0 xl:border-r">
+        <label for="readme-editor" class="block px-5 pt-5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 sm:px-6">Markdown Editor</label>
+        <div class="px-5 pb-5 pt-3 sm:px-6 sm:pb-6">
+          <textarea
+            id="readme-editor"
+            class="custom-scroll min-h-[520px] w-full rounded-2xl px-4 py-4 font-mono text-sm leading-7 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/20"
+            spellcheck="false"
+            placeholder="# Course README&#10;&#10;Add your overview, syllabus, setup steps, and resources here..."
+          >{{ readme_source }}</textarea>
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between px-5 pt-5 sm:px-6">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Live Preview</p>
+          <span class="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs text-slate-400">Rendered safely before save</span>
+        </div>
+        <div class="px-5 pb-5 pt-3 sm:px-6 sm:pb-6">
+          <div id="readme-preview" class="prose custom-scroll max-h-[520px] max-w-none overflow-y-auto rounded-2xl border border-slate-700 bg-slate-950/55 px-5 py-5 readme-prose">
+            {{ readme_html|safe }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+{% if not desktop_only %}
+<script>
+  (function () {
+    const editor = document.getElementById("readme-editor");
+    const preview = document.getElementById("readme-preview");
+    const saveBtn = document.getElementById("readme-save-btn");
+    const status = document.getElementById("readme-save-status");
+    if (!editor || !preview || !saveBtn || !status) {
+      return;
+    }
+
+    const csrfToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("csrftoken="))
+      ?.split("=")[1];
+
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+      highlight: function (code, lang) {
+        if (window.hljs && lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+        if (window.hljs) {
+          return hljs.highlightAuto(code).value;
+        }
+        return code;
+      }
+    });
+
+    function enhancePreview() {
+      if (!window.hljs) {
+        return;
+      }
+      preview.querySelectorAll("pre code").forEach((block) => {
+        try {
+          hljs.highlightElement(block);
+        } catch (error) {
+          console.warn("README preview highlighting skipped for one block.", error);
+        }
+      });
+    }
+
+    function renderPreview(markdownSource) {
+      const parsed = window.marked ? marked.parse(markdownSource || "") : (markdownSource || "");
+      preview.innerHTML = window.DOMPurify ? DOMPurify.sanitize(parsed) : parsed;
+      enhancePreview();
+    }
+
+    renderPreview(editor.value);
+
+    editor.addEventListener("input", function () {
+      renderPreview(editor.value);
+      status.textContent = "Unsaved changes";
+      status.className = "mt-3 text-sm text-amber-300";
+    });
+
+    saveBtn.addEventListener("click", async function () {
+      saveBtn.disabled = true;
+      status.textContent = "Saving README...";
+      status.className = "mt-3 text-sm text-slate-300";
+
+      try {
+        const formData = new FormData();
+        formData.append("readme_content", editor.value);
+
+        const response = await fetch("{% url 'course_readme_edit' classroom.id %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": csrfToken || "",
+            "X-Requested-With": "XMLHttpRequest"
+          },
+          body: formData
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "Failed to save README.");
+        }
+
+        renderPreview(editor.value);
+        status.textContent = "Saved " + (data.updated_at || "just now");
+        status.className = "mt-3 text-sm text-emerald-300";
+      } catch (error) {
+        status.textContent = error.message || "Failed to save README.";
+        status.className = "mt-3 text-sm text-rose-300";
+      } finally {
+        saveBtn.disabled = false;
+      }
+    });
+  })();
+</script>
+{% endif %}
+<script>
+  (function () {
+    if (!window.hljs) {
+      return;
+    }
+    document.querySelectorAll(".readme-prose pre code").forEach((block) => {
+      try {
+        hljs.highlightElement(block);
+      } catch (error) {
+        console.warn("README code highlight skipped for one block.", error);
+      }
+    });
+  })();
+</script>
+{% endblock %}

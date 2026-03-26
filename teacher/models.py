@@ -22,6 +22,8 @@ class ClassRoom(models.Model):
 
     description = models.TextField(blank=True)
 
+    readme_content = models.TextField(blank=True, null=True)
+
     teacher = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

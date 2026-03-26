@@ -4,13 +4,163 @@
 {% block header %}Class Detail{% endblock %}
 {% block header_subtitle %}See class context, current assignments, and the next action for each task in a compact student workflow.{% endblock %}
 
+{% block extra_styles %}
+<style>
+  .class-readme-preview {
+    position: relative;
+    max-height: 21rem;
+    overflow: hidden;
+  }
+
+  .class-readme-preview::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 4.5rem;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0), rgba(2, 6, 23, 0.96));
+    pointer-events: none;
+  }
+
+  .class-readme-prose {
+    color: #dbe4f0;
+    font-size: 0.94rem;
+    line-height: 1.75;
+  }
+
+  .class-readme-prose h1,
+  .class-readme-prose h2,
+  .class-readme-prose h3,
+  .class-readme-prose h4,
+  .class-readme-prose h5,
+  .class-readme-prose h6 {
+    color: #f8fafc;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-top: 1.2em;
+    margin-bottom: 0.6em;
+  }
+
+  .class-readme-prose h1 { font-size: 1.55rem; }
+  .class-readme-prose h2 { font-size: 1.3rem; }
+  .class-readme-prose h3 { font-size: 1.08rem; }
+
+  .class-readme-prose p,
+  .class-readme-prose ul,
+  .class-readme-prose ol,
+  .class-readme-prose table,
+  .class-readme-prose pre,
+  .class-readme-prose blockquote {
+    margin-top: 0;
+    margin-bottom: 0.95rem;
+  }
+
+  .class-readme-prose ul,
+  .class-readme-prose ol {
+    padding-left: 1.25rem;
+  }
+
+  .class-readme-prose a {
+    color: #5eead4;
+    text-decoration: none;
+  }
+
+  .class-readme-prose a:hover {
+    text-decoration: underline;
+  }
+
+  .class-readme-prose code {
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(15, 23, 42, 0.88);
+    color: #c4b5fd;
+    border-radius: 0.45rem;
+    padding: 0.12rem 0.38rem;
+    font-size: 0.9em;
+  }
+
+  .class-readme-prose pre {
+    overflow-x: auto;
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    background: #020617;
+    border-radius: 0.9rem;
+    padding: 0.9rem;
+  }
+
+  .class-readme-prose pre code {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .class-readme-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .class-readme-prose th,
+  .class-readme-prose td {
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    padding: 0.65rem 0.8rem;
+    text-align: left;
+  }
+
+  .class-readme-prose th {
+    background: rgba(15, 23, 42, 0.92);
+    color: #f8fafc;
+  }
+
+  .class-readme-prose blockquote {
+    border-left: 4px solid rgba(45, 212, 191, 0.85);
+    background: rgba(15, 23, 42, 0.54);
+    border-radius: 0 0.9rem 0.9rem 0;
+    padding: 0.8rem 0.95rem;
+    color: #cbd5e1;
+  }
+
+  .class-readme-prose img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    margin: 0.9rem 0;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 {% load assignment_tags %}
 <section class="space-y-5 reveal">
   <div class="rounded-2xl border border-slate-700 bg-slate-900/45 p-5 sm:p-6">
-    <h2 class="text-xl font-bold text-white">{{ classroom.name }}</h2>
-    <p class="text-sm text-slate-400 mt-1">Teacher: {{ classroom.teacher.username }}</p>
-    <p class="text-sm text-slate-300 mt-3">{{ classroom.description|default:"No description provided." }}</p>
+    <div>
+      <h2 class="text-xl font-bold text-white">{{ classroom.name }}</h2>
+      <p class="text-sm text-slate-400 mt-1">Teacher: {{ classroom.teacher.username }}</p>
+    </div>
+    {% if has_classroom_readme %}
+    <div class="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">About This Course</p>
+      <div class="class-readme-preview mt-3">
+        <div id="class-readme-output" class="prose class-readme-prose max-w-none">
+          {{ classroom_readme_html|safe }}
+        </div>
+        <textarea id="class-readme-raw" class="hidden">{{ classroom.readme_content }}</textarea>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <a href="{% url 'course_readme_view' classroom.id %}" class="btn-muted inline-flex min-h-10 items-center justify-center px-4 text-sm">
+          Read more
+        </a>
+      </div>
+    </div>
+    {% elif classroom.description %}
+    <div class="mt-3 rounded-xl border border-slate-700 bg-slate-950/35 p-4">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">About This Course</p>
+      <p class="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-300">{{ classroom.description }}</p>
+    </div>
+    {% else %}
+    <p class="text-sm text-slate-400 mt-3">No description provided.</p>
+    {% endif %}
   </div>
 
   <div class="space-y-4">
@@ -69,4 +219,48 @@
     {% endfor %}
   </div>
 </section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+<script>
+  (function () {
+    const output = document.getElementById("class-readme-output");
+    const raw = document.getElementById("class-readme-raw");
+    if (!output || !raw || !raw.value.trim()) {
+      return;
+    }
+
+    if (window.marked) {
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function (code, lang) {
+          if (window.hljs && lang && hljs.getLanguage(lang)) {
+            return hljs.highlight(code, { language: lang }).value;
+          }
+          if (window.hljs) {
+            return hljs.highlightAuto(code).value;
+          }
+          return code;
+        }
+      });
+      const parsed = marked.parse(raw.value || "");
+      output.innerHTML = window.DOMPurify ? DOMPurify.sanitize(parsed) : parsed;
+    }
+
+    if (!window.hljs) {
+      return;
+    }
+    output.querySelectorAll("pre code").forEach((block) => {
+      try {
+        hljs.highlightElement(block);
+      } catch (error) {
+        console.warn("Student README code highlight skipped for one block.", error);
+      }
+    });
+  })();
+</script>
 {% endblock %}

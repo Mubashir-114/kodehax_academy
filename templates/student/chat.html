@@ -60,7 +60,9 @@
 
     <div class="chat-input-row">
         <input id="image-input" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" class="hidden" />
-        <button type="button" class="upload-btn" onclick="document.getElementById('image-input').click()" title="Upload image">Attach</button>
+        <button type="button" class="upload-btn" onclick="document.getElementById('image-input').click()" title="Add image" aria-label="Add image">
+          <span class="upload-glyph" aria-hidden="true"></span>
+        </button>
         <input id="user-input" type="text" placeholder="Type your question and press Enter..." onkeydown="if(event.key==='Enter') sendMessage()" />
         <button onclick="sendMessage()" id="send-btn" class="send-btn" disabled>Send</button>
     </div>
@@ -728,6 +730,34 @@
     font-size: 0.84rem;
     font-weight: 600;
     transition: 180ms ease;
+  }
+
+  .upload-glyph {
+    position: relative;
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+  }
+
+  .upload-glyph::before,
+  .upload-glyph::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: currentColor;
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+  }
+
+  .upload-glyph::before {
+    width: 0.9rem;
+    height: 2px;
+  }
+
+  .upload-glyph::after {
+    width: 2px;
+    height: 0.9rem;
   }
 
   .preview-btn:hover,

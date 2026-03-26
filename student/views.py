@@ -44,6 +44,7 @@ from teacher.services.performance import (
     sync_code_submission_record,
     sync_file_submission_record,
 )
+from teacher.services.course_readme import render_course_readme_html
 from kodehax_academy.mobile import render_for_device
 
 MODEL = "gemini-flash-latest"
@@ -1013,6 +1014,8 @@ def class_detail(request, class_id):
     return render_for_device(request, "student/class_detail.html", {
         "classroom": classroom,
         "assignment_rows": assignment_rows,
+        "classroom_readme_html": render_course_readme_html(classroom.readme_content),
+        "has_classroom_readme": bool((classroom.readme_content or "").strip()),
     })
 
 

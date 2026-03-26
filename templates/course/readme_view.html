@@ -1,0 +1,211 @@
+{% extends base_template %}
+
+{% block title %}Course README{% endblock %}
+{% block page_title %}Course README{% endblock %}
+{% block page_subtitle %}Review the classroom guide, resources, setup notes, and markdown documentation in a clean GitHub-style reading view.{% endblock %}
+{% block header %}Course README{% endblock %}
+{% block header_subtitle %}Review the classroom guide, resources, setup notes, and markdown documentation in a clean GitHub-style reading view.{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/github-dark.min.css">
+<style>
+  .readme-shell {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.78));
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 48px rgba(2, 6, 23, 0.28);
+    overflow: hidden;
+  }
+
+  .readme-prose {
+    color: #dbe4f0;
+    font-size: 0.98rem;
+    line-height: 1.8;
+  }
+
+  .readme-prose h1,
+  .readme-prose h2,
+  .readme-prose h3,
+  .readme-prose h4,
+  .readme-prose h5,
+  .readme-prose h6 {
+    color: #f8fafc;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-top: 1.6em;
+    margin-bottom: 0.75em;
+  }
+
+  .readme-prose h1 { font-size: 2rem; }
+  .readme-prose h2 { font-size: 1.55rem; }
+  .readme-prose h3 { font-size: 1.2rem; }
+
+  .readme-prose p,
+  .readme-prose ul,
+  .readme-prose ol,
+  .readme-prose table,
+  .readme-prose pre,
+  .readme-prose blockquote {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  .readme-prose ul,
+  .readme-prose ol {
+    padding-left: 1.35rem;
+  }
+
+  .readme-prose a {
+    color: #5eead4;
+    text-decoration: none;
+  }
+
+  .readme-prose a:hover {
+    color: #99f6e4;
+    text-decoration: underline;
+  }
+
+  .readme-prose code {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(15, 23, 42, 0.88);
+    color: #c4b5fd;
+    border-radius: 0.5rem;
+    padding: 0.15rem 0.4rem;
+    font-size: 0.9em;
+  }
+
+  .readme-prose pre {
+    overflow-x: auto;
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    background: #020617;
+    border-radius: 1rem;
+    padding: 1rem;
+  }
+
+  .readme-prose pre code {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .readme-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .readme-prose th,
+  .readme-prose td {
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    padding: 0.75rem 0.9rem;
+    text-align: left;
+  }
+
+  .readme-prose th {
+    background: rgba(15, 23, 42, 0.92);
+    color: #f8fafc;
+  }
+
+  .readme-prose blockquote {
+    border-left: 4px solid rgba(45, 212, 191, 0.85);
+    background: rgba(15, 23, 42, 0.54);
+    border-radius: 0 0.9rem 0.9rem 0;
+    padding: 0.9rem 1rem;
+    color: #cbd5e1;
+  }
+
+  .readme-prose img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    border: 1px solid rgba(71, 85, 105, 0.72);
+    margin: 1rem 0;
+  }
+
+  .readme-prose hr {
+    border: 0;
+    border-top: 1px solid rgba(71, 85, 105, 0.72);
+    margin: 1.5rem 0;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="space-y-6">
+  <div class="readme-shell reveal">
+    <div class="border-b border-slate-700/80 px-5 py-4 sm:px-6">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Classroom</p>
+          <h2 class="mt-2 text-2xl font-black text-white">{{ classroom.name }}</h2>
+          <p class="mt-2 text-sm text-slate-400">Teacher: {{ classroom.teacher.username }}</p>
+        </div>
+        <div class="flex flex-col gap-3 sm:items-end">
+          {% if can_edit_readme %}
+          <a href="{% url 'course_readme_edit' classroom.id %}" class="btn-primary inline-flex min-h-11 items-center justify-center px-4 text-sm">
+            Edit README
+          </a>
+          {% endif %}
+          <a href="{% if is_teacher_view %}{% url 'class_detail' classroom.id %}{% else %}{% url 'student_class_detail' classroom.id %}{% endif %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">
+            Back to Classroom
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-5 py-5 sm:px-6 sm:py-6">
+      <div id="readme-view-output" class="prose max-w-none readme-prose">
+        {{ readme_html|safe }}
+      </div>
+      <textarea id="readme-view-raw" class="hidden">{{ readme_source }}</textarea>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+<script>
+  (function () {
+    const output = document.getElementById("readme-view-output");
+    const raw = document.getElementById("readme-view-raw");
+    if (!output || !raw) {
+      return;
+    }
+
+    if (window.marked) {
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+        highlight: function (code, lang) {
+          if (window.hljs && lang && hljs.getLanguage(lang)) {
+            return hljs.highlight(code, { language: lang }).value;
+          }
+          if (window.hljs) {
+            return hljs.highlightAuto(code).value;
+          }
+          return code;
+        }
+      });
+      const parsed = marked.parse(raw.value || "");
+      output.innerHTML = window.DOMPurify ? DOMPurify.sanitize(parsed) : parsed;
+    }
+
+    if (!window.hljs) {
+      return;
+    }
+    output.querySelectorAll("pre code").forEach((block) => {
+      try {
+        hljs.highlightElement(block);
+      } catch (error) {
+        console.warn("README code highlight skipped for one block.", error);
+      }
+    });
+  })();
+</script>
+{% endblock %}
