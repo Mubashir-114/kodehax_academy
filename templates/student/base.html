@@ -232,7 +232,7 @@
     {% block extra_styles %}{% endblock %}
 </head>
 <body class="min-h-screen overflow-x-hidden">
-{% with current_path=request.path %}
+{% with current_path=request.path view_name=request.resolver_match.view_name %}
 <div class="min-h-screen flex flex-col lg:flex-row">
     <aside class="hidden lg:block w-64 shrink-0 border-r border-slate-800/90 bg-slate-950/85 backdrop-blur-xl">
         <div class="flex min-h-full flex-col px-5 py-6">
@@ -252,19 +252,19 @@
             </div>
 
             <nav class="mt-6 space-y-2 reveal delay-1">
-                <a href="{% url 'student_dashboard' %}" class="nav-link {% if '/student/dashboard/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+                <a href="{% url 'student_dashboard' %}" class="nav-link {% if view_name == 'student_dashboard' or view_name == 'student_class_detail' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
                     Dashboard
                 </a>
-                <a href="{% url 'daily_challenges_today' %}" class="nav-link {% if '/daily-challenges/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+                <a href="{% url 'daily_challenges_today' %}" class="nav-link {% if view_name == 'daily_challenges_today' or view_name == 'daily_challenge_workspace' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
                     Daily Challenges
                 </a>
-                <a href="{% url 'view_assignments' %}" class="nav-link {% if '/student/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+                <a href="{% url 'view_assignments' %}" class="nav-link {% if view_name == 'view_assignments' or view_name == 'submit_assignment' or view_name == 'take_quiz_assignment' or view_name == 'submit_code_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
                     Assignment
                 </a>
-                <a href="{% url 'student_performance_dashboard' %}" class="nav-link {% if '/student/performance/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+                <a href="{% url 'student_performance_dashboard' %}" class="nav-link {% if view_name == 'student_performance_dashboard' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
                     Performance Dashboard
                 </a>
-                <a href="{% url 'student_profile' %}" class="nav-link {% if '/student/profile/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+                <a href="{% url 'student_profile' %}" class="nav-link {% if view_name == 'student_profile' or view_name == 'edit_student_profile' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
                     Profile
                 </a>
             </nav>

@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.db.models import Count
 from datetime import timedelta
 import re
+from student.models import StudentProfile
 from .services.ai_tools import generate_quiz, generate_notes, generate_coding_assignment
 from .services.evaluation import (
     evaluate_quiz_for_assignment,
@@ -170,7 +171,18 @@ def class_detail(request, id):
     if redirect_response:
         return redirect_response
 
-    students = classroom.students.all()
+    students = list(classroom.students.all())
+    student_profiles = {
+        profile.user_id: profile
+        for profile in StudentProfile.objects.filter(user__in=students)
+    }
+    student_rows = [
+        {
+            "student": student,
+            "profile": student_profiles.get(student.id),
+        }
+        for student in students
+    ]
 
     assignments = classroom.assignments.all()
     assignment_rows = []
@@ -191,6 +203,7 @@ def class_detail(request, id):
     context = {
         "classroom": classroom,
         "students": students,
+        "student_rows": student_rows,
         "assignment_rows": assignment_rows
     }
 
@@ -669,9 +682,12 @@ def student_performance(request, class_id, student_id):
         messages.error(request, "Student not found in this classroom.")
         return redirect("performance_list", class_id=classroom.id)
 
+    profile, _ = StudentProfile.objects.get_or_create(user=student)
+
     context = {
         "classroom": classroom,
         "student": student,
+        "profile": profile,
         "analytics": get_student_detail_analytics(classroom, student),
     }
 

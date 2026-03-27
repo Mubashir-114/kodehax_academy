@@ -122,7 +122,127 @@
       line-height: 1.2;
     }
 
+    .teacher-mobile-header {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.9);
+      background:
+        radial-gradient(circle at top left, rgba(14, 165, 233, 0.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(99, 102, 241, 0.18), transparent 34%),
+        linear-gradient(180deg, rgba(2, 6, 23, 0.94), rgba(2, 6, 23, 0.86));
+    }
+
+    .teacher-mobile-header::after {
+      content: "";
+      position: absolute;
+      inset: auto -32px -40px auto;
+      width: 112px;
+      height: 112px;
+      border-radius: 2rem;
+      background: rgba(15, 23, 42, 0.38);
+      transform: rotate(18deg);
+      pointer-events: none;
+    }
+
+    .teacher-mobile-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .teacher-mobile-brand-copy {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .teacher-mobile-brand-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #7dd3fc;
+    }
+
+    .teacher-mobile-brand-title {
+      margin-top: 0.2rem;
+      font-size: 1.35rem;
+      line-height: 1.05;
+      font-weight: 900;
+      color: #f8fafc;
+    }
+
+    .teacher-mobile-brand-subtitle {
+      margin-top: 0.25rem;
+      font-size: 0.76rem;
+      line-height: 1.35;
+      color: #94a3b8;
+    }
+
+    .teacher-mobile-menu-btn {
+      min-width: 3.25rem;
+      min-height: 3.25rem;
+      padding-inline: 0.95rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(100, 116, 139, 0.42);
+      background: rgba(15, 23, 42, 0.34);
+      color: #f8fafc;
+      font-size: 0.875rem;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 10px 24px rgba(2, 6, 23, 0.16);
+      backdrop-filter: blur(10px);
+    }
+
+    .teacher-mobile-menu-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .teacher-mobile-header-row {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.9rem;
+    }
+
+    .teacher-mobile-brand-logo {
+      width: 3.25rem;
+      height: 3.25rem;
+      flex: 0 0 3.25rem;
+    }
+
     @media (max-width: 380px) {
+      .teacher-mobile-header-row {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .teacher-mobile-brand {
+        align-items: center;
+      }
+
+      .teacher-mobile-brand-logo {
+        width: 2.9rem;
+        height: 2.9rem;
+        flex-basis: 2.9rem;
+      }
+
+      .teacher-mobile-brand-title {
+        font-size: 1.1rem;
+      }
+
+      .teacher-mobile-brand-subtitle {
+        max-width: 18rem;
+      }
+
+      .teacher-mobile-menu-btn {
+        width: 100%;
+        min-height: 2.9rem;
+      }
+
       .mobile-action-btn {
         min-height: 2.625rem;
         font-size: 0.8125rem;
@@ -243,7 +363,7 @@
   {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen overflow-x-hidden">
-{% with current_path=request.path first_class=request.user.teacher_classes.first %}
+{% with current_path=request.path current_view=request.resolver_match.url_name first_class=request.user.teacher_classes.first %}
 <div class="min-h-screen flex flex-col lg:flex-row">
   <aside class="hidden lg:block w-64 shrink-0 border-r border-slate-800/90 bg-slate-950/85 backdrop-blur-xl">
     <div class="flex h-screen flex-col px-5 py-6">
@@ -263,19 +383,19 @@
       </div>
 
       <nav class="mt-6 space-y-2 reveal delay-1">
-        <a href="{% url 'teacher_dashboard' %}" class="nav-link {% if '/teacher/dashboard/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'teacher_dashboard' %}" class="nav-link {% if current_view == 'teacher_dashboard' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Dashboard
         </a>
         {% if classroom %}
-        <a href="{% url 'assignment_list' classroom.id %}" class="nav-link {% if '/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'assignment_list' classroom.id %}" class="nav-link {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Assignment
         </a>
         {% elif assignment %}
-        <a href="{% url 'assignment_list' assignment.classroom.id %}" class="nav-link {% if '/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'assignment_list' assignment.classroom.id %}" class="nav-link {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Assignment
         </a>
         {% elif first_class %}
-        <a href="{% url 'assignments_page' class_id=first_class.id %}" class="nav-link {% if '/assignments/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'assignments_page' class_id=first_class.id %}" class="nav-link {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Assignment
         </a>
         {% else %}
@@ -283,15 +403,15 @@
         {% endif %}
 
         {% if classroom %}
-        <a href="{% url 'class_detail' classroom.id %}" class="nav-link {% if '/teacher/classes/' in current_path and '/performance/' not in current_path and '/assignments/' not in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'class_detail' classroom.id %}" class="nav-link {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Students
         </a>
         {% elif assignment %}
-        <a href="{% url 'class_detail' assignment.classroom.id %}" class="nav-link {% if '/teacher/classes/' in current_path and '/performance/' not in current_path and '/assignments/' not in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'class_detail' assignment.classroom.id %}" class="nav-link {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Students
         </a>
         {% elif first_class %}
-        <a href="{% url 'class_detail' first_class.id %}" class="nav-link {% if '/teacher/classes/' in current_path and '/performance/' not in current_path and '/assignments/' not in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'class_detail' first_class.id %}" class="nav-link {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Students
         </a>
         {% else %}
@@ -299,20 +419,20 @@
         {% endif %}
 
         {% if classroom %}
-        <a href="{% url 'performance_list' classroom.id %}" class="nav-link {% if '/performance/' in current_path or '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'performance_list' classroom.id %}" class="nav-link {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Analytics
         </a>
         {% elif assignment %}
-        <a href="{% url 'performance_list' assignment.classroom.id %}" class="nav-link {% if '/performance/' in current_path or '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'performance_list' assignment.classroom.id %}" class="nav-link {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Analytics
         </a>
         {% elif first_class %}
-        <a href="{% url 'performance_list' first_class.id %}" class="nav-link {% if '/performance/' in current_path or '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        <a href="{% url 'performance_list' first_class.id %}" class="nav-link {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Analytics
         </a>
         {% else %}
-        <a href="{% url 'ai_tools' %}" class="nav-link {% if '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Analytics
+        <a href="{% url 'ai_tools' %}" class="nav-link {% if current_view == 'ai_tools' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+          AI Tools
         </a>
         {% endif %}
       </nav>
@@ -335,22 +455,24 @@
   </aside>
 
   <div class="flex min-h-screen flex-1 flex-col">
-    <header class="border-b border-slate-800/90 bg-slate-950/70 px-4 py-4 backdrop-blur-xl sm:px-6 lg:hidden">
-      <div class="flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-          <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-10 w-10 rounded-2xl object-cover">
-          <div>
-            <p class="text-[11px] uppercase tracking-[0.2em] text-slate-500">Kodehax Academy</p>
-            <h2 class="text-base font-black text-white">Teacher Hub</h2>
+    <header class="teacher-mobile-header px-4 py-4 backdrop-blur-xl sm:px-6 lg:hidden">
+      <div class="teacher-mobile-header-row">
+        <div class="teacher-mobile-brand">
+          <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="teacher-mobile-brand-logo rounded-2xl object-cover border border-slate-700/70 shadow-[0_12px_30px_rgba(15,23,42,0.28)]">
+          <div class="teacher-mobile-brand-copy">
+            <p class="teacher-mobile-brand-label">Teacher Workspace</p>
+            <h2 class="teacher-mobile-brand-title">Teacher Hub</h2>
+            <p class="teacher-mobile-brand-subtitle">Classes, students, and analytics in one place.</p>
           </div>
         </div>
         <button
           type="button"
-          class="inline-flex h-11 items-center justify-center rounded-2xl border border-slate-700 px-4 text-sm font-semibold text-slate-100 mobile-action-btn"
+          class="teacher-mobile-menu-btn inline-flex items-center justify-center gap-2"
           data-mobile-nav-toggle="teacher-mobile-menu"
           aria-controls="teacher-mobile-menu"
           aria-expanded="false"
         >
+          <svg class="teacher-mobile-menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M4 7h16"/><path d="M4 12h16"/><path d="M4 17h16"/></svg>
           Menu
         </button>
       </div>
@@ -408,16 +530,16 @@
 
 <nav class="fixed inset-x-3 bottom-3 z-40 rounded-[1.35rem] border border-slate-700/80 bg-slate-950/92 p-2 shadow-[0_20px_45px_rgba(2,6,23,0.45)] backdrop-blur lg:hidden">
   <div class="grid grid-cols-4 gap-1 text-[10px]">
-    <a href="{% url 'teacher_dashboard' %}" class="mobile-tab {% if '/teacher/dashboard/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'teacher_dashboard' %}" class="mobile-tab {% if current_view == 'teacher_dashboard' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V20h14v-9.5"/></svg>
       <span>Dashboard</span>
     </a>
     {% if classroom %}
-    <a href="{% url 'assignment_list' classroom.id %}" class="mobile-tab {% if '/assignments/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'assignment_list' classroom.id %}" class="mobile-tab {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% elif assignment %}
-    <a href="{% url 'assignment_list' assignment.classroom.id %}" class="mobile-tab {% if '/assignments/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'assignment_list' assignment.classroom.id %}" class="mobile-tab {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% elif first_class %}
-    <a href="{% url 'assignments_page' class_id=first_class.id %}" class="mobile-tab {% if '/assignments/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'assignments_page' class_id=first_class.id %}" class="mobile-tab {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% else %}
     <span class="mobile-tab text-slate-600 flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% endif %}
@@ -430,11 +552,11 @@
     {% endif %}
 
     {% if classroom %}
-    <a href="{% url 'class_detail' classroom.id %}" class="mobile-tab {% if '/teacher/classes/' in current_path and '/performance/' not in current_path and '/assignments/' not in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'class_detail' classroom.id %}" class="mobile-tab {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% elif assignment %}
-    <a href="{% url 'class_detail' assignment.classroom.id %}" class="mobile-tab {% if '/teacher/classes/' in current_path and '/performance/' not in current_path and '/assignments/' not in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'class_detail' assignment.classroom.id %}" class="mobile-tab {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% elif first_class %}
-    <a href="{% url 'class_detail' first_class.id %}" class="mobile-tab {% if '/teacher/classes/' in current_path and '/performance/' not in current_path and '/assignments/' not in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'class_detail' first_class.id %}" class="mobile-tab {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% else %}
     <span class="mobile-tab text-slate-600 flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% endif %}
@@ -447,16 +569,16 @@
     {% endif %}
 
     {% if classroom %}
-    <a href="{% url 'performance_list' classroom.id %}" class="mobile-tab {% if '/performance/' in current_path or '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'performance_list' classroom.id %}" class="mobile-tab {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% elif assignment %}
-    <a href="{% url 'performance_list' assignment.classroom.id %}" class="mobile-tab {% if '/performance/' in current_path or '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'performance_list' assignment.classroom.id %}" class="mobile-tab {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% elif first_class %}
-    <a href="{% url 'performance_list' first_class.id %}" class="mobile-tab {% if '/performance/' in current_path or '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'performance_list' first_class.id %}" class="mobile-tab {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% else %}
-    <a href="{% url 'ai_tools' %}" class="mobile-tab {% if '/teacher/ai-tools/' in current_path %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    <a href="{% url 'ai_tools' %}" class="mobile-tab {% if current_view == 'ai_tools' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% endif %}
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v4"/><path d="M5.5 6.5 8 9"/><path d="M3 12h4"/><path d="m5.5 17.5 2.5-2.5"/><path d="M12 17v4"/><path d="m16 15 2.5 2.5"/><path d="M17 12h4"/><path d="m16 9 2.5-2.5"/><circle cx="12" cy="12" r="4"/></svg>
-      <span>Analytics</span>
+      <span>{% if not classroom and not assignment and not first_class %}AI Tools{% else %}Analytics{% endif %}</span>
     </a>
   </div>
 </nav>

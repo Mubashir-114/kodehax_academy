@@ -1,9 +1,55 @@
 {% extends "teacher/base.html" %}
 
-{% block title %}Performance - {{ student.username }}{% endblock %}
-{% block page_title %}Student Detail{% endblock %}
+{% block title %}Manage Student - {{ student.username }}{% endblock %}
+{% block page_title %}Manage Student{% endblock %}
+{% block page_subtitle %}Review student profile details, analytics, and teacher actions in one workspace without changing the existing class flow.{% endblock %}
 {% block extra_head %}
 <style>
+  .student-avatar-trigger {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    display: inline-flex;
+    cursor: zoom-in;
+  }
+
+  .student-avatar-image,
+  .student-avatar-fallback {
+    height: 3.5rem;
+    width: 3.5rem;
+  }
+
+  .student-avatar-lightbox {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(2, 6, 23, 0.88);
+    backdrop-filter: blur(10px);
+    z-index: 1100;
+  }
+
+  .student-avatar-lightbox.open {
+    display: flex;
+  }
+
+  .student-avatar-lightbox img {
+    max-width: min(92vw, 28rem);
+    max-height: 78vh;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    object-fit: contain;
+    box-shadow: 0 24px 60px rgba(2, 6, 23, 0.45);
+  }
+
+  .student-management-mobile-card {
+    flex: 0 0 calc(100% - 2.5rem);
+    width: calc(100% - 2.5rem);
+    scroll-snap-align: start;
+  }
+
   .mobile-metric-rail {
     display: flex;
     flex-wrap: nowrap;
@@ -26,17 +72,53 @@
     width: calc(100% - 2.5rem);
     scroll-snap-align: start;
   }
+
+  @media (min-width: 640px) {
+    .student-avatar-image,
+    .student-avatar-fallback {
+      height: 6rem;
+      width: 6rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .student-avatar-trigger {
+      cursor: default;
+      pointer-events: none;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
   <section class="glass-card hover-lift p-4 sm:p-6 reveal">
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Student Profile</p>
-        <h3 class="mt-1 text-2xl font-black text-white sm:text-3xl">{{ student.username }}</h3>
-        <p class="text-slate-300">{{ student.email }}</p>
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <div class="flex items-start gap-4">
+        {% if profile.profile_picture %}
+        <button
+          type="button"
+          class="student-avatar-trigger"
+          data-student-avatar-open
+          aria-label="Expand student profile picture"
+        >
+          <img src="{{ profile.profile_picture.url }}" alt="{{ student.username }}" class="student-avatar-image rounded-3xl border border-slate-700 object-cover shadow-lg shadow-slate-950/30">
+        </button>
+        {% else %}
+        <div class="student-avatar-fallback flex items-center justify-center rounded-3xl border border-slate-700 bg-slate-900 text-2xl font-black text-white shadow-lg shadow-slate-950/30 sm:text-3xl">
+          {{ student.username|first|upper }}
+        </div>
+        {% endif %}
+        <div>
+          <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Manage Student</p>
+          <h3 class="mt-1 text-2xl font-black text-white sm:text-3xl">{{ student.username }}</h3>
+          <p class="mt-1 break-all text-slate-300">{{ student.email }}</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.course|default:"Course not set" }}</span>
+            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.batch|default:"Batch not set" }}</span>
+            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.student_id|default:"Student ID not set" }}</span>
+          </div>
+        </div>
       </div>
       <div class="flex flex-wrap gap-3">
         <div class="rounded-2xl border border-slate-700 bg-slate-950/40 px-4 py-3 text-right">
@@ -49,6 +131,122 @@
         </div>
       </div>
     </div>
+    <div class="mt-5 md:hidden">
+      <div class="mobile-metric-rail">
+        <article class="student-management-mobile-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Teacher Actions</p>
+          <div class="mt-3 grid gap-3">
+            <a href="{% url 'class_detail' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Back To Classroom</a>
+            <a href="{% url 'performance_list' classroom.id %}" class="btn-primary inline-flex min-h-11 items-center justify-center px-4 text-sm">View Full Class Analytics</a>
+            <a href="mailto:{{ student.email }}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Email Student</a>
+            <form
+              method="post"
+              action="{% url 'remove_student_from_classroom' classroom.id student.id %}"
+              data-confirm="true"
+              data-confirm-title="Remove Student"
+              data-confirm-message="Remove {{ student.username|escapejs }} from this classroom?"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn-danger inline-flex min-h-11 w-full items-center justify-center px-4 text-sm">Remove Student</button>
+            </form>
+          </div>
+        </article>
+        <article class="student-management-mobile-card rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Student Details</p>
+          <dl class="mt-3 space-y-3 text-sm">
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-400">Phone</dt>
+              <dd class="text-right text-slate-200">{{ profile.phone_number|default:"-" }}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-400">DOB</dt>
+              <dd class="text-right text-slate-200">{{ profile.date_of_birth|date:"d M Y"|default:"-" }}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-400">Gender</dt>
+              <dd class="text-right text-slate-200">{{ profile.gender|default:"-" }}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-400">Guardian</dt>
+              <dd class="text-right text-slate-200">{{ profile.parent_name|default:"-" }}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-400">Parent Phone</dt>
+              <dd class="text-right text-slate-200">{{ profile.parent_phone|default:"-" }}</dd>
+            </div>
+            <div class="flex items-start justify-between gap-4">
+              <dt class="text-slate-400">Parent Email</dt>
+              <dd class="max-w-[60%] break-all text-right text-slate-200">{{ profile.parent_email|default:"-" }}</dd>
+            </div>
+          </dl>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="hidden gap-6 md:grid md:grid-cols-[1.05fr_0.95fr]">
+    <article class="glass-card p-6 reveal">
+      <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Student Information</p>
+      <h4 class="mt-1 text-xl font-bold text-white">Profile and contact details</h4>
+      <div class="mt-5 grid grid-cols-2 gap-4">
+        <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Phone</p>
+          <p class="mt-2 text-sm font-semibold text-slate-200">{{ profile.phone_number|default:"Not added" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Date of Birth</p>
+          <p class="mt-2 text-sm font-semibold text-slate-200">{{ profile.date_of_birth|date:"d M Y"|default:"Not added" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Gender</p>
+          <p class="mt-2 text-sm font-semibold text-slate-200">{{ profile.gender|default:"Not added" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Guardian Relation</p>
+          <p class="mt-2 text-sm font-semibold text-slate-200">{{ profile.guardian_relation|default:"Not added" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Parent Name</p>
+          <p class="mt-2 text-sm font-semibold text-slate-200">{{ profile.parent_name|default:"Not added" }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Parent Phone</p>
+          <p class="mt-2 text-sm font-semibold text-slate-200">{{ profile.parent_phone|default:"Not added" }}</p>
+        </div>
+        <div class="col-span-2 rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Parent Email</p>
+          <p class="mt-2 break-all text-sm font-semibold text-slate-200">{{ profile.parent_email|default:"Not added" }}</p>
+        </div>
+        <div class="col-span-2 rounded-2xl border border-slate-700 bg-slate-950/40 p-4">
+          <p class="text-xs uppercase tracking-[0.1em] text-slate-400">Address</p>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-200">{{ profile.address|default:"Not added" }}</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="glass-card p-6 reveal delay-1">
+      <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Teacher Actions</p>
+      <h4 class="mt-1 text-xl font-bold text-white">Management shortcuts</h4>
+      <div class="mt-5 grid gap-3">
+        <a href="{% url 'class_detail' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Back To Classroom</a>
+        <a href="{% url 'performance_list' classroom.id %}" class="btn-primary inline-flex min-h-11 items-center justify-center px-4 text-sm">Open Class Analytics</a>
+        <a href="{% url 'assignment_list' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Open Assignments</a>
+        <a href="mailto:{{ student.email }}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Email Student</a>
+        {% if profile.parent_email %}
+        <a href="mailto:{{ profile.parent_email }}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Email Parent</a>
+        {% endif %}
+        <form
+          method="post"
+          action="{% url 'remove_student_from_classroom' classroom.id student.id %}"
+          data-confirm="true"
+          data-confirm-title="Remove Student"
+          data-confirm-message="Remove {{ student.username|escapejs }} from this classroom?"
+        >
+          {% csrf_token %}
+          <button type="submit" class="btn-danger inline-flex min-h-11 w-full items-center justify-center px-4 text-sm">Remove Student</button>
+        </form>
+      </div>
+    </article>
   </section>
 
   <section class="md:hidden">
@@ -222,4 +420,44 @@
     </div>
   </section>
 </div>
+
+{% if profile.profile_picture %}
+<div id="studentAvatarLightbox" class="student-avatar-lightbox" aria-hidden="true">
+  <img src="{{ profile.profile_picture.url }}" alt="{{ student.username }} enlarged profile picture">
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+{% if profile.profile_picture %}
+<script>
+  (() => {
+    const trigger = document.querySelector("[data-student-avatar-open]");
+    const lightbox = document.getElementById("studentAvatarLightbox");
+
+    if (!trigger || !lightbox) return;
+
+    const closeLightbox = () => {
+      lightbox.classList.remove("open");
+      lightbox.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("overflow-hidden");
+    };
+
+    trigger.addEventListener("click", () => {
+      if (window.innerWidth >= 768) return;
+      lightbox.classList.add("open");
+      lightbox.setAttribute("aria-hidden", "false");
+      document.body.classList.add("overflow-hidden");
+    });
+
+    lightbox.addEventListener("click", closeLightbox);
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && lightbox.classList.contains("open")) {
+        closeLightbox();
+      }
+    });
+  })();
+</script>
+{% endif %}
 {% endblock %}

@@ -4,6 +4,53 @@
 {% block page_title %}Dashboard{% endblock %}
 {% block extra_head %}
 <style>
+  .teacher-hero-card {
+    padding: 1rem;
+  }
+
+  .teacher-hero-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .teacher-hero-actions {
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 767px) {
+    .teacher-hero-card {
+      padding: 0.9rem;
+    }
+
+    .teacher-hero-copy p:first-child {
+      font-size: 0.68rem;
+      line-height: 1.2;
+    }
+
+    .teacher-hero-copy h3 {
+      margin-top: 0;
+      font-size: 1.85rem;
+      line-height: 1.08;
+    }
+
+    .teacher-hero-copy p:last-child {
+      margin-top: 0;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .teacher-hero-actions {
+      gap: 0.55rem;
+    }
+
+    .teacher-hero-actions a {
+      min-height: 2.7rem;
+      padding-block: 0.7rem;
+      font-size: 0.95rem;
+    }
+  }
+
   .teacher-meter-rail {
     display: flex;
     flex-wrap: nowrap;
@@ -49,14 +96,14 @@
 
 {% block content %}
 <div class="space-y-6">
-  <section class="glass-card hover-lift p-4 sm:p-6 reveal">
+  <section class="teacher-hero-card glass-card hover-lift reveal">
     <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-      <div>
+      <div class="teacher-hero-copy">
         <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Teaching Analytics</p>
         <h3 class="mt-1 text-2xl font-black text-white sm:text-3xl">Micro-insights for {{ request.user.username }}</h3>
         <p class="mt-2 max-w-2xl text-slate-300">Monitor skill health, streaks, daily challenge balance, and students who need intervention without chart-heavy dashboards.</p>
       </div>
-      <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+      <div class="teacher-hero-actions flex w-full flex-col sm:w-auto sm:flex-row">
         <a href="{% url 'create_class' %}" class="btn-primary inline-flex items-center justify-center px-5 py-2.5">
           + Create Class
         </a>
