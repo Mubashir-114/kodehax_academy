@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     'users',
     'student',
     'teacher',
-    'chat',
     'adminpanel',
     'skill_assessment',
     'daily_challenges',
