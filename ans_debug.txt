@@ -1,5 +1,0 @@
-Answer 15 - Student: Mubashir114 - QID: 10 - Option: 'B'
-Answer 14 - Student: Mubashir114 - QID: 9 - Option: 'B'
-Answer 13 - Student: Mubashir114 - QID: 8 - Option: 'C'
-Answer 12 - Student: Mubashir114 - QID: 7 - Option: 'B'
-Answer 11 - Student: Mubashir114 - QID: 6 - Option: 'C'
