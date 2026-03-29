@@ -3,20 +3,32 @@ from .models import ClassRoom, TeacherProfile
 
 
 class ClassRoomForm(forms.ModelForm):
+    def clean_readme_content(self):
+        readme_content = (self.cleaned_data.get("readme_content") or "").strip()
+        if not readme_content:
+            raise forms.ValidationError("Add the classroom README before creating the class.")
+        return readme_content
 
     class Meta:
         model = ClassRoom
-        fields = ["name", "description"]
+        fields = ["name", "description", "readme_content"]
 
         widgets = {
             "name": forms.TextInput(attrs={
-                "class": "w-full border rounded p-2"
+                "class": "w-full border rounded p-2",
+                "placeholder": "e.g. Full Stack Web Development"
             }),
 
             "description": forms.Textarea(attrs={
                 "class": "w-full border rounded p-2",
-                "rows": 4
-            })
+                "rows": 4,
+                "placeholder": "Explain what students will learn, how the class runs, and what to expect."
+            }),
+            "readme_content": forms.Textarea(attrs={
+                "class": "w-full border rounded p-2 font-mono",
+                "rows": 16,
+                "placeholder": "# Course README\n\nAdd setup steps, learning goals, resources, and weekly structure here..."
+            }),
         }
 
 

@@ -18,6 +18,7 @@ from daily_challenges.models import DailyChallengeSession, StudentPoints
 from daily_challenges.services import get_today_challenge_set, refresh_challenge_set
 from skill_assessment.models import StudentSkill
 from .models import ChatMessage, ChatSession, ImageQuery
+from .context_processors import ACTIVE_CLASSROOM_SESSION_KEY, resolve_active_student_classroom
 from .services.gemini_vision import ImageQueryError, upload_image_to_gemini
 from .services.chat_memory import (
     append_message,
@@ -802,6 +803,7 @@ def _ensure_student(request):
 def _build_assignment_rows(assignments, student):
     assignment_list = list(assignments)
     assignment_ids = [assignment.id for assignment in assignment_list]
+    now = timezone.now()
 
     file_submissions = Submission.objects.filter(
         student=student,
@@ -835,41 +837,46 @@ def _build_assignment_rows(assignments, student):
 
     rows = []
     for assignment in assignment_list:
+        is_archived = assignment.due_date < now
         row = {
             "assignment": assignment,
-            "status_label": "Pending",
+            "status_label": "Archived" if is_archived else "Pending",
             "status_class": "amber",
-            "action_label": "Open",
-            "can_submit": True,
+            "action_label": "View Assignment" if is_archived else "Open",
+            "can_submit": not is_archived,
+            "is_archived": is_archived,
         }
 
         if assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_FILE:
             row["submission"] = file_submission_map.get(assignment.id)
-            row["action_label"] = "Submit"
+            row["action_label"] = "View Assignment" if is_archived else "Submit"
             if row["submission"]:
-                row["status_label"] = "Submitted"
-                row["status_class"] = "emerald"
-                if assignment.allows_multiple_attempts:
+                row["status_label"] = "Archived" if is_archived else "Submitted"
+                row["status_class"] = "amber" if is_archived else "emerald"
+                if not is_archived and assignment.allows_multiple_attempts:
                     row["action_label"] = "Re-submit"
                 else:
                     row["action_label"] = "View Submission"
         elif assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_CODE:
             row["submission"] = code_submission_map.get(assignment.id)
-            row["action_label"] = "Write Code"
+            row["action_label"] = "View Assignment" if is_archived else "Write Code"
             if row["submission"]:
-                row["status_label"] = "Submitted"
-                row["status_class"] = "emerald"
-                if assignment.allows_multiple_attempts:
+                row["status_label"] = "Archived" if is_archived else "Submitted"
+                row["status_class"] = "amber" if is_archived else "emerald"
+                if not is_archived and assignment.allows_multiple_attempts:
                     row["action_label"] = "Update Code"
                 else:
                     row["action_label"] = "View Submission"
         else:
             row["submission"] = quiz_result_map.get(assignment.id)
-            row["action_label"] = "Take Assignment"
+            row["action_label"] = "View Assignment" if is_archived else "Take Assignment"
             attempted = row["submission"] or assignment.id in quiz_attempted_ids
             if attempted:
-                row["status_class"] = "emerald"
-                if assignment.allows_multiple_attempts:
+                row["status_class"] = "amber" if is_archived else "emerald"
+                if is_archived:
+                    row["status_label"] = "Archived"
+                    row["action_label"] = "Review Answers"
+                elif assignment.allows_multiple_attempts:
                     row["status_label"] = "Attempted"
                     row["action_label"] = "Retake Assignment"
                 else:
@@ -988,6 +995,7 @@ def join_classroom(request):
             return redirect("student_dashboard")
 
         classroom.students.add(request.user)
+        request.session[ACTIVE_CLASSROOM_SESSION_KEY] = classroom.id
         messages.success(
             request,
             f"You joined {classroom.name}."
@@ -1006,14 +1014,18 @@ def class_detail(request, class_id):
         students=request.user
     )
 
-    assignments = classroom.assignments.filter(
-        due_date__gte=timezone.now()
+    now = timezone.now()
+    active_assignments = classroom.assignments.filter(
+        due_date__gte=now
     ).order_by("due_date")
-    assignment_rows = _build_assignment_rows(assignments, request.user)
+    archived_assignments = classroom.assignments.filter(
+        due_date__lt=now
+    ).order_by("-due_date")
 
     return render_for_device(request, "student/class_detail.html", {
         "classroom": classroom,
-        "assignment_rows": assignment_rows,
+        "active_assignment_rows": _build_assignment_rows(active_assignments, request.user),
+        "archived_assignment_rows": _build_assignment_rows(archived_assignments, request.user),
         "classroom_readme_html": render_course_readme_html(classroom.readme_content),
         "has_classroom_readme": bool((classroom.readme_content or "").strip()),
     })
@@ -1025,15 +1037,27 @@ def view_assignments(request):
     if redirect_response:
         return redirect_response
 
-    assignments = Assignment.objects.filter(
+    joined_classrooms = ClassRoom.objects.filter(students=request.user).order_by("name", "id")
+    active_classroom = resolve_active_student_classroom(request, joined_classrooms)
+    active_assignments = Assignment.objects.filter(
         classroom__students=request.user,
         due_date__gte=timezone.now(),
     ).select_related("classroom", "classroom__teacher").order_by("due_date")
+    archived_assignments = Assignment.objects.filter(
+        classroom__students=request.user,
+        due_date__lt=timezone.now(),
+    ).select_related("classroom", "classroom__teacher").order_by("-due_date")
+    if active_classroom:
+        active_assignments = active_assignments.filter(classroom=active_classroom)
+        archived_assignments = archived_assignments.filter(classroom=active_classroom)
 
-    assignment_rows = _build_assignment_rows(assignments, request.user)
+    active_assignment_rows = _build_assignment_rows(active_assignments, request.user)
+    archived_assignment_rows = _build_assignment_rows(archived_assignments, request.user)
 
     return render_for_device(request, "student/assignment/view_assignment.html", {
-        "assignment_rows": assignment_rows,
+        "active_assignment_rows": active_assignment_rows,
+        "archived_assignment_rows": archived_assignment_rows,
+        "active_classroom": active_classroom,
     })
 
 
@@ -1106,22 +1130,23 @@ def submit_assignment(request, assignment_id):
         id=assignment_id,
         classroom__students=request.user
     )
-    if assignment.due_date < timezone.now():
-        messages.error(request, "This assignment deadline has passed.")
-        return redirect("view_assignments")
 
     if assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_QUIZ:
         return redirect("take_quiz_assignment", assignment_id=assignment.id)
     if assignment.assignment_type == Assignment.ASSIGNMENT_TYPE_CODE:
         return redirect("submit_code_assignment", assignment_id=assignment.id)
 
+    is_archived = assignment.due_date < timezone.now()
     existing_submission = Submission.objects.filter(
         assignment=assignment,
         student=request.user
     ).first()
-    can_submit = assignment.allows_multiple_attempts or not existing_submission
+    can_submit = (not is_archived) and (assignment.allows_multiple_attempts or not existing_submission)
 
     if request.method == "POST":
+        if is_archived:
+            messages.error(request, "This assignment is archived. New submissions are closed.")
+            return redirect("submit_assignment", assignment_id=assignment.id)
         if not can_submit:
             messages.error(request, "This assignment allows only one attempt.")
             return redirect("submit_assignment", assignment_id=assignment.id)
@@ -1152,6 +1177,7 @@ def submit_assignment(request, assignment_id):
         "assignment": assignment,
         "existing_submission": existing_submission,
         "can_submit": can_submit,
+        "is_archived": is_archived,
     })
 
 
@@ -1167,9 +1193,6 @@ def take_quiz_assignment(request, assignment_id):
         classroom__students=request.user,
         assignment_type=Assignment.ASSIGNMENT_TYPE_QUIZ
     )
-    if assignment.due_date < timezone.now():
-        messages.error(request, "This assignment deadline has passed.")
-        return redirect("view_assignments")
     questions = assignment.quiz_questions.all()
     if not questions.exists():
         # Backfill parser for old AI quizzes that were saved only as description text.
@@ -1199,9 +1222,13 @@ def take_quiz_assignment(request, assignment_id):
         student=request.user,
     ).exists()
     has_existing_attempt = bool(existing_answers) or has_existing_result
-    can_submit = assignment.allows_multiple_attempts or not has_existing_attempt
+    is_archived = assignment.due_date < timezone.now()
+    can_submit = (not is_archived) and (assignment.allows_multiple_attempts or not has_existing_attempt)
 
     if request.method == "POST":
+        if is_archived:
+            messages.error(request, "This assignment is archived. New submissions are closed.")
+            return redirect("take_quiz_assignment", assignment_id=assignment.id)
         if not questions.exists():
             messages.error(request, "No assignment questions configured yet.")
             return redirect("view_assignments")
@@ -1250,6 +1277,7 @@ def take_quiz_assignment(request, assignment_id):
         "questions": questions,
         "question_rows": question_rows,
         "can_submit": can_submit,
+        "is_archived": is_archived,
         "show_description": show_description,
     })
 
@@ -1266,14 +1294,12 @@ def submit_code_assignment(request, assignment_id):
         classroom__students=request.user,
         assignment_type=Assignment.ASSIGNMENT_TYPE_CODE
     )
-    if assignment.due_date < timezone.now():
-        messages.error(request, "This coding assignment deadline has passed.")
-        return redirect("view_assignments")
+    is_archived = assignment.due_date < timezone.now()
     existing_submission = CodeSubmission.objects.filter(
         assignment=assignment,
         student=request.user
     ).first()
-    can_submit = assignment.allows_multiple_attempts or not existing_submission
+    can_submit = (not is_archived) and (assignment.allows_multiple_attempts or not existing_submission)
 
     # --- PARSING LOGIC FOR MULTIPLE PROBLEMS ---
     # Split the assignment description by "### Problem " headers.
@@ -1298,6 +1324,9 @@ def submit_code_assignment(request, assignment_id):
     delimiter = "\n\n# --- PROBLEM SEPARATOR ---\n\n"
     
     if request.method == "POST":
+        if is_archived:
+            messages.error(request, "This coding assignment is archived. New submissions are closed.")
+            return redirect("submit_code_assignment", assignment_id=assignment.id)
         if not can_submit:
             messages.error(request, "This coding assignment allows only one attempt.")
             return redirect("submit_code_assignment", assignment_id=assignment.id)
@@ -1355,6 +1384,7 @@ def submit_code_assignment(request, assignment_id):
         "assignment": assignment,
         "existing_submission": existing_submission,
         "can_submit": can_submit,
+        "is_archived": is_archived,
         "problem_data": problem_data,
         "preamble": preamble if len(parts) > 1 and parts[0].strip() else None,
     })

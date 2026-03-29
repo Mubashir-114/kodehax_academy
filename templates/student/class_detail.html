@@ -164,7 +164,11 @@
   </div>
 
   <div class="space-y-4">
-    {% for row in assignment_rows %}
+    <div class="flex items-center justify-between gap-3">
+      <h3 class="text-sm font-semibold uppercase tracking-[0.16em] text-slate-400">Active Assignments</h3>
+      <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">{{ active_assignment_rows|length }} live</span>
+    </div>
+    {% for row in active_assignment_rows %}
     <article class="rounded-2xl border border-slate-700 bg-slate-900/40 p-5">
       <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
@@ -215,6 +219,62 @@
     {% empty %}
     <div class="rounded-2xl border border-slate-700 bg-slate-900/40 p-8 text-center text-sm text-slate-400">
       No assignments posted yet.
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="space-y-4">
+    <div class="flex items-center justify-between gap-3">
+      <h3 class="text-sm font-semibold uppercase tracking-[0.16em] text-slate-400">Archived Assignments</h3>
+      <span class="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs text-amber-200">{{ archived_assignment_rows|length }} archived</span>
+    </div>
+    {% for row in archived_assignment_rows %}
+    <article class="rounded-2xl border border-amber-500/25 bg-amber-500/10 p-5">
+      <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-slate-100">{{ row.assignment.title }}</h3>
+          <p class="mt-1 text-xs text-slate-400">{{ row.assignment.get_assignment_type_display }}</p>
+        </div>
+        <div class="text-sm text-slate-300">
+          <p class="text-xs uppercase tracking-[0.16em] text-slate-500">Ended</p>
+          <p class="mt-1">{{ row.assignment.due_date|date:"M d, Y H:i" }}</p>
+        </div>
+      </div>
+
+      {% if row.assignment.description %}
+      <div class="mt-4 rounded-xl border border-slate-700 bg-slate-950/40 p-4">
+        <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Questions / Instructions</p>
+        <div class="whitespace-pre-wrap text-sm text-slate-200">{{ row.assignment.description|assignment_summary:row.assignment.assignment_type }}</div>
+      </div>
+      {% endif %}
+
+      <div class="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:flex-wrap sm:items-center">
+        <span class="rounded-md bg-amber-900/30 px-2 py-1 text-amber-200">{{ row.status_label }}</span>
+
+        {% if row.assignment.assignment_type == "file" or row.assignment.assignment_type == "code" %}
+          {% if row.submission and row.submission.score %}
+          <span class="text-slate-300">Score: {{ row.submission.score }} / {{ row.assignment.max_score }}</span>
+          {% elif row.submission %}
+          <span class="text-slate-400">Submitted, not graded yet</span>
+          {% else %}
+          <span class="text-slate-500">No submission recorded</span>
+          {% endif %}
+        {% elif row.assignment.assignment_type == "quiz" and row.submission %}
+          <span class="text-slate-300">Score: {{ row.submission.score }} / {{ row.assignment.max_score }}</span>
+        {% endif %}
+
+        {% if row.assignment.assignment_type == "quiz" %}
+        <a href="{% url 'take_quiz_assignment' row.assignment.id %}" class="btn-muted inline-flex h-12 w-full items-center justify-center px-4 text-sm sm:w-auto">{{ row.action_label }}</a>
+        {% elif row.assignment.assignment_type == "code" %}
+        <a href="{% url 'submit_code_assignment' row.assignment.id %}" class="btn-muted inline-flex h-12 w-full items-center justify-center px-4 text-sm sm:w-auto">{{ row.action_label }}</a>
+        {% else %}
+        <a href="{% url 'submit_assignment' row.assignment.id %}" class="btn-muted inline-flex h-12 w-full items-center justify-center px-4 text-sm sm:w-auto">{{ row.action_label }}</a>
+        {% endif %}
+      </div>
+    </article>
+    {% empty %}
+    <div class="rounded-2xl border border-slate-700 bg-slate-900/40 p-8 text-center text-sm text-slate-400">
+      No archived assignments yet.
     </div>
     {% endfor %}
   </div>

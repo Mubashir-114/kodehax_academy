@@ -4,33 +4,41 @@
 
 {% block content %}
 <div class="space-y-6 pb-20 md:pb-0">
-<div class="mb-2 flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:text-left reveal">
+  <section class="glass-card hover-lift reveal overflow-hidden">
+    <div class="flex flex-col gap-6 p-5 sm:p-6 lg:flex-row lg:items-center lg:justify-between lg:p-8">
+      <div class="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:text-left">
+        {% if profile.profile_picture %}
+          <img src="{{ profile.profile_picture.url }}"
+               class="h-24 w-24 rounded-3xl border border-slate-600 object-cover shadow-lg shadow-slate-950/30 sm:h-28 sm:w-28">
+        {% else %}
+          <div class="flex h-24 w-24 items-center justify-center rounded-3xl border border-slate-600 bg-slate-900/60 text-3xl font-black text-slate-300 shadow-lg shadow-slate-950/30 sm:h-28 sm:w-28">
+            {{ request.user.username|first|upper }}
+          </div>
+        {% endif %}
 
-    {% if profile.profile_picture %}
-        <img src="{{ profile.profile_picture.url }}"
-             class="h-24 w-24 rounded-full object-cover border border-slate-600 shadow-lg shadow-slate-950/30">
-    {% else %}
-        <div class="flex h-24 w-24 items-center justify-center rounded-full border border-slate-600 bg-slate-900/60 text-3xl font-black text-slate-300 shadow-lg shadow-slate-950/30">
-          {{ request.user.username|first|upper }}
+        <div>
+          <p class="text-xs uppercase tracking-[0.16em] text-slate-500">Student Profile</p>
+          <h2 class="mt-1 text-3xl font-black tracking-tight text-white sm:text-4xl">{{ request.user.username }}</h2>
+          <p class="mt-2 break-all text-sm text-slate-400 sm:text-base">{{ request.user.email }}</p>
         </div>
-    {% endif %}
+      </div>
 
-    <div>
-        <h2 class="text-2xl font-bold text-white sm:text-3xl">{{ request.user.username }}</h2>
-        <p class="break-all text-sm text-slate-400 sm:text-base">{{ request.user.email }}</p>
-        <a href="{% url 'edit_student_profile' %}" class="btn-primary mt-4 inline-flex h-10 items-center justify-center px-5 text-sm md:hidden">
+      <div class="flex flex-col gap-3 sm:flex-row lg:items-center">
+        <a href="{% url 'edit_student_profile' %}" class="btn-primary inline-flex h-11 items-center justify-center px-5 text-sm">
           Edit Profile
         </a>
+      </div>
     </div>
+  </section>
 
-</div>
-<div class="mx-auto max-w-4xl reveal delay-1">
+  <div class="mx-auto max-w-5xl reveal delay-1">
   <div class="rounded-2xl border border-slate-700 bg-slate-900/45 p-6 sm:p-8">
-    <div class="mb-6 hidden flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:flex">
-      <h2 class="text-2xl font-bold tracking-tight text-white">Student Information</h2>
-      <a href="{% url 'edit_student_profile' %}" class="btn-primary inline-flex h-11 items-center justify-center px-4 text-sm">
-        Edit Profile
-      </a>
+    <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="text-2xl font-bold tracking-tight text-white">Student Information</h2>
+        <p class="mt-2 text-sm text-slate-400">Profile details, academic identity, and parent contact information in one clean layout.</p>
+      </div>
+      <span class="rounded-full border border-slate-700 bg-slate-950/50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Profile Overview</span>
     </div>
 
     <div class="rounded-2xl border border-slate-700/80 bg-slate-950/40 p-4 transition hover:bg-slate-900/70 md:hidden">

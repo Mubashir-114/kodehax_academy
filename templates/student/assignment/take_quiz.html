@@ -15,7 +15,11 @@
     {% endif %}
   </div>
 
-  {% if not can_submit %}
+  {% if is_archived %}
+  <div class="rounded-xl border border-amber-700 bg-amber-950/20 p-4 text-sm text-amber-200">
+    This assignment is archived. You can review the questions here, but new submissions are closed.
+  </div>
+  {% elif not can_submit %}
   <div class="rounded-xl border border-amber-700 bg-amber-950/20 p-4 text-sm text-amber-200">
     This assignment allows only one attempt. Your previous answers are shown below.
   </div>

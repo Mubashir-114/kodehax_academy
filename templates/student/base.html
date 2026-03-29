@@ -142,6 +142,37 @@
         width: 100%;
       }
 
+      .student-class-switcher {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        padding-right: 2.9rem;
+        border-color: rgba(45, 212, 191, 0.34);
+        background-color: rgba(15, 23, 42, 0.96);
+        background-image:
+          linear-gradient(45deg, transparent 50%, #cbd5e1 50%),
+          linear-gradient(135deg, #cbd5e1 50%, transparent 50%);
+        background-position:
+          calc(100% - 1.15rem) calc(50% - 0.12rem),
+          calc(100% - 0.8rem) calc(50% - 0.12rem);
+        background-size: 0.4rem 0.4rem, 0.4rem 0.4rem;
+        background-repeat: no-repeat;
+      }
+
+      .student-class-switcher:hover {
+        border-color: rgba(45, 212, 191, 0.56);
+      }
+
+      .student-class-switcher:focus {
+        border-color: rgba(45, 212, 191, 0.82);
+        box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.16);
+      }
+
+      .student-class-switcher option {
+        background: #0f172a;
+        color: #f8fafc;
+      }
+
       @media (max-width: 380px) {
         .mobile-top-action-grid {
           grid-template-columns: 1fr;
@@ -249,6 +280,19 @@
                     <p class="mt-2 truncate text-sm font-semibold text-slate-100">{{ request.user.username }}</p>
                     <p class="mt-1 truncate text-xs text-slate-400">{{ request.user.email }}</p>
                 </div>
+                {% if student_classrooms %}
+                <div class="mt-4 rounded-2xl border border-slate-800 bg-slate-900/55 p-4">
+                    <label for="student-class-switcher" class="text-xs uppercase tracking-[0.16em] text-slate-500">Active Course</label>
+                    <select id="student-class-switcher" class="student-class-switcher mt-3 w-full rounded-xl border border-slate-700 px-3 py-2.5 text-sm text-slate-100 outline-none transition">
+                        {% for nav_class in student_classrooms %}
+                        <option value="{% url 'student_class_detail' nav_class.id %}" {% if active_student_classroom and nav_class.id == active_student_classroom.id %}selected{% endif %}>
+                            {{ nav_class.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <p class="mt-2 text-xs text-slate-400">Assignments and course pages follow this selection.</p>
+                </div>
+                {% endif %}
             </div>
 
             <nav class="mt-6 space-y-2 reveal delay-1">
@@ -330,6 +374,19 @@
                             <p class="mt-2 text-sm font-semibold text-slate-100">{{ request.user.username }}</p>
                             <p class="mt-1 break-all text-xs text-slate-400">{{ request.user.email }}</p>
                         </div>
+                        {% if student_classrooms %}
+                        <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+                            <label for="student-class-switcher-mobile" class="text-xs uppercase tracking-[0.16em] text-slate-500">Active Course</label>
+                            <select id="student-class-switcher-mobile" class="student-class-switcher mt-3 w-full rounded-xl border border-slate-700 px-3 py-2.5 text-sm text-slate-100 outline-none transition">
+                                {% for nav_class in student_classrooms %}
+                                <option value="{% url 'student_class_detail' nav_class.id %}" {% if active_student_classroom and nav_class.id == active_student_classroom.id %}selected{% endif %}>
+                                    {{ nav_class.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <p class="mt-2 text-xs text-slate-400">Switch course context before opening assignments or class pages.</p>
+                        </div>
+                        {% endif %}
                         <div class="grid grid-cols-1 gap-2 text-sm">
                             <a href="{% url 'skill_assessment_profile' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4 mobile-action-btn mobile-action-btn-full">Skill Profile</a>
                             <a href="{% url 'chat_page' %}" class="btn-muted inline-flex h-12 items-center justify-center px-4 mobile-action-btn mobile-action-btn-full">AI Assistant</a>
@@ -394,34 +451,42 @@
   (() => {
     const toggle = document.querySelector("[data-mobile-nav-toggle='student-mobile-menu']");
     const menu = document.getElementById("student-mobile-menu");
-    if (!toggle || !menu) return;
+    if (toggle && menu) {
+      const closeControls = menu.querySelectorAll("[data-mobile-drawer-close]");
+      const closeDrawer = () => {
+        document.body.classList.remove("mobile-drawer-open");
+        menu.setAttribute("hidden", "");
+        toggle.setAttribute("aria-expanded", "false");
+      };
 
-    const closeControls = menu.querySelectorAll("[data-mobile-drawer-close]");
-    const closeDrawer = () => {
-      document.body.classList.remove("mobile-drawer-open");
-      menu.setAttribute("hidden", "");
-      toggle.setAttribute("aria-expanded", "false");
-    };
+      toggle.addEventListener("click", () => {
+        const isOpen = document.body.classList.contains("mobile-drawer-open");
+        if (isOpen) {
+          closeDrawer();
+          return;
+        }
+        menu.removeAttribute("hidden");
+        document.body.classList.add("mobile-drawer-open");
+        toggle.setAttribute("aria-expanded", "true");
+      });
 
-    toggle.addEventListener("click", () => {
-      const isOpen = document.body.classList.contains("mobile-drawer-open");
-      if (isOpen) {
-        closeDrawer();
-        return;
-      }
-      menu.removeAttribute("hidden");
-      document.body.classList.add("mobile-drawer-open");
-      toggle.setAttribute("aria-expanded", "true");
-    });
+      closeControls.forEach((control) => {
+        control.addEventListener("click", closeDrawer);
+      });
 
-    closeControls.forEach((control) => {
-      control.addEventListener("click", closeDrawer);
-    });
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeDrawer();
+        }
+      });
+    }
 
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
-        closeDrawer();
-      }
+    document.querySelectorAll(".student-class-switcher").forEach((switcher) => {
+      switcher.addEventListener("change", () => {
+        if (switcher.value) {
+          window.location.href = switcher.value;
+        }
+      });
     });
   })();
 </script>

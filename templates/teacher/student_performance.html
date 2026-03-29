@@ -113,11 +113,19 @@
           <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Manage Student</p>
           <h3 class="mt-1 text-2xl font-black text-white sm:text-3xl">{{ student.username }}</h3>
           <p class="mt-1 break-all text-slate-300">{{ student.email }}</p>
+          {% if profile.course or profile.batch or profile.student_id %}
           <div class="mt-3 flex flex-wrap gap-2">
-            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.course|default:"Course not set" }}</span>
-            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.batch|default:"Batch not set" }}</span>
-            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.student_id|default:"Student ID not set" }}</span>
+            {% if profile.course %}
+            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.course }}</span>
+            {% endif %}
+            {% if profile.batch %}
+            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.batch }}</span>
+            {% endif %}
+            {% if profile.student_id %}
+            <span class="rounded-full border border-slate-700 bg-slate-950/40 px-3 py-1 text-xs text-slate-300">{{ profile.student_id }}</span>
+            {% endif %}
           </div>
+          {% endif %}
         </div>
       </div>
       <div class="flex flex-wrap gap-3">
@@ -227,15 +235,16 @@
     <article class="glass-card p-6 reveal delay-1">
       <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Teacher Actions</p>
       <h4 class="mt-1 text-xl font-bold text-white">Management shortcuts</h4>
-      <div class="mt-5 grid gap-3">
+      <div class="mt-5 grid grid-cols-2 gap-3">
         <a href="{% url 'class_detail' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Back To Classroom</a>
         <a href="{% url 'performance_list' classroom.id %}" class="btn-primary inline-flex min-h-11 items-center justify-center px-4 text-sm">Open Class Analytics</a>
         <a href="{% url 'assignment_list' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Open Assignments</a>
         <a href="mailto:{{ student.email }}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Email Student</a>
         {% if profile.parent_email %}
-        <a href="mailto:{{ profile.parent_email }}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">Email Parent</a>
+        <a href="mailto:{{ profile.parent_email }}" class="btn-muted col-span-2 inline-flex min-h-11 items-center justify-center px-4 text-sm">Email Parent</a>
         {% endif %}
         <form
+          class="{% if not profile.parent_email %}col-span-2{% endif %}"
           method="post"
           action="{% url 'remove_student_from_classroom' classroom.id student.id %}"
           data-confirm="true"

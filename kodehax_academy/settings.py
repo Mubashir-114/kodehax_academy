@@ -95,6 +95,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'teacher.context_processors.teacher_profile_nav',
+                'student.context_processors.student_nav_context',
             ],
             'libraries': {
                 'breadcrumbs': 'users.templatetags.breadcrumbs',
@@ -158,7 +159,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.getenv("TIME_ZONE", "Asia/Kolkata")
 
 USE_I18N = True
 

@@ -122,6 +122,39 @@
       line-height: 1.2;
     }
 
+    .teacher-class-switcher {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding-right: 2.9rem;
+      border-color: rgba(129, 140, 248, 0.4);
+      background-color: rgba(15, 23, 42, 0.96);
+      background-image:
+        linear-gradient(45deg, transparent 50%, #cbd5e1 50%),
+        linear-gradient(135deg, #cbd5e1 50%, transparent 50%);
+      background-position:
+        calc(100% - 1.15rem) calc(50% - 0.12rem),
+        calc(100% - 0.8rem) calc(50% - 0.12rem);
+      background-size: 0.4rem 0.4rem, 0.4rem 0.4rem;
+      background-repeat: no-repeat;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    }
+
+    .teacher-class-switcher:hover {
+      border-color: rgba(129, 140, 248, 0.68);
+      background-color: rgba(15, 23, 42, 1);
+    }
+
+    .teacher-class-switcher:focus {
+      border-color: rgba(129, 140, 248, 0.9);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+    }
+
+    .teacher-class-switcher option {
+      background: #0f172a;
+      color: #f8fafc;
+    }
+
     .teacher-mobile-header {
       position: relative;
       overflow: hidden;
@@ -363,7 +396,7 @@
   {% block extra_head %}{% endblock %}
 </head>
 <body class="min-h-screen overflow-x-hidden">
-{% with current_path=request.path current_view=request.resolver_match.url_name first_class=request.user.teacher_classes.first %}
+{% with current_path=request.path current_view=request.resolver_match.url_name %}
 <div class="min-h-screen flex flex-col lg:flex-row">
   <aside class="hidden lg:block w-64 shrink-0 border-r border-slate-800/90 bg-slate-950/85 backdrop-blur-xl">
     <div class="flex h-screen flex-col px-5 py-6">
@@ -380,54 +413,43 @@
           <p class="mt-2 truncate text-sm font-semibold text-slate-100">{{ request.user.username }}</p>
           <p class="mt-1 text-xs text-slate-400">Manage classrooms, submissions, and analytics.</p>
         </div>
+        {% if teacher_classrooms %}
+        <div class="mt-4 rounded-2xl border border-slate-800 bg-slate-900/55 p-4">
+          <label for="teacher-class-switcher" class="text-xs uppercase tracking-[0.16em] text-slate-500">Active Classroom</label>
+          <select id="teacher-class-switcher" class="teacher-class-switcher mt-3 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20">
+            {% for nav_class in teacher_classrooms %}
+            <option value="{% url 'class_detail' nav_class.id %}" {% if active_teacher_classroom and nav_class.id == active_teacher_classroom.id %}selected{% endif %}>
+              {{ nav_class.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <p class="mt-2 text-xs text-slate-400">Assignment, students, and analytics links follow this classroom.</p>
+        </div>
+        {% endif %}
       </div>
 
       <nav class="mt-6 space-y-2 reveal delay-1">
         <a href="{% url 'teacher_dashboard' %}" class="nav-link {% if current_view == 'teacher_dashboard' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Dashboard
         </a>
-        {% if classroom %}
-        <a href="{% url 'assignment_list' classroom.id %}" class="nav-link {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Assignment
-        </a>
-        {% elif assignment %}
-        <a href="{% url 'assignment_list' assignment.classroom.id %}" class="nav-link {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Assignment
-        </a>
-        {% elif first_class %}
-        <a href="{% url 'assignments_page' class_id=first_class.id %}" class="nav-link {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        {% if active_teacher_classroom %}
+        <a href="{% url 'assignment_list' active_teacher_classroom.id %}" class="nav-link {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Assignment
         </a>
         {% else %}
         <span class="nav-link nav-link-disabled text-slate-500 flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">Assignment</span>
         {% endif %}
 
-        {% if classroom %}
-        <a href="{% url 'class_detail' classroom.id %}" class="nav-link {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Students
-        </a>
-        {% elif assignment %}
-        <a href="{% url 'class_detail' assignment.classroom.id %}" class="nav-link {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Students
-        </a>
-        {% elif first_class %}
-        <a href="{% url 'class_detail' first_class.id %}" class="nav-link {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        {% if active_teacher_classroom %}
+        <a href="{% url 'class_detail' active_teacher_classroom.id %}" class="nav-link {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Students
         </a>
         {% else %}
         <span class="nav-link nav-link-disabled text-slate-500 flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">Students</span>
         {% endif %}
 
-        {% if classroom %}
-        <a href="{% url 'performance_list' classroom.id %}" class="nav-link {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Analytics
-        </a>
-        {% elif assignment %}
-        <a href="{% url 'performance_list' assignment.classroom.id %}" class="nav-link {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
-          Analytics
-        </a>
-        {% elif first_class %}
-        <a href="{% url 'performance_list' first_class.id %}" class="nav-link {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
+        {% if active_teacher_classroom %}
+        <a href="{% url 'performance_list' active_teacher_classroom.id %}" class="nav-link {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-300{% endif %} flex min-h-11 items-center rounded-2xl px-4 text-sm font-semibold">
           Analytics
         </a>
         {% else %}
@@ -482,6 +504,19 @@
           <p class="mt-2 text-sm font-semibold text-slate-100">{{ request.user.username }}</p>
           <p class="mt-1 text-xs text-slate-400">Create classes and track student outcomes.</p>
         </div>
+        {% if teacher_classrooms %}
+        <div class="rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
+          <label for="teacher-class-switcher-mobile" class="text-xs uppercase tracking-[0.16em] text-slate-500">Active Classroom</label>
+          <select id="teacher-class-switcher-mobile" class="teacher-class-switcher mt-3 w-full rounded-xl border border-slate-700 bg-slate-950/80 px-3 py-2.5 text-sm text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20">
+            {% for nav_class in teacher_classrooms %}
+            <option value="{% url 'class_detail' nav_class.id %}" {% if active_teacher_classroom and nav_class.id == active_teacher_classroom.id %}selected{% endif %}>
+              {{ nav_class.name }}
+            </option>
+            {% endfor %}
+          </select>
+          <p class="mt-2 text-xs text-slate-400">This sets the classroom used by assignment, students, and analytics shortcuts.</p>
+        </div>
+        {% endif %}
         <div class="grid grid-cols-1 gap-2 text-sm">
           <a href="{% url 'create_class' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 mobile-action-btn">Create Class</a>
           <a href="{% url 'teacher_profile' %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 mobile-action-btn">Profile</a>
@@ -534,51 +569,39 @@
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10.5V20h14v-9.5"/></svg>
       <span>Dashboard</span>
     </a>
-    {% if classroom %}
-    <a href="{% url 'assignment_list' classroom.id %}" class="mobile-tab {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-    {% elif assignment %}
-    <a href="{% url 'assignment_list' assignment.classroom.id %}" class="mobile-tab {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-    {% elif first_class %}
-    <a href="{% url 'assignments_page' class_id=first_class.id %}" class="mobile-tab {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    {% if active_teacher_classroom %}
+    <a href="{% url 'assignment_list' active_teacher_classroom.id %}" class="mobile-tab {% if current_view == 'assignment_list' or current_view == 'assignments_page' or current_view == 'assignment_type_selector' or current_view == 'create_assignment' or current_view == 'create_file_assignment' or current_view == 'create_quiz_assignment' or current_view == 'create_code_assignment' or current_view == 'assignment_detail' or current_view == 'grade_file_submission' or current_view == 'grade_code_submission' or current_view == 'evaluate_code_submission' or current_view == 'auto_grade_quiz' or current_view == 'extend_assignment_deadline' or current_view == 'delete_assignment' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% else %}
     <span class="mobile-tab text-slate-600 flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% endif %}
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>
       <span>Assignment</span>
-    {% if classroom or assignment or first_class %}
+    {% if active_teacher_classroom %}
     </a>
     {% else %}
     </span>
     {% endif %}
 
-    {% if classroom %}
-    <a href="{% url 'class_detail' classroom.id %}" class="mobile-tab {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-    {% elif assignment %}
-    <a href="{% url 'class_detail' assignment.classroom.id %}" class="mobile-tab {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-    {% elif first_class %}
-    <a href="{% url 'class_detail' first_class.id %}" class="mobile-tab {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    {% if active_teacher_classroom %}
+    <a href="{% url 'class_detail' active_teacher_classroom.id %}" class="mobile-tab {% if current_view == 'class_detail' or current_view == 'remove_student_from_classroom' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% else %}
     <span class="mobile-tab text-slate-600 flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% endif %}
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="2.5"/><circle cx="16.5" cy="9.5" r="1.8"/><path d="M4 18a5 5 0 0 1 10 0"/><path d="M14 18a3.5 3.5 0 0 1 7 0"/></svg>
       <span>Students</span>
-    {% if classroom or assignment or first_class %}
+    {% if active_teacher_classroom %}
     </a>
     {% else %}
     </span>
     {% endif %}
 
-    {% if classroom %}
-    <a href="{% url 'performance_list' classroom.id %}" class="mobile-tab {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-    {% elif assignment %}
-    <a href="{% url 'performance_list' assignment.classroom.id %}" class="mobile-tab {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
-    {% elif first_class %}
-    <a href="{% url 'performance_list' first_class.id %}" class="mobile-tab {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
+    {% if active_teacher_classroom %}
+    <a href="{% url 'performance_list' active_teacher_classroom.id %}" class="mobile-tab {% if current_view == 'performance_list' or current_view == 'student_performance' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% else %}
     <a href="{% url 'ai_tools' %}" class="mobile-tab {% if current_view == 'ai_tools' %}active{% else %}text-slate-400{% endif %} flex min-h-14 flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2">
     {% endif %}
       <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v4"/><path d="M5.5 6.5 8 9"/><path d="M3 12h4"/><path d="m5.5 17.5 2.5-2.5"/><path d="M12 17v4"/><path d="m16 15 2.5 2.5"/><path d="M17 12h4"/><path d="m16 9 2.5-2.5"/><circle cx="12" cy="12" r="4"/></svg>
-      <span>{% if not classroom and not assignment and not first_class %}AI Tools{% else %}Analytics{% endif %}</span>
+      <span>{% if not active_teacher_classroom %}AI Tools{% else %}Analytics{% endif %}</span>
     </a>
   </div>
 </nav>
@@ -617,6 +640,14 @@
         navToggle.setAttribute("aria-expanded", String(!isOpen));
       });
     }
+
+    document.querySelectorAll(".teacher-class-switcher").forEach((switcher) => {
+      switcher.addEventListener("change", () => {
+        if (switcher.value) {
+          window.location.href = switcher.value;
+        }
+      });
+    });
 
     const closeModal = () => {
       overlay.classList.remove("open");

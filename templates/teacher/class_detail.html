@@ -33,8 +33,8 @@
 {% block content %}
 <div class="space-y-6">
   <section class="glass-card hover-lift p-4 sm:p-6 reveal">
-    <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-      <div>
+    <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(260px,0.65fr)]">
+      <div class="flex min-h-full flex-col">
         <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Classroom</p>
         <h3 class="mt-1 text-xl font-black text-white sm:text-3xl">{{ classroom.name }}</h3>
         <div class="mt-2 max-w-3xl">
@@ -46,23 +46,51 @@
             <p class="mt-2 text-sm leading-6 text-slate-400">{{ classroom.description }}</p>
           </details>
         </div>
-      </div>
-      <div class="flex w-full flex-col gap-3 md:max-w-[220px]">
-        <div class="rounded-xl border border-blue-800 bg-blue-900/30 px-3 py-2.5 text-left md:px-4 md:py-3 md:text-right">
-          <p class="text-xs uppercase tracking-[0.1em] text-blue-400 font-semibold">Class Code</p>
-          <p class="mt-1 text-xl font-black text-blue-300 md:text-2xl">{{ classroom.class_code }}</p>
+
+        <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div class="rounded-2xl border border-slate-700/70 bg-slate-950/35 px-4 py-3">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Created</p>
+            <p class="mt-2 text-sm font-semibold text-slate-200">{{ classroom.created_at|date:"M d, Y" }}</p>
+          </div>
+          <div class="rounded-2xl border border-slate-700/70 bg-slate-950/35 px-4 py-3">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Students</p>
+            <p class="mt-2 text-sm font-semibold text-slate-200">{{ students.count }} enrolled</p>
+          </div>
+          <div class="rounded-2xl border border-slate-700/70 bg-slate-950/35 px-4 py-3">
+            <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">README</p>
+            <p class="mt-2 text-sm font-semibold text-slate-200">
+              {% if classroom.readme_content %}
+                Ready for students
+              {% else %}
+                Not added yet
+              {% endif %}
+            </p>
+          </div>
         </div>
-        <a href="{% url 'course_readme_view' classroom.id %}" class="btn-muted inline-flex min-h-11 items-center justify-center px-4 text-sm">
-          Open README
-        </a>
-        {% if not request.is_mobile %}
-        <a href="{% url 'course_readme_edit' classroom.id %}" class="btn-primary inline-flex min-h-11 items-center justify-center px-4 text-sm">
-          Edit README
-        </a>
-        {% endif %}
+      </div>
+
+      <div class="flex min-h-full flex-col justify-between gap-4">
+        <div class="rounded-2xl border border-blue-800 bg-blue-900/30 px-4 py-4 text-left xl:text-right">
+          <p class="text-xs uppercase tracking-[0.1em] text-blue-400 font-semibold">Class Code</p>
+          <p class="mt-2 text-3xl font-black tracking-tight text-blue-300">{{ classroom.class_code }}</p>
+          <p class="mt-2 text-xs text-blue-200/75">Share this code so students can join the classroom.</p>
+        </div>
+
+        <div class="rounded-2xl border border-slate-700/70 bg-slate-950/35 p-4">
+          <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Quick Actions</p>
+          <div class="mt-3 flex flex-col gap-2 sm:flex-row xl:flex-col">
+            <a href="{% url 'course_readme_view' classroom.id %}" class="btn-muted inline-flex h-10 items-center justify-center px-4 text-sm">
+              Open README
+            </a>
+            {% if not request.is_mobile %}
+            <a href="{% url 'course_readme_edit' classroom.id %}" class="btn-primary inline-flex h-10 items-center justify-center px-4 text-sm">
+              Edit README
+            </a>
+            {% endif %}
+          </div>
+        </div>
       </div>
     </div>
-    <p class="mt-3 text-xs text-slate-500 md:mt-5 md:text-sm">Created on {{ classroom.created_at|date:"M d, Y" }}</p>
   </section>
 
   <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-1">

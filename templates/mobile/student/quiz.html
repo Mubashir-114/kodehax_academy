@@ -4,10 +4,49 @@
 <header class="mb-4">
     <a href="{% url 'view_assignments' %}" class="text-sm text-slate-500">&larr; Back</a>
     <h1 class="mt-2 text-2xl font-semibold">{{ assignment.title }}</h1>
-    <p class="text-sm text-slate-500">One question at a time.</p>
+    <p class="text-sm text-slate-500">{% if is_archived %}Archived quiz review.{% else %}One question at a time.{% endif %}</p>
 </header>
 
-{% if can_submit %}
+{% if is_archived %}
+<section class="space-y-4">
+    <div class="card border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-900">
+        This assignment is archived. You can review the questions here, but new submissions are closed.
+    </div>
+
+    {% for row in question_rows %}
+        <article class="card p-5 reveal-2">
+            <p class="text-xs uppercase tracking-[0.16em] text-slate-500">Question {{ forloop.counter }}</p>
+            <h2 class="mt-2 text-lg font-semibold">{{ row.question.question }}</h2>
+            <div class="mt-4 space-y-2">
+                <label class="option-row block rounded-2xl border p-3 {% if row.selected_option == 'A' %}border-amber-300 bg-amber-50{% else %}border-slate-200 bg-white/70 opacity-75{% endif %}">
+                    <input type="radio" disabled {% if row.selected_option == 'A' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_a }}</span>
+                </label>
+                <label class="option-row block rounded-2xl border p-3 {% if row.selected_option == 'B' %}border-amber-300 bg-amber-50{% else %}border-slate-200 bg-white/70 opacity-75{% endif %}">
+                    <input type="radio" disabled {% if row.selected_option == 'B' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_b }}</span>
+                </label>
+                <label class="option-row block rounded-2xl border p-3 {% if row.selected_option == 'C' %}border-amber-300 bg-amber-50{% else %}border-slate-200 bg-white/70 opacity-75{% endif %}">
+                    <input type="radio" disabled {% if row.selected_option == 'C' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_c }}</span>
+                </label>
+                <label class="option-row block rounded-2xl border p-3 {% if row.selected_option == 'D' %}border-amber-300 bg-amber-50{% else %}border-slate-200 bg-white/70 opacity-75{% endif %}">
+                    <input type="radio" disabled {% if row.selected_option == 'D' %}checked{% endif %}>
+                    <span class="ml-2 text-sm">{{ row.question.option_d }}</span>
+                </label>
+            </div>
+        </article>
+    {% empty %}
+        <section class="card p-5">
+            <p class="text-sm text-slate-500">No assignment questions available.</p>
+        </section>
+    {% endfor %}
+
+    <section class="card p-5">
+        <a href="{% url 'view_assignments' %}" class="inline-flex rounded-2xl border border-slate-300 px-4 py-2 text-sm font-medium">Back to Courses</a>
+    </section>
+</section>
+{% elif can_submit %}
 <form method="post" id="quiz-form" class="space-y-4">
     {% csrf_token %}
     <div class="card p-4 reveal-1">
