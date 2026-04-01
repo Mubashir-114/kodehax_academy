@@ -21,20 +21,29 @@
     .auth-link {
         color: #a9adff;
     }
+
+    .auth-shell {
+        min-height: 74vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1.25rem;
+    }
+
+    .auth-footer-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-size: 0.9rem;
+        color: #cbd5e1;
+    }
 </style>
 {% endblock %}
 {% block content %}
 <div class="pt-2 pb-6">
-<header class="mb-6">
-    <nav class="card flex items-center justify-between px-4 py-3 reveal-1">
-        <a href="/" class="flex items-center gap-2">
-            <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-8 w-8 rounded-lg object-cover">
-            <span class="text-sm font-semibold text-slate-800">Kodehax Academy</span>
-        </a>
-        <a href="{% url 'student_login' %}" class="text-sm font-semibold auth-link">Sign in</a>
-    </nav>
-</header>
-<main class="min-h-[74vh] flex items-start pt-2">
+{% include "mobile/components/auth_drawer.html" %}
+<main class="auth-shell pt-2">
     <section class="card auth-card w-full p-5 reveal-1">
         <p class="text-xs uppercase tracking-[0.2em] text-indigo-200/80">Kodehax Academy</p>
         <h1 class="mt-2 text-2xl font-semibold">Create Student Account</h1>
@@ -58,6 +67,10 @@
         </form>
         <p class="mt-4 text-sm text-slate-300">Already registered? <a href="{% url 'student_login' %}" class="font-medium auth-link">Sign in</a></p>
     </section>
+    <div class="auth-footer-nav px-1 reveal-2">
+        <a href="/" class="text-slate-600">Back to home</a>
+        <a href="{% url 'student_login' %}" class="font-medium auth-link">Already have an account?</a>
+    </div>
 </main>
 </div>
 {% endblock %}

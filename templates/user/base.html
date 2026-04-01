@@ -12,9 +12,10 @@
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <style>
         :root{--bg1:#020617;--bg2:#0b1224;--bg3:#0f172a;--surface:rgba(255,255,255,.025);--surface-2:rgba(255,255,255,.04);--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.15);--text:#e5eefb;--muted:#8ea0b9;--title:#f8fbff}
-        html{scroll-behavior:smooth}body{margin:0;color:var(--text);color-scheme:dark;font-family:"Manrope",sans-serif;background:radial-gradient(circle at 18% 22%,rgba(59,130,246,.22),transparent 18%),radial-gradient(circle at 78% 14%,rgba(99,102,241,.18),transparent 16%),radial-gradient(circle at 55% 88%,rgba(59,130,246,.08),transparent 22%),linear-gradient(145deg,var(--bg1),var(--bg2) 52%,var(--bg3) 100%);background-size:160% 160%;animation:gradientDrift 18s ease-in-out infinite alternate;overflow-x:hidden}
+        html{scroll-behavior:smooth;background-color:var(--bg1);overscroll-behavior-y:none}
+        body{margin:0;min-height:100vh;color:var(--text);color-scheme:dark;font-family:"Manrope",sans-serif;background-color:var(--bg1);background-image:radial-gradient(circle at 18% 22%,rgba(59,130,246,.22),transparent 18%),radial-gradient(circle at 78% 14%,rgba(99,102,241,.18),transparent 16%),radial-gradient(circle at 55% 88%,rgba(59,130,246,.08),transparent 22%),linear-gradient(145deg,var(--bg1),var(--bg2) 52%,var(--bg3) 100%);background-size:160% 160%;background-repeat:no-repeat;animation:gradientDrift 18s ease-in-out infinite alternate;overflow-x:hidden}
         h1,h2,h3,h4,.font-display{font-family:"Space Grotesk",sans-serif}
-        body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(148,163,184,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.09) 1px,transparent 1px);background-size:44px 44px;opacity:.28;pointer-events:none;mask-image:radial-gradient(circle at center,black 46%,transparent 88%);z-index:0}
+        body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(148,163,184,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.09) 1px,transparent 1px);background-size:44px 44px;opacity:.28;pointer-events:none;mask-image:radial-gradient(circle at center,black 46%,transparent 88%);-webkit-mask-image:radial-gradient(circle at center,black 46%,transparent 88%);z-index:0}
         body:after{content:"";position:fixed;inset:-10% -15%;background:radial-gradient(circle at 22% 28%,rgba(59,130,246,.07),transparent 18%),radial-gradient(circle at 74% 18%,rgba(99,102,241,.06),transparent 16%);filter:blur(26px);animation:floatLights 20s ease-in-out infinite alternate;pointer-events:none;z-index:0}
         .page-shell{position:relative;z-index:1}.glass{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border-strong);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 28px 70px rgba(2,6,23,.62),inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.015)}
         .premium{position:relative;overflow:hidden;border-radius:1.25rem;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}.premium:after{content:"";position:absolute;inset:auto -18% -42% auto;width:12rem;height:12rem;border-radius:999px;background:radial-gradient(circle,rgba(99,102,241,.14),transparent 70%);opacity:0;transition:opacity .28s ease;pointer-events:none}.premium:hover{transform:translateY(-10px) scale(1.02);border-color:rgba(255,255,255,.22);box-shadow:0 38px 82px rgba(2,6,23,.66),0 0 0 1px rgba(255,255,255,.045) inset,0 0 30px rgba(59,130,246,.12)}.premium:hover:after{opacity:1}
@@ -112,6 +113,135 @@
         .accordion-item.open .accordion-panel{display:block}
         .info-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.09)}
         .mobile-stack{display:flex;flex-direction:column;gap:1rem}
+        .mobile-topbar,.mobile-nav,.mobile-card,.mobile-feature,.mobile-chat-bubble,.mobile-cta-shell,.mobile-stat-card,.mobile-live-panel,.mobile-spotlight-panel,.mobile-stage,.mobile-stage-panel,.mobile-float-card{position:relative;overflow:hidden}
+        .mobile-fallback{display:none}
+        .mobile-shell{position:relative;max-width:30rem;margin:0 auto;padding:1rem 1rem 7rem}
+        .mobile-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 0%,rgba(59,130,246,.13),transparent 26%),radial-gradient(circle at 88% 8%,rgba(168,85,247,.12),transparent 24%),radial-gradient(circle at 50% 58%,rgba(59,130,246,.06),transparent 30%);pointer-events:none}
+        .mobile-shell:after{content:"";position:absolute;left:8%;right:8%;top:7rem;height:18rem;border-radius:999px;background:radial-gradient(circle,rgba(79,70,229,.16),transparent 70%);filter:blur(18px);pointer-events:none;opacity:.78}
+        .mobile-section{position:relative;z-index:1;margin-top:4.3rem}
+        .mobile-topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.05rem;border-radius:1.55rem}
+        .mobile-logo{display:flex;align-items:center;gap:.85rem;min-width:0}
+        .mobile-logo img{width:2.8rem;height:2.8rem;border-radius:1rem;object-fit:cover;box-shadow:0 16px 30px rgba(15,23,42,.34)}
+        .mobile-logo-mark{font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:#7f8faf}
+        .mobile-logo-name{font-size:1rem;font-weight:800;color:#fff;line-height:1.1}
+        .mobile-menu-btn{display:inline-flex;align-items:center;justify-content:center;width:3rem;height:3rem;border-radius:1rem;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:#fff;transition:transform .18s ease,background .18s ease,border-color .18s ease}
+        .mobile-menu-btn:active,.mobile-nav-link:active,.mobile-hero-btn:active,.mobile-cta-btn:active{transform:scale(.97)}
+        .mobile-menu-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2)}
+        .mobile-hero{text-align:center;padding-top:.75rem}
+        .mobile-badge{display:inline-flex;align-items:center;justify-content:center;padding:.5rem .95rem;border-radius:999px;border:1px solid rgba(129,140,248,.22);background:rgba(2,6,23,.48);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#c6d6f0}
+        .mobile-title{margin:1.2rem 0 0;font-size:clamp(2.65rem,10vw,4.1rem);line-height:.95;letter-spacing:-.05em;color:#fff;text-wrap:balance}
+        .mobile-subtext{margin:1rem auto 0;max-width:21rem;font-size:1.02rem;line-height:1.8;color:#c9d7ed}
+        .mobile-hero-btn,.mobile-cta-btn{display:inline-flex;align-items:center;justify-content:center;width:100%;min-height:3.8rem;padding:0 1.35rem;border-radius:1.35rem;font-size:1rem;font-weight:800}
+        .mobile-hero-btn{margin-top:1.5rem}
+        .mobile-stage{margin-top:1.5rem;padding:1.15rem;border-radius:1.9rem;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));box-shadow:0 34px 80px rgba(2,6,23,.58),0 0 0 1px rgba(255,255,255,.02) inset}
+        .mobile-stage:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 15%,rgba(59,130,246,.18),transparent 26%),radial-gradient(circle at 82% 18%,rgba(168,85,247,.18),transparent 24%);pointer-events:none}
+        .mobile-stage-device{position:relative;z-index:1;border-radius:1.75rem;padding:1rem;background:linear-gradient(180deg,rgba(2,6,23,.96),rgba(15,23,42,.92));border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 22px 46px rgba(2,6,23,.46)}
+        .mobile-stage-notch{width:7rem;height:.45rem;border-radius:999px;background:rgba(148,163,184,.22);margin:0 auto .85rem}
+        .mobile-stage-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;text-align:left}
+        .mobile-stage-kicker{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#8fa4c8}
+        .mobile-stage-title{margin-top:.3rem;font-size:1rem;font-weight:800;color:#fff}
+        .mobile-stage-signal{display:inline-flex;align-items:center;gap:.38rem;padding:.38rem .6rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:.72rem;color:#d9e6f8}
+        .mobile-stage-signal span{width:.42rem;height:.42rem;border-radius:999px;background:#38bdf8;box-shadow:0 0 12px rgba(56,189,248,.85)}
+        .mobile-stage-grid{margin-top:1rem;display:grid;gap:.85rem}
+        .mobile-stage-panel{padding:1rem;border-radius:1.35rem;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.028));border:1px solid rgba(255,255,255,.08);text-align:left}
+        .mobile-stage-panel .eyebrow{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:#94a8c7}
+        .mobile-stage-panel strong{display:block;margin-top:.45rem;font-size:1rem;color:#fff}
+        .mobile-stage-panel p{margin:.45rem 0 0;font-size:.88rem;line-height:1.6;color:#c9d7eb}
+        .mobile-stage-metric{display:flex;justify-content:space-between;gap:1rem;align-items:flex-end}
+        .mobile-stage-metric .value{font-size:2rem;font-weight:800;line-height:1;color:#fff}
+        .mobile-stage-metric .note{font-size:.8rem;color:#b8c8e0}
+        .mobile-float-card{position:absolute;z-index:2;padding:.8rem .9rem;border-radius:1.15rem;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 18px 38px rgba(2,6,23,.44);text-align:left}
+        .mobile-float-card.top{top:-.8rem;right:-.15rem;transform:rotate(7deg)}
+        .mobile-float-card.bottom{left:-.2rem;bottom:1.15rem;transform:rotate(-6deg)}
+        .mobile-float-label{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:#a8b7d2}
+        .mobile-float-value{margin-top:.35rem;font-size:.95rem;font-weight:800;color:#fff}
+        .mobile-float-note{margin-top:.18rem;font-size:.74rem;color:#d3def2}
+        .mobile-marquee{margin-top:1.15rem;border-radius:1.2rem;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);padding:.8rem 0}
+        .mobile-marquee-track{display:flex;gap:1.5rem;min-width:max-content;padding-left:1rem;animation:marqueeDrift 18s linear infinite}
+        .mobile-marquee-item{display:inline-flex;align-items:center;gap:.55rem;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d4e0f5}
+        .mobile-marquee-item:before{content:"";display:inline-block;width:.42rem;height:.42rem;border-radius:999px;background:linear-gradient(135deg,#38bdf8,#818cf8);box-shadow:0 0 14px rgba(99,102,241,.45)}
+        .mobile-stats-grid{margin-top:1.2rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem}
+        .mobile-stat-card{padding:1rem 1rem 1.05rem;border-radius:1.35rem;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.026));border:1px solid rgba(255,255,255,.1);text-align:left}
+        .mobile-stat-label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#96a9c8}
+        .mobile-stat-value{margin-top:.55rem;font-size:1.55rem;font-weight:800;color:#fff}
+        .mobile-stat-note{margin-top:.3rem;font-size:.84rem;line-height:1.55;color:#c2d0e7}
+        .mobile-spotlight-panel{margin-top:1rem;padding:1rem 1.05rem 1.05rem;border-radius:1.4rem;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.025));text-align:left}
+        .mobile-spotlight-label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#8ea0be}
+        .mobile-spotlight-line{margin-top:.65rem;min-height:3rem;font-size:.96rem;line-height:1.7;color:#eef4ff}
+        .mobile-card{padding:1.35rem;border-radius:1.6rem}
+        .mobile-chat-card{padding:1.35rem 1.2rem 1.3rem}
+        .mobile-chat-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
+        .mobile-chat-title{font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8ba0c2}
+        .mobile-chat-status{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#c8d6ee}
+        .mobile-chat-status span{display:inline-block;width:.5rem;height:.5rem;border-radius:999px;background:#38bdf8;box-shadow:0 0 14px rgba(56,189,248,.9)}
+        .mobile-chat-pills{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}
+        .mobile-chat-pill{display:inline-flex;align-items:center;justify-content:center;padding:.55rem .85rem;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d4e0f4;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease}
+        .mobile-chat-pill.active{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));border-color:rgba(129,140,248,.35);color:#fff}
+        .mobile-chat-flow{display:flex;flex-direction:column;gap:1rem}
+        .mobile-chat-bubble{max-width:88%;padding:1rem 1rem 1.05rem;border-radius:1.35rem;border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+        .mobile-chat-bubble.user{align-self:flex-end;background:rgba(255,255,255,.045)}
+        .mobile-chat-bubble.ai{align-self:flex-start;background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.22));box-shadow:0 18px 44px rgba(59,130,246,.18),0 0 34px rgba(99,102,241,.12)}
+        .mobile-chat-label{display:block;margin-bottom:.45rem;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9db1cf}
+        .mobile-chat-text{font-size:.98rem;line-height:1.7;color:#f8fbff}
+        .mobile-live-panel{margin-top:1rem;padding:1rem 1.05rem;border-radius:1.35rem;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03)}
+        .mobile-live-row{display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+        .mobile-live-row strong{font-size:.95rem;color:#fff}
+        .mobile-live-row span{font-size:.8rem;color:#b9c8df}
+        .mobile-progress{margin-top:.75rem;height:.45rem;border-radius:999px;background:rgba(148,163,184,.14);overflow:hidden}
+        .mobile-progress-bar{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#38bdf8,#6366f1,#8b5cf6);box-shadow:0 0 18px rgba(99,102,241,.26);transition:width 1s ease}
+        .mobile-features{display:flex;flex-direction:column;gap:1rem}
+        .mobile-feature{display:flex;gap:1rem;align-items:flex-start;padding:1.35rem 1.25rem;border-radius:1.55rem}
+        .mobile-feature-icon{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:3rem;height:3rem;border-radius:1rem;border:1px solid rgba(129,140,248,.18);background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));color:#eef4ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+        .mobile-feature h3{margin:0;font-size:1.08rem;font-weight:800;color:#fff}
+        .mobile-feature p{margin:.45rem 0 0;font-size:.95rem;line-height:1.75;color:#c7d4e8}
+        .mobile-switcher{display:flex;gap:.55rem;overflow:auto;padding-bottom:.15rem;-ms-overflow-style:none;scrollbar-width:none}
+        .mobile-switcher::-webkit-scrollbar{display:none}
+        .mobile-switch-btn{display:inline-flex;align-items:center;justify-content:center;padding:.6rem .95rem;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d1ddf2;white-space:nowrap;transition:transform .18s ease,background .18s ease,border-color .18s ease}
+        .mobile-switch-btn.active{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.2));border-color:rgba(129,140,248,.34);color:#fff}
+        .mobile-switch-panel{display:none}
+        .mobile-switch-panel.active{display:flex;flex-direction:column;gap:.85rem}
+        .mobile-surface-block{margin-top:1rem;padding:1.15rem;border-radius:1.45rem;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.022))}
+        .mobile-surface-block h3{margin:0;font-size:1.2rem;font-weight:800;color:#fff}
+        .mobile-surface-block p{margin:.55rem 0 0;font-size:.95rem;line-height:1.7;color:#c9d7eb}
+        .mobile-surface-metrics{margin-top:.9rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+        .mobile-surface-metric{padding:.85rem;border-radius:1.1rem;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
+        .mobile-surface-metric .label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#8ea1c0}
+        .mobile-surface-metric .value{margin-top:.45rem;font-size:1rem;font-weight:700;color:#fff}
+        .mobile-profile-shell{padding:1.15rem;border-radius:1.65rem;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.024));box-shadow:0 28px 60px rgba(2,6,23,.38),inset 0 1px 0 rgba(255,255,255,.04)}
+        .mobile-profile-hero{padding:1.2rem 1.1rem 1.15rem;border-radius:1.45rem;background:radial-gradient(circle at top right,rgba(59,130,246,.18),transparent 32%),linear-gradient(135deg,rgba(17,24,39,.9),rgba(30,41,59,.96));border:1px solid rgba(255,255,255,.08)}
+        .mobile-profile-kicker{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#95a8c7}
+        .mobile-profile-title{margin:.55rem 0 0;font-size:1.55rem;line-height:1.2;font-weight:800;color:#fff}
+        .mobile-profile-copy{margin:.8rem 0 0;font-size:.94rem;line-height:1.75;color:#d5e2f5}
+        .mobile-profile-badges{margin-top:1rem;display:flex;flex-wrap:wrap;gap:.6rem}
+        .mobile-profile-badge{display:inline-flex;align-items:center;justify-content:center;padding:.48rem .72rem;border-radius:999px;border:1px solid rgba(129,140,248,.2);background:rgba(255,255,255,.05);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#e3ecfb}
+        .mobile-profile-grid{display:grid;gap:.85rem}
+        .mobile-profile-card{padding:1rem;border-radius:1.25rem;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08)}
+        .mobile-profile-card .label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#8ea1c0}
+        .mobile-profile-card .value{margin-top:.55rem;font-size:.95rem;line-height:1.7;color:#f6f9ff}
+        .mobile-profile-list{display:grid;gap:.75rem}
+        .mobile-profile-list-item{padding:.95rem 1rem;border-radius:1.2rem;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
+        .mobile-profile-list-item strong{display:block;font-size:.94rem;color:#fff}
+        .mobile-profile-list-item span{display:block;margin-top:.35rem;font-size:.88rem;line-height:1.65;color:#cad7ea}
+        .mobile-profile-courses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+        .mobile-profile-course{padding:.95rem;border-radius:1.15rem;background:linear-gradient(180deg,rgba(59,130,246,.1),rgba(255,255,255,.025));border:1px solid rgba(129,140,248,.16)}
+        .mobile-profile-course strong{display:block;font-size:.92rem;color:#fff}
+        .mobile-profile-course span{display:block;margin-top:.35rem;font-size:.82rem;line-height:1.55;color:#c8d5e9}
+        .mobile-profile-contact{display:grid;gap:.75rem}
+        .mobile-profile-contact-item{padding:.95rem 1rem;border-radius:1.2rem;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
+        .mobile-profile-contact-item .label{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:#8ea1c0}
+        .mobile-profile-contact-item .value{margin-top:.4rem;font-size:.9rem;line-height:1.65;color:#f5f8ff}
+        .mobile-cta-shell{padding:1.5rem 1.25rem;border-radius:1.7rem;background:radial-gradient(circle at top left,rgba(59,130,246,.3),transparent 32%),radial-gradient(circle at top right,rgba(168,85,247,.24),transparent 28%),linear-gradient(135deg,rgba(30,41,59,.9),rgba(15,23,42,.96))}
+        .mobile-cta-shell p{margin:0;font-size:.76rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#cad6ee}
+        .mobile-cta-shell h3{margin:.85rem 0 0;font-size:1.7rem;line-height:1.2;font-weight:800;color:#fff;text-wrap:balance}
+        .mobile-cta-shell .mobile-cta-copy{margin:.8rem 0 1.2rem;font-size:.96rem;line-height:1.75;color:#d7e2f5}
+        .mobile-cta-orbs{position:absolute;inset:0;pointer-events:none}
+        .mobile-cta-orbs:before,.mobile-cta-orbs:after{content:"";position:absolute;border-radius:999px;filter:blur(6px)}
+        .mobile-cta-orbs:before{width:7rem;height:7rem;top:-1rem;right:-1rem;background:radial-gradient(circle,rgba(99,102,241,.28),transparent 70%)}
+        .mobile-cta-orbs:after{width:8rem;height:8rem;left:-1rem;bottom:-2rem;background:radial-gradient(circle,rgba(59,130,246,.24),transparent 72%)}
+        .mobile-nav{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:45;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;padding:.7rem;border-radius:1.5rem}
+        .mobile-nav-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.42rem;min-height:4rem;border-radius:1.1rem;color:#c4d2ea;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-decoration:none;transition:transform .18s ease,background .18s ease,color .18s ease}
+        .mobile-nav-link svg{width:1.2rem;height:1.2rem}
+        .mobile-nav-link.active,.mobile-nav-link:hover{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));color:#fff}
         @media (min-width:1024px){.lg\:px-16{padding-left:4rem;padding-right:4rem}.lg\:py-24{padding-top:6rem;padding-bottom:6rem}}
         @media (min-width:1280px){.xl\:mt-24{margin-top:6rem}.xl\:text-\[5\.5rem\]{font-size:5.5rem;line-height:1}.xl\:grid-cols-\[1\.06fr_0\.94fr\]{grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr)}.xl\:grid-cols-\[1\.08fr_0\.92fr\]{grid-template-columns:1.08fr .92fr}}
         .grid-cols-\[1\.15fr_0\.85fr\]{grid-template-columns:1.15fr .85fr}
@@ -119,7 +249,8 @@
         @media (max-width:1279px){.hero-section{padding:2.5rem}.hero-grid{grid-template-columns:1fr}.hero-copy .hero-lead,.hero-spotlight,.hero-support-grid{max-width:none}.hero-support-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-chat{margin-top:0}.hero-window{gap:1.25rem}}
         @media (max-width:900px){.hero-support-grid{grid-template-columns:1fr}.hero-mini-card,.hero-meta-card{min-height:auto}.hero-chat-grid,.hero-bottom-strip{grid-template-columns:1fr}.course-layout{grid-template-columns:1fr}.course-aside{grid-template-rows:none;grid-template-columns:1fr}}
         @media (max-width:1023px){body{background-size:auto;animation:none}.desktop-only{display:none}.mobile-fallback{display:block}}
-        @keyframes gradientDrift{from{background-position:0 50%}to{background-position:100% 50%}}@keyframes floatLights{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(2%,-1.5%,0) scale(1.04)}}@keyframes messageSlideIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@keyframes typingPulse{0%,80%,100%{transform:scale(.7);opacity:.45}40%{transform:scale(1);opacity:1}}@keyframes responseGlow{0%,100%{text-shadow:0 0 0 rgba(125,211,252,0);filter:brightness(1)}50%{text-shadow:0 0 16px rgba(125,211,252,.16),0 0 30px rgba(99,102,241,.12);filter:brightness(1.04)}}
+        @media (max-width:480px){.mobile-shell{padding-left:.95rem;padding-right:.95rem}.mobile-title{font-size:2.8rem}.mobile-section{margin-top:3.9rem}.mobile-card,.mobile-feature,.mobile-cta-shell,.mobile-stat-card,.mobile-surface-block,.mobile-stage,.mobile-profile-shell{border-radius:1.45rem}.mobile-stats-grid,.mobile-surface-metrics,.mobile-profile-courses{grid-template-columns:1fr}.mobile-float-card.top{right:.1rem}.mobile-float-card.bottom{left:.1rem;bottom:.85rem}.mobile-stage-device{padding:.9rem}}
+        @keyframes gradientDrift{from{background-position:0 50%}to{background-position:100% 50%}}@keyframes floatLights{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(2%,-1.5%,0) scale(1.04)}}@keyframes messageSlideIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@keyframes typingPulse{0%,80%,100%{transform:scale(.7);opacity:.45}40%{transform:scale(1);opacity:1}}@keyframes responseGlow{0%,100%{text-shadow:0 0 0 rgba(125,211,252,0);filter:brightness(1)}50%{text-shadow:0 0 16px rgba(125,211,252,.16),0 0 30px rgba(99,102,241,.12);filter:brightness(1.04)}}@keyframes marqueeDrift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -374,19 +505,330 @@
             </footer>
         </div>
 
-        <div class="mobile-fallback px-4 py-8">
-            <div class="mx-auto max-w-2xl space-y-5">
-                <div class="glass rounded-3xl p-6">
-                    <div class="flex items-center gap-3"><img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-11 w-11 rounded-2xl object-cover"><div><p class="text-xs uppercase tracking-[0.22em] text-slate-500">Kodehax</p><h2 class="text-lg font-black text-white">Academy</h2></div></div>
-                    <h3 class="mt-6 text-3xl font-black leading-tight text-white">Ethical, practical tech training that feels premium.</h3>
-                    <p class="mt-3 text-sm leading-7 text-slate-300">Live classes, real projects, mentorship, internships, and honest career-focused programs inspired by the public Kodehax Academy site.</p>
-                    <div class="mt-5 mobile-stack">
-                        <div class="glass rounded-2xl px-4 py-4"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Top promise</p><p class="mt-2 text-sm font-semibold text-white">No scams. No false promises.</p></div>
-                        <div class="glass rounded-2xl px-4 py-4"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Programs</p><p class="mt-2 text-sm font-semibold text-white">Web, Data Science, Cyber Security, AI/ML, Python</p></div>
+        <div class="mobile-fallback">
+            <div class="mobile-shell">
+                <header class="mobile-section mt-0">
+                    <div class="glass mobile-topbar reveal visible">
+                        <a href="/" class="mobile-logo">
+                            <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo">
+                            <div>
+                                <p class="mobile-logo-mark">Kodehax</p>
+                                <h2 class="mobile-logo-name">Academy</h2>
+                            </div>
+                        </a>
+                        <a href="{% url 'student_login' %}" class="mobile-menu-btn" aria-label="Login">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M4 7h16"></path>
+                                <path d="M8 12h12"></path>
+                                <path d="M12 17h8"></path>
+                            </svg>
+                        </a>
                     </div>
-                    <div class="mt-6 flex flex-col gap-3"><a href="{% url 'student_register' %}" class="btn-primary inline-flex h-12 items-center justify-center px-5">Join Now</a><a href="{% url 'teacher_login' %}" class="btn-secondary inline-flex h-12 items-center justify-center px-5">Teacher Portal</a></div>
-                </div>
+                </header>
+
+                <section class="mobile-section mobile-hero reveal visible" id="mobile-home">
+                    <span class="mobile-badge">AI-Powered LMS</span>
+                    <h1 class="mobile-title font-display">Learn Smarter with AI</h1>
+                    <p class="mobile-subtext">Touch-friendly lessons, instant guidance, and premium learning flows built for modern students.</p>
+                    <a href="{% url 'student_register' %}" class="btn-primary mobile-hero-btn">Start Learning</a>
+                    <div class="mobile-stage">
+                        <div class="mobile-float-card top">
+                            <div class="mobile-float-label">Live Session</div>
+                            <div class="mobile-float-value">AI Tutor Online</div>
+                            <div class="mobile-float-note">Explaining in real time</div>
+                        </div>
+                        <div class="mobile-float-card bottom">
+                            <div class="mobile-float-label">Momentum</div>
+                            <div class="mobile-float-value">+18% Focus</div>
+                            <div class="mobile-float-note">vs last week</div>
+                        </div>
+                        <div class="mobile-stage-device">
+                            <div class="mobile-stage-notch"></div>
+                            <div class="mobile-stage-head">
+                                <div>
+                                    <div class="mobile-stage-kicker">Mobile Learning Surface</div>
+                                    <div class="mobile-stage-title">AI lesson flow</div>
+                                </div>
+                                <div class="mobile-stage-signal"><span></span>Live</div>
+                            </div>
+                            <div class="mobile-stage-grid">
+                                <div class="mobile-stage-panel">
+                                    <div class="eyebrow">Current Topic</div>
+                                    <strong>Python loops and iteration</strong>
+                                    <p>Explanation, examples, and next practice are stacked into one calm screen.</p>
+                                </div>
+                                <div class="mobile-stage-panel">
+                                    <div class="mobile-stage-metric">
+                                        <div>
+                                            <div class="eyebrow">Confidence</div>
+                                            <div class="value">94%</div>
+                                        </div>
+                                        <div class="note">adaptive review ready</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mobile-marquee glass">
+                        <div class="mobile-marquee-track">
+                            <span class="mobile-marquee-item">Live AI guidance</span>
+                            <span class="mobile-marquee-item">Mentor-backed paths</span>
+                            <span class="mobile-marquee-item">Mobile-first lessons</span>
+                            <span class="mobile-marquee-item">Smart progress</span>
+                            <span class="mobile-marquee-item">Live AI guidance</span>
+                            <span class="mobile-marquee-item">Mentor-backed paths</span>
+                            <span class="mobile-marquee-item">Mobile-first lessons</span>
+                            <span class="mobile-marquee-item">Smart progress</span>
+                        </div>
+                    </div>
+                    <div class="mobile-stats-grid">
+                        <div class="glass mobile-stat-card reveal s1">
+                            <div class="mobile-stat-label">Completion</div>
+                            <div class="mobile-stat-value" data-counter data-target="92" data-suffix="%">0</div>
+                            <div class="mobile-stat-note">lesson continuation rate</div>
+                        </div>
+                        <div class="glass mobile-stat-card reveal s2">
+                            <div class="mobile-stat-label">AI Support</div>
+                            <div class="mobile-stat-value" data-counter data-target="24" data-suffix="h">0</div>
+                            <div class="mobile-stat-note">hour guidance rhythm</div>
+                        </div>
+                    </div>
+                    <div class="glass mobile-spotlight-panel">
+                        <div class="mobile-spotlight-label">Live Spotlight</div>
+                        <div class="mobile-spotlight-line" data-mobile-spotlight>Adaptive study flows keep lessons, AI help, and action steps connected on one mobile screen.</div>
+                    </div>
+                </section>
+
+                <section class="mobile-section reveal" id="mobile-ai">
+                    <div class="glass mobile-card mobile-chat-card">
+                        <div class="mobile-chat-head">
+                            <p class="mobile-chat-title">AI Chat Preview</p>
+                            <div class="mobile-chat-status"><span></span>Live help</div>
+                        </div>
+                        <div class="mobile-chat-pills" data-mobile-switcher>
+                            <button type="button" class="mobile-chat-pill active" data-mobile-switch-trigger="python">Python</button>
+                            <button type="button" class="mobile-chat-pill" data-mobile-switch-trigger="sql">SQL</button>
+                            <button type="button" class="mobile-chat-pill" data-mobile-switch-trigger="api">API</button>
+                        </div>
+                        <div class="mobile-chat-flow">
+                            <div class="mobile-switch-panel active" data-mobile-switch-panel="python">
+                                <div class="mobile-chat-bubble user">
+                                    <span class="mobile-chat-label">User</span>
+                                    <div class="mobile-chat-text">Explain Python loops</div>
+                                </div>
+                                <div class="mobile-chat-bubble ai">
+                                    <span class="mobile-chat-label">AI Tutor</span>
+                                    <div class="flex items-center gap-2" data-typing>
+                                        <span class="typing-dot"></span>
+                                        <span class="typing-dot"></span>
+                                        <span class="typing-dot"></span>
+                                    </div>
+                                    <div class="mobile-chat-text hidden" data-ai-response>Python loops repeat a block of code for each item or until a condition changes, so you can automate patterns instead of writing the same line again.</div>
+                                </div>
+                            </div>
+                            <div class="mobile-switch-panel" data-mobile-switch-panel="sql">
+                                <div class="mobile-chat-bubble user">
+                                    <span class="mobile-chat-label">User</span>
+                                    <div class="mobile-chat-text">When do I use a LEFT JOIN?</div>
+                                </div>
+                                <div class="mobile-chat-bubble ai">
+                                    <span class="mobile-chat-label">AI Tutor</span>
+                                    <div class="mobile-chat-text">Use a LEFT JOIN when you want every row from the left table, even if the right table has missing matches.</div>
+                                </div>
+                            </div>
+                            <div class="mobile-switch-panel" data-mobile-switch-panel="api">
+                                <div class="mobile-chat-bubble user">
+                                    <span class="mobile-chat-label">User</span>
+                                    <div class="mobile-chat-text">Why is my API returning 401?</div>
+                                </div>
+                                <div class="mobile-chat-bubble ai">
+                                    <span class="mobile-chat-label">AI Tutor</span>
+                                    <div class="mobile-chat-text">A 401 usually means your request is missing valid authentication, so check the token, header format, and expiry first.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mobile-live-panel">
+                            <div class="mobile-live-row"><strong>AI session confidence</strong><span>Updated now</span></div>
+                            <div class="mobile-progress"><div class="mobile-progress-bar" data-progress-value="86"></div></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mobile-section reveal">
+                    <div class="mobile-features">
+                        <article class="glass mobile-feature">
+                            <div class="mobile-feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"></path>
+                                    <path d="M12 12l8-4.5"></path>
+                                    <path d="M12 12v9"></path>
+                                    <path d="M12 12L4 7.5"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Adaptive Courses</h3>
+                                <p>Lessons reshape around learner progress so each touchpoint stays clear, guided, and relevant.</p>
+                            </div>
+                        </article>
+                        <article class="glass mobile-feature">
+                            <div class="mobile-feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M5 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 4V6a2 2 0 0 1 2-2z"></path>
+                                    <path d="M9 9h6"></path>
+                                    <path d="M9 13h4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>AI Tutor Support</h3>
+                                <p>Get concise explanations, practice help, and fast feedback inside a calm chat-first experience.</p>
+                            </div>
+                        </article>
+                        <article class="glass mobile-feature">
+                            <div class="mobile-feature-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M4 15c2.5-3 5.5-4.5 8-4.5s5.5 1.5 8 4.5"></path>
+                                    <path d="M12 4v6"></path>
+                                    <circle cx="12" cy="16" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3>Progress Insights</h3>
+                                <p>Track momentum with simplified milestones designed for quick scans on smaller screens.</p>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section class="mobile-section reveal" id="mobile-profile">
+                    <div class="mobile-profile-shell">
+                        <div class="mobile-profile-hero">
+                            <div class="mobile-profile-kicker">Kodehax Academy</div>
+                            <h3 class="mobile-profile-title">A career-focused online tech academy built around practical learning.</h3>
+                            <p class="mobile-profile-copy">This section now reflects Kodehax Academy more directly: guided programs, live support, internships, certification help, and placement-oriented mentoring presented in a cleaner mobile profile layout.</p>
+                            <div class="mobile-profile-badges">
+                                <span class="mobile-profile-badge">Live Classes</span>
+                                <span class="mobile-profile-badge">Mentorship</span>
+                                <span class="mobile-profile-badge">Internships</span>
+                                <span class="mobile-profile-badge">Career Support</span>
+                            </div>
+                        </div>
+
+                        <div class="mobile-switcher" data-mobile-switcher>
+                            <button type="button" class="mobile-switch-btn active" data-mobile-switch-trigger="about">About</button>
+                            <button type="button" class="mobile-switch-btn" data-mobile-switch-trigger="services">Services</button>
+                            <button type="button" class="mobile-switch-btn" data-mobile-switch-trigger="courses">Courses</button>
+                        </div>
+
+                        <div class="mobile-switch-panel active" data-mobile-switch-panel="about">
+                            <div class="mobile-profile-grid">
+                                <div class="mobile-profile-card">
+                                    <div class="label">Overview</div>
+                                    <div class="value">Kodehax Academy presents itself as an online tech learning platform focused on helping students build real, employable skills through structured instruction and industry-relevant practice.</div>
+                                </div>
+                                <div class="mobile-profile-card">
+                                    <div class="label">What Stands Out</div>
+                                    <div class="value">The academy messaging emphasizes hands-on learning, mentor guidance, and outcome-driven support rather than only self-paced content access.</div>
+                                </div>
+                                <div class="mobile-profile-card">
+                                    <div class="label">Student Experience</div>
+                                    <div class="value">Learners move through guided lessons, get support when blocked, and stay connected to next steps like projects, certifications, and placement preparation.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mobile-switch-panel" data-mobile-switch-panel="services">
+                            <div class="mobile-profile-list">
+                                <div class="mobile-profile-list-item">
+                                    <strong>Mentorship and live guidance</strong>
+                                    <span>Support is positioned around expert-led teaching, doubt resolution, and practical explanation rather than passive content consumption.</span>
+                                </div>
+                                <div class="mobile-profile-list-item">
+                                    <strong>Internships and live projects</strong>
+                                    <span>The academy highlights real-world practice so learners can connect concepts to portfolio-ready work and team workflows.</span>
+                                </div>
+                                <div class="mobile-profile-list-item">
+                                    <strong>Certification and placement assistance</strong>
+                                    <span>Career support is part of the offer, with messaging centered on helping students move from learning to opportunities.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mobile-switch-panel" data-mobile-switch-panel="courses">
+                            <div class="mobile-profile-courses">
+                                <div class="mobile-profile-course">
+                                    <strong>Web Development</strong>
+                                    <span>Frontend, backend, and full-stack foundations for modern product building.</span>
+                                </div>
+                                <div class="mobile-profile-course">
+                                    <strong>Data Science</strong>
+                                    <span>Analytics-oriented learning paths that connect data handling with decision-making.</span>
+                                </div>
+                                <div class="mobile-profile-course">
+                                    <strong>Cyber Security</strong>
+                                    <span>Security-focused training for learners exploring defensive and systems thinking.</span>
+                                </div>
+                                <div class="mobile-profile-course">
+                                    <strong>AI and Programming</strong>
+                                    <span>Programming fundamentals and AI-oriented tracks for current technical workflows.</span>
+                                </div>
+                            </div>
+                            <div class="mobile-profile-contact">
+                                <div class="mobile-profile-contact-item">
+                                    <div class="label">Academy Focus</div>
+                                    <div class="value">Online learning, practical tech skills, guided delivery, and career acceleration.</div>
+                                </div>
+                                <div class="mobile-profile-contact-item">
+                                    <div class="label">Bengaluru Presence</div>
+                                    <div class="value">Kodehax Academy LLP is listed in Koramangala, Bengaluru, Karnataka.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mobile-section reveal" id="mobile-courses">
+                    <div class="mobile-cta-shell">
+                        <div class="mobile-cta-orbs"></div>
+                        <p>Start Today</p>
+                        <h3>Build real skills with guided learning, live support, and career momentum.</h3>
+                        <div class="mobile-cta-copy">Explore Kodehax Academy programs across development, data, security, and AI, then move into mentorship, projects, and placement-oriented support.</div>
+                        <a href="{% url 'student_register' %}" class="btn-primary mobile-cta-btn">Explore Courses and Join</a>
+                    </div>
+                </section>
             </div>
+
+            <nav class="glass mobile-nav" aria-label="Bottom navigation">
+                <a href="#mobile-home" class="mobile-nav-link active">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 11.5L12 4l9 7.5"></path>
+                        <path d="M5 10.5V20h14v-9.5"></path>
+                    </svg>
+                    <span>Home</span>
+                </a>
+                <a href="#mobile-courses" class="mobile-nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
+                        <path d="M8 7h8"></path>
+                        <path d="M8 11h8"></path>
+                    </svg>
+                    <span>Courses</span>
+                </a>
+                <a href="#mobile-ai" class="mobile-nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"></path>
+                        <path d="M9.5 11.5h5"></path>
+                        <path d="M12 9v5"></path>
+                    </svg>
+                    <span>AI</span>
+                </a>
+                <a href="#mobile-profile" class="mobile-nav-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 21a8 8 0 1 0-16 0"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>Profile</span>
+                </a>
+            </nav>
         </div>
         {% endblock %}
     </div>
@@ -405,26 +847,89 @@
                 revealItems.forEach((item) => { if (!item.classList.contains("visible")) observer.observe(item); });
             }
 
-            const typing = document.querySelector("[data-typing]");
-            const response = document.querySelector("[data-ai-response]");
-            if (typing && response) {
+            document.querySelectorAll("[data-typing]").forEach((typing, index) => {
+                const response = typing.parentElement ? typing.parentElement.querySelector("[data-ai-response]") : null;
+                if (!response) return;
                 window.setTimeout(() => {
                     typing.classList.add("hidden");
                     response.classList.remove("hidden");
                     response.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 420, easing: "ease-out", fill: "forwards" });
-                }, 1800);
+                }, 1800 + (index * 140));
+            });
+
+            const mobileSpotlight = document.querySelector("[data-mobile-spotlight]");
+            if (mobileSpotlight) {
+                const lines = [
+                    "Adaptive study flows keep lessons, AI help, and action steps connected on one mobile screen.",
+                    "Glass surfaces and glow states make the mobile UI feel premium without changing the core palette.",
+                    "Touch-first spacing and motion cues help learners move faster with less friction."
+                ];
+                let mobileLineIndex = 0;
+                window.setInterval(() => {
+                    mobileLineIndex = (mobileLineIndex + 1) % lines.length;
+                    mobileSpotlight.textContent = lines[mobileLineIndex];
+                    mobileSpotlight.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 320, easing: "ease-out" });
+                }, 2800);
             }
+
+            document.querySelectorAll("[data-mobile-switcher]").forEach((switcher) => {
+                const triggers = switcher.querySelectorAll("[data-mobile-switch-trigger]");
+                if (!triggers.length) return;
+                const scope = switcher.closest(".mobile-section") || switcher.parentElement;
+                const panels = scope.querySelectorAll("[data-mobile-switch-panel]");
+                triggers.forEach((trigger) => {
+                    trigger.addEventListener("click", () => {
+                        const target = trigger.dataset.mobileSwitchTrigger;
+                        triggers.forEach((item) => item.classList.toggle("active", item === trigger));
+                        panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.mobileSwitchPanel === target));
+                    });
+                });
+            });
+
+            document.querySelectorAll("[data-progress-value]").forEach((bar) => {
+                const target = Math.max(0, Math.min(100, Number(bar.dataset.progressValue || "0")));
+                const progressObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        bar.style.width = target + "%";
+                        progressObserver.unobserve(entry.target);
+                    });
+                }, { threshold: 0.35 });
+                progressObserver.observe(bar);
+            });
+
+            document.querySelectorAll("[data-auth-form]").forEach((form) => {
+                form.querySelectorAll("input, select, textarea").forEach((input) => {
+                    input.classList.add("auth-input");
+                    const wrapper = input.parentElement;
+                    if (!wrapper || !wrapper.classList.contains("auth-input-shell")) return;
+                    if (input.type === "password" && !wrapper.querySelector("[data-password-toggle]")) {
+                        const toggle = document.createElement("button");
+                        toggle.type = "button";
+                        toggle.className = "auth-password-toggle";
+                        toggle.setAttribute("data-password-toggle", "");
+                        toggle.textContent = "Show";
+                        wrapper.appendChild(toggle);
+                        toggle.addEventListener("click", () => {
+                            const isPassword = input.type === "password";
+                            input.type = isPassword ? "text" : "password";
+                            toggle.textContent = isPassword ? "Hide" : "Show";
+                        });
+                    }
+                });
+            });
 
             const counters = document.querySelectorAll("[data-counter]");
             if (counters.length) {
                 const runCounter = (element) => {
                     const target = Number(element.dataset.target || "0");
+                    const suffix = element.dataset.suffix ?? (target >= 10 ? "%" : "");
                     const start = performance.now();
                     const duration = 1400;
                     const step = (now) => {
                         const progress = Math.min((now - start) / duration, 1);
                         const eased = 1 - Math.pow(1 - progress, 3);
-                        element.textContent = Math.round(target * eased) + (target >= 10 ? "%" : "");
+                        element.textContent = Math.round(target * eased) + suffix;
                         if (progress < 1) requestAnimationFrame(step);
                     };
                     requestAnimationFrame(step);

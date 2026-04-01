@@ -4,26 +4,139 @@
 {% block title %}Student Login{% endblock %}
 {% block extra_head %}
 <style>
+    .auth-shell {
+        max-width: 34rem;
+    }
+
+    .auth-hero {
+        position: relative;
+        overflow: hidden;
+        padding: 1.35rem;
+        border-radius: 1.5rem;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: 0 24px 54px rgba(2, 6, 23, 0.4);
+    }
+
+    .auth-hero::after {
+        content: "";
+        position: absolute;
+        right: -18%;
+        bottom: -38%;
+        width: 11rem;
+        height: 11rem;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.2), transparent 70%);
+        pointer-events: none;
+    }
+
+    .auth-kicker {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #86efac;
+    }
+
+    .auth-mini-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem;
+        margin-top: 1rem;
+    }
+
+    .auth-mini-card {
+        padding: 0.9rem;
+        border-radius: 1.1rem;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.035);
+    }
+
+    .auth-mini-card .label {
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #94a3b8;
+    }
+
+    .auth-mini-card .value {
+        margin-top: 0.45rem;
+        font-size: 0.96rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
     .auth-card {
         background: rgba(2, 6, 23, 0.82);
         border: 1px solid rgba(71, 85, 105, 0.7);
-        border-radius: 1rem;
+        border-radius: 1.4rem;
+        box-shadow: 0 28px 58px rgba(2, 6, 23, 0.42);
     }
 
     .auth-btn {
         width: 100%;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1rem;
+        min-height: 3.5rem;
+        border-radius: 1rem;
+        padding: 0.95rem 1rem;
         font-weight: 700;
         color: #e2e8f0;
         background: rgba(30, 41, 59, 0.9);
         border: 1px solid rgba(99, 102, 241, 0.5);
-        transition: background 160ms ease, border-color 160ms ease;
+        transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
     }
 
     .auth-btn:hover {
         background: rgba(51, 65, 85, 0.95);
         border-color: rgba(129, 140, 248, 0.75);
+    }
+
+    .auth-btn:active {
+        transform: scale(0.98);
+    }
+
+    .auth-input-shell {
+        position: relative;
+    }
+
+    .auth-input {
+        width: 100%;
+        min-height: 3.5rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.72);
+        color: #e5eefb;
+        padding: 0.95rem 1rem;
+        outline: none;
+        transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+    }
+
+    .auth-input:focus {
+        border-color: rgba(96, 165, 250, 0.7);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        background: rgba(15, 23, 42, 0.86);
+    }
+
+    .auth-input::placeholder {
+        color: #8ea0b9;
+    }
+
+    .auth-password-toggle {
+        position: absolute;
+        right: 0.9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: #93c5fd;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    @media (max-width: 640px) {
+        .auth-topbar-links {
+            display: none;
+        }
     }
 </style>
 {% endblock %}
@@ -31,7 +144,7 @@
 {% block content %}
 <div class="px-4 pb-24 pt-8 sm:px-6 lg:px-8 lg:pt-10">
     <div class="mx-auto max-w-7xl">
-        <nav class="glass mb-4 rounded-2xl px-5 py-4 sm:px-6">
+        <nav class="glass mb-6 rounded-2xl px-5 py-4 sm:px-6">
             <div class="flex items-center justify-between gap-4">
                 <a href="/" class="flex items-center gap-3">
                     <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-10 w-10 rounded-xl object-cover">
@@ -40,24 +153,33 @@
                         <p class="text-base font-black text-white">Academy</p>
                     </div>
                 </a>
-                <div class="flex items-center gap-6 text-sm">
+                <div class="auth-topbar-links flex items-center gap-6 text-sm">
                     <a href="/" class="nav-link">Home</a>
-                    <a href="{% url 'student_register' %}" class="nav-link">Register</a>
-                    <a href="{% url 'teacher_login' %}" class="nav-link">Teacher</a>
+                    <a href="{% url 'student_login' %}" class="nav-link">Student Login</a>
+                    <a href="{% url 'teacher_login' %}" class="nav-link">Teacher Login</a>
                 </div>
             </div>
         </nav>
 
-        <div class="mx-auto w-full max-w-md pb-6 reveal">
+        <div class="auth-shell mx-auto w-full pb-6 reveal">
+            <div class="auth-hero mb-5">
+                <p class="auth-kicker">Student Access</p>
+                <h2 class="mt-3 text-2xl font-black text-white">Pick up your learning flow right where you left it.</h2>
+                <p class="mt-3 text-sm leading-7 text-slate-300">The same premium AI-first experience continues here with clearer touch targets, cleaner spacing, and faster form interactions on mobile.</p>
+                <div class="auth-mini-grid">
+                    <div class="auth-mini-card"><p class="label">Mode</p><p class="value">AI-guided sessions</p></div>
+                    <div class="auth-mini-card"><p class="label">Access</p><p class="value">Fast student login</p></div>
+                </div>
+            </div>
             <div class="auth-card p-7 md:p-8">
                 <p class="mb-2 text-center text-xs font-semibold tracking-[0.2em] text-emerald-300">WELCOME BACK</p>
                 <h2 class="mb-6 text-center text-2xl font-black text-white">Student Login</h2>
 
-                <form method="POST" class="space-y-4">
+                <form method="POST" class="space-y-4" data-auth-form>
                     {% csrf_token %}
 
-                    {{ form.username }}
-                    {{ form.password }}
+                    <div class="auth-input-shell">{{ form.username }}</div>
+                    <div class="auth-input-shell">{{ form.password }}</div>
 
                     <button class="auth-btn">Login as Student</button>
                 </form>

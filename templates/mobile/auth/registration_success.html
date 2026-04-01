@@ -20,9 +20,15 @@
 </style>
 {% endblock %}
 {% block content %}
-<section class="done-panel mt-8 p-6 text-center reveal-1">
+<div class="pt-2 pb-6">
+{% include "mobile/components/auth_drawer.html" %}
+<section class="done-panel p-6 text-center reveal-1">
     <h1 class="text-2xl font-semibold">Verify Your Email</h1>
     <p class="mt-3 text-sm text-slate-300">A verification link has been sent. Open it, then continue to login.</p>
     <a href="{% url 'student_login' %}" class="done-btn mt-5 inline-flex px-4 py-3 text-sm">Go to Login</a>
 </section>
+<div class="mt-4 px-1 text-sm">
+    <a href="/" class="text-slate-600">Back to home</a>
+</div>
+</div>
 {% endblock %}

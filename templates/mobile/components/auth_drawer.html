@@ -1,0 +1,63 @@
+{% load static %}
+<header class="mb-6">
+    <nav class="card auth-nav px-4 py-3 reveal-1">
+        <a href="/" class="auth-nav-brand">
+            <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-8 w-8 rounded-lg object-cover">
+            <span class="text-sm font-semibold text-slate-800">Kodehax Academy</span>
+        </a>
+        <button type="button" class="auth-nav-toggle" data-auth-drawer-open aria-label="Open navigation menu" aria-controls="auth-drawer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5">
+                <path d="M5 7h14"></path>
+                <path d="M9 12h10"></path>
+                <path d="M5 17h14"></path>
+            </svg>
+        </button>
+    </nav>
+</header>
+
+<div class="auth-drawer-backdrop" data-auth-drawer-close></div>
+<aside id="auth-drawer" class="auth-drawer" aria-label="Authentication navigation">
+    <div class="auth-drawer-head">
+        <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-indigo-200/80">Quick Navigation</p>
+            <p class="mt-2 text-sm font-semibold text-white">Move in and out of auth smoothly.</p>
+        </div>
+        <button type="button" class="auth-drawer-close" data-auth-drawer-close aria-label="Close navigation menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="h-5 w-5">
+                <path d="M6 6l12 12"></path>
+                <path d="M18 6L6 18"></path>
+            </svg>
+        </button>
+    </div>
+    <p class="auth-drawer-copy">Use this menu to switch between home, sign in, and registration without getting stuck inside a single auth screen.</p>
+    <div class="auth-drawer-links">
+        <a href="/" class="auth-drawer-link">
+            <span>
+                <span class="auth-drawer-label">Home</span>
+                <span class="auth-drawer-note">Exit auth and return to the mobile landing page.</span>
+            </span>
+            <span aria-hidden="true">&rarr;</span>
+        </a>
+        <a href="{% url 'student_login' %}" class="auth-drawer-link {% if request.resolver_match.view_name == 'student_login' %}active{% endif %}">
+            <span>
+                <span class="auth-drawer-label">Student Login</span>
+                <span class="auth-drawer-note">Continue into the student sign-in flow.</span>
+            </span>
+            <span aria-hidden="true">&rarr;</span>
+        </a>
+        <a href="{% url 'register' %}" class="auth-drawer-link {% if request.resolver_match.view_name == 'register' or request.resolver_match.view_name == 'student_register' %}active{% endif %}">
+            <span>
+                <span class="auth-drawer-label">Create Account</span>
+                <span class="auth-drawer-note">Open student registration and get into the platform.</span>
+            </span>
+            <span aria-hidden="true">&rarr;</span>
+        </a>
+        <a href="{% url 'forgot_password' %}" class="auth-drawer-link {% if request.resolver_match.view_name == 'forgot_password' %}active{% endif %}">
+            <span>
+                <span class="auth-drawer-label">Reset Password</span>
+                <span class="auth-drawer-note">Recover access if you are blocked during login.</span>
+            </span>
+            <span aria-hidden="true">&rarr;</span>
+        </a>
+    </div>
+</aside>

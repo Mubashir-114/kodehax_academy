@@ -1,7 +1,9 @@
 {% extends "mobile/base.html" %}
 {% block title %}Verify OTP | Kodehax Academy{% endblock %}
 {% block content %}
-<section class="card mt-8 p-5 reveal-1">
+<div class="pt-2 pb-6">
+{% include "mobile/components/auth_drawer.html" %}
+<section class="card p-5 reveal-1">
     <h1 class="text-xl font-semibold">Verify Login</h1>
     <p class="mt-1 text-sm text-slate-500">Enter the code sent to {{ otp_email }}.</p>
     <form method="post" class="mt-4 space-y-4">
@@ -20,4 +22,8 @@
         <button type="submit" class="btn-muted w-full px-4 py-3 text-sm">Resend OTP</button>
     </form>
 </section>
+<div class="mt-4 px-1 text-sm">
+    <a href="{% url 'student_login' %}" class="text-slate-600">Back to sign in</a>
+</div>
+</div>
 {% endblock %}
