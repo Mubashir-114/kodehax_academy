@@ -54,7 +54,7 @@
         .page-shell {
             width: min(100%, 430px);
             margin: 0 auto;
-            padding: 14px 14px 108px;
+            padding: 14px 14px 32px;
             position: relative;
         }
 
@@ -84,11 +84,16 @@
             top: 12px;
             z-index: 25;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
             gap: 12px;
             padding: 14px 16px;
             border-radius: 24px;
+        }
+        .top-bar-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
 
         .brand {
@@ -121,24 +126,62 @@
             color: #fff;
         }
 
-        .menu-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.04);
+        .top-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .top-nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .top-nav-links::-webkit-scrollbar { display: none; }
+        .top-link,
+        .auth-link {
+            min-height: 46px;
+            border-radius: 999px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
+            padding: 0 16px;
+            border: 1px solid rgba(255,255,255,.1);
+            background: rgba(255,255,255,.04);
+            color: #dbe7f8;
             text-decoration: none;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+            font-size: 14px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
         }
+        .top-link.active,
+        .top-link:hover,
+        .auth-link:hover {
+            background: linear-gradient(135deg, rgba(37,99,235,.24), rgba(79,70,229,.18));
+            border-color: rgba(129,140,248,.3);
+            color: #fff;
+        }
+        .auth-links {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+        .auth-link.register {
+            padding: 0 20px;
+            background: linear-gradient(135deg, #2563eb, #4f46e5 48%, #7c3aed);
+            border-color: transparent;
+            box-shadow: 0 18px 34px rgba(79,70,229,.28);
+        }
+        .auth-link.register:hover { filter: brightness(1.06); }
 
-        .menu-btn:active,
+        .top-link:active,
+        .auth-link:active,
         .hero-btn:active,
-        .cta-btn:active,
-        .bottom-link:active { transform: scale(.97); }
+        .cta-btn:active { transform: scale(.97); }
 
         .section {
             position: relative;
@@ -906,48 +949,8 @@
             color: #fff;
         }
 
-        .bottom-nav {
-            position: fixed;
-            left: 14px;
-            right: 14px;
-            bottom: 14px;
-            z-index: 40;
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 8px;
-            padding: 10px;
-            border-radius: 24px;
-        }
-
-        .bottom-link {
-            min-height: 68px;
-            border-radius: 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            color: #c4d2ea;
-            text-decoration: none;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-        }
-
-        .bottom-link.active,
-        .bottom-link:hover {
-            background: linear-gradient(135deg, rgba(37,99,235,.24), rgba(79,70,229,.18));
-            color: #fff;
-        }
-
-        .bottom-link svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        button.bottom-link {
+        button.top-link {
             border: 0;
-            background: transparent;
             cursor: pointer;
             font: inherit;
         }
@@ -1002,20 +1005,28 @@
 
     <div class="page-shell">
         <header class="glass top-bar reveal visible">
-            <a href="{% url 'home' %}" class="brand">
-                <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo">
-                <div>
-                    <div class="brand-mark">Kodehax</div>
-                    <div class="brand-name">Academy</div>
+            <div class="top-bar-row">
+                <a href="{% url 'home' %}" class="brand">
+                    <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo">
+                    <div>
+                        <div class="brand-mark">Kodehax</div>
+                        <div class="brand-name">Academy</div>
+                    </div>
+                </a>
+                <div class="auth-links">
+                    <a href="{% url 'student_login' %}" class="auth-link">Login</a>
+                    <a href="{% url 'student_register' %}" class="auth-link register">Join Now</a>
                 </div>
-            </a>
-            <a href="{% url 'student_login' %}" class="menu-btn" aria-label="Login">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 7h16"></path>
-                    <path d="M8 12h12"></path>
-                    <path d="M12 17h8"></path>
-                </svg>
-            </a>
+            </div>
+            <nav class="top-nav" aria-label="Mobile navigation">
+                <div class="top-nav-links">
+                    <button type="button" class="top-link active" data-page-trigger="home">Home</button>
+                    <button type="button" class="top-link" data-page-trigger="profile">About</button>
+                    <button type="button" class="top-link" data-page-trigger="ai">Services</button>
+                    <button type="button" class="top-link" data-page-trigger="courses">Courses</button>
+                    <button type="button" class="top-link" data-page-trigger="profile">Contact</button>
+                </div>
+            </nav>
         </header>
 
         <section class="hero reveal visible page-section active" data-page-section="home">
@@ -1259,39 +1270,6 @@
             </div>
         </section>
     </div>
-
-    <nav class="glass bottom-nav" aria-label="Bottom navigation">
-        <button type="button" class="bottom-link active" data-page-trigger="home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 11.5L12 4l9 7.5"></path>
-                <path d="M5 10.5V20h14v-9.5"></path>
-            </svg>
-            <span>Home</span>
-        </button>
-        <button type="button" class="bottom-link" data-page-trigger="courses">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
-                <path d="M8 7h8"></path>
-                <path d="M8 11h8"></path>
-            </svg>
-            <span>Courses</span>
-        </button>
-        <button type="button" class="bottom-link" data-page-trigger="ai">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"></path>
-                <path d="M9.5 11.5h5"></path>
-                <path d="M12 9v5"></path>
-            </svg>
-            <span>AI</span>
-        </button>
-        <button type="button" class="bottom-link" data-page-trigger="profile">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M20 21a8 8 0 1 0-16 0"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            <span>Profile</span>
-        </button>
-    </nav>
 
     <script>
         (() => {

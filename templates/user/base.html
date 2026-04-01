@@ -115,18 +115,26 @@
         .mobile-stack{display:flex;flex-direction:column;gap:1rem}
         .mobile-topbar,.mobile-nav,.mobile-card,.mobile-feature,.mobile-chat-bubble,.mobile-cta-shell,.mobile-stat-card,.mobile-live-panel,.mobile-spotlight-panel,.mobile-stage,.mobile-stage-panel,.mobile-float-card{position:relative;overflow:hidden}
         .mobile-fallback{display:none}
-        .mobile-shell{position:relative;max-width:30rem;margin:0 auto;padding:1rem 1rem 7rem}
+        .mobile-shell{position:relative;max-width:30rem;margin:0 auto;padding:1rem 1rem 3rem}
         .mobile-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 0%,rgba(59,130,246,.13),transparent 26%),radial-gradient(circle at 88% 8%,rgba(168,85,247,.12),transparent 24%),radial-gradient(circle at 50% 58%,rgba(59,130,246,.06),transparent 30%);pointer-events:none}
         .mobile-shell:after{content:"";position:absolute;left:8%;right:8%;top:7rem;height:18rem;border-radius:999px;background:radial-gradient(circle,rgba(79,70,229,.16),transparent 70%);filter:blur(18px);pointer-events:none;opacity:.78}
-        .mobile-section{position:relative;z-index:1;margin-top:4.3rem}
-        .mobile-topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.05rem;border-radius:1.55rem}
+        .mobile-section{position:relative;z-index:1;margin-top:3.2rem}
+        .mobile-topbar{position:sticky;top:1rem;z-index:35;display:flex;flex-direction:column;gap:.9rem;padding:1rem 1.05rem;border-radius:1.55rem}
+        .mobile-topbar-row{display:flex;align-items:center;justify-content:space-between;gap:.85rem}
         .mobile-logo{display:flex;align-items:center;gap:.85rem;min-width:0}
         .mobile-logo img{width:2.8rem;height:2.8rem;border-radius:1rem;object-fit:cover;box-shadow:0 16px 30px rgba(15,23,42,.34)}
         .mobile-logo-mark{font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:#7f8faf}
         .mobile-logo-name{font-size:1rem;font-weight:800;color:#fff;line-height:1.1}
-        .mobile-menu-btn{display:inline-flex;align-items:center;justify-content:center;width:3rem;height:3rem;border-radius:1rem;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:#fff;transition:transform .18s ease,background .18s ease,border-color .18s ease}
-        .mobile-menu-btn:active,.mobile-nav-link:active,.mobile-hero-btn:active,.mobile-cta-btn:active{transform:scale(.97)}
-        .mobile-menu-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.2)}
+        .mobile-debug-banner{display:flex;align-items:center;justify-content:center;min-height:2.6rem;border-radius:999px;padding:0 1rem;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:.78rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 16px 28px rgba(239,68,68,.24)}
+        .mobile-nav{display:flex;flex-direction:column;gap:.85rem}
+        .mobile-nav-row{display:flex;align-items:center;gap:.7rem;overflow-x:auto;padding-bottom:.15rem;scrollbar-width:none;-ms-overflow-style:none}
+        .mobile-nav-row::-webkit-scrollbar{display:none}
+        .mobile-nav-link,.mobile-auth-link{display:inline-flex;align-items:center;justify-content:center;min-height:2.9rem;border-radius:999px;padding:0 1rem;color:#d7e3f8;font-size:.85rem;font-weight:700;letter-spacing:.01em;text-decoration:none;white-space:nowrap;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease}
+        .mobile-nav-link.active,.mobile-nav-link:hover,.mobile-auth-link:hover{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));border-color:rgba(129,140,248,.28);color:#fff}
+        .mobile-auth-row{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+        .mobile-auth-link.register{padding:0 1.35rem;background:linear-gradient(135deg,#2563eb,#4f46e5 48%,#7c3aed);border-color:transparent;box-shadow:0 18px 34px rgba(79,70,229,.28)}
+        .mobile-auth-link.register:hover{filter:brightness(1.06)}
+        .mobile-nav-link:active,.mobile-auth-link:active,.mobile-hero-btn:active,.mobile-cta-btn:active{transform:scale(.97)}
         .mobile-hero{text-align:center;padding-top:.75rem}
         .mobile-badge{display:inline-flex;align-items:center;justify-content:center;padding:.5rem .95rem;border-radius:999px;border:1px solid rgba(129,140,248,.22);background:rgba(2,6,23,.48);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#c6d6f0}
         .mobile-title{margin:1.2rem 0 0;font-size:clamp(2.65rem,10vw,4.1rem);line-height:.95;letter-spacing:-.05em;color:#fff;text-wrap:balance}
@@ -238,10 +246,6 @@
         .mobile-cta-orbs:before,.mobile-cta-orbs:after{content:"";position:absolute;border-radius:999px;filter:blur(6px)}
         .mobile-cta-orbs:before{width:7rem;height:7rem;top:-1rem;right:-1rem;background:radial-gradient(circle,rgba(99,102,241,.28),transparent 70%)}
         .mobile-cta-orbs:after{width:8rem;height:8rem;left:-1rem;bottom:-2rem;background:radial-gradient(circle,rgba(59,130,246,.24),transparent 72%)}
-        .mobile-nav{position:fixed;left:1rem;right:1rem;bottom:1rem;z-index:45;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.65rem;padding:.7rem;border-radius:1.5rem}
-        .mobile-nav-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.42rem;min-height:4rem;border-radius:1.1rem;color:#c4d2ea;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-decoration:none;transition:transform .18s ease,background .18s ease,color .18s ease}
-        .mobile-nav-link svg{width:1.2rem;height:1.2rem}
-        .mobile-nav-link.active,.mobile-nav-link:hover{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));color:#fff}
         @media (min-width:1024px){.lg\:px-16{padding-left:4rem;padding-right:4rem}.lg\:py-24{padding-top:6rem;padding-bottom:6rem}}
         @media (min-width:1280px){.xl\:mt-24{margin-top:6rem}.xl\:text-\[5\.5rem\]{font-size:5.5rem;line-height:1}.xl\:grid-cols-\[1\.06fr_0\.94fr\]{grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr)}.xl\:grid-cols-\[1\.08fr_0\.92fr\]{grid-template-columns:1.08fr .92fr}}
         .grid-cols-\[1\.15fr_0\.85fr\]{grid-template-columns:1.15fr .85fr}
@@ -249,7 +253,7 @@
         @media (max-width:1279px){.hero-section{padding:2.5rem}.hero-grid{grid-template-columns:1fr}.hero-copy .hero-lead,.hero-spotlight,.hero-support-grid{max-width:none}.hero-support-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-chat{margin-top:0}.hero-window{gap:1.25rem}}
         @media (max-width:900px){.hero-support-grid{grid-template-columns:1fr}.hero-mini-card,.hero-meta-card{min-height:auto}.hero-chat-grid,.hero-bottom-strip{grid-template-columns:1fr}.course-layout{grid-template-columns:1fr}.course-aside{grid-template-rows:none;grid-template-columns:1fr}}
         @media (max-width:1023px){body{background-size:auto;animation:none}.desktop-only{display:none}.mobile-fallback{display:block}}
-        @media (max-width:480px){.mobile-shell{padding-left:.95rem;padding-right:.95rem}.mobile-title{font-size:2.8rem}.mobile-section{margin-top:3.9rem}.mobile-card,.mobile-feature,.mobile-cta-shell,.mobile-stat-card,.mobile-surface-block,.mobile-stage,.mobile-profile-shell{border-radius:1.45rem}.mobile-stats-grid,.mobile-surface-metrics,.mobile-profile-courses{grid-template-columns:1fr}.mobile-float-card.top{right:.1rem}.mobile-float-card.bottom{left:.1rem;bottom:.85rem}.mobile-stage-device{padding:.9rem}}
+        @media (max-width:480px){.mobile-shell{padding-left:.95rem;padding-right:.95rem}.mobile-title{font-size:2.8rem}.mobile-section{margin-top:2.8rem}.mobile-card,.mobile-feature,.mobile-cta-shell,.mobile-stat-card,.mobile-surface-block,.mobile-stage,.mobile-profile-shell,.mobile-topbar{border-radius:1.45rem}.mobile-stats-grid,.mobile-surface-metrics,.mobile-profile-courses{grid-template-columns:1fr}.mobile-float-card.top{right:.1rem}.mobile-float-card.bottom{left:.1rem;bottom:.85rem}.mobile-stage-device{padding:.9rem}.mobile-topbar-row{align-items:flex-start;flex-direction:column}.mobile-auth-row{width:100%;display:grid;grid-template-columns:1fr 1fr}.mobile-nav-link,.mobile-auth-link{min-height:2.8rem}}
         @keyframes gradientDrift{from{background-position:0 50%}to{background-position:100% 50%}}@keyframes floatLights{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(2%,-1.5%,0) scale(1.04)}}@keyframes messageSlideIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@keyframes typingPulse{0%,80%,100%{transform:scale(.7);opacity:.45}40%{transform:scale(1);opacity:1}}@keyframes responseGlow{0%,100%{text-shadow:0 0 0 rgba(125,211,252,0);filter:brightness(1)}50%{text-shadow:0 0 16px rgba(125,211,252,.16),0 0 30px rgba(99,102,241,.12);filter:brightness(1.04)}}@keyframes marqueeDrift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     </style>
     {% block extra_head %}{% endblock %}
@@ -509,20 +513,29 @@
             <div class="mobile-shell">
                 <header class="mobile-section mt-0">
                     <div class="glass mobile-topbar reveal visible">
-                        <a href="/" class="mobile-logo">
-                            <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo">
-                            <div>
-                                <p class="mobile-logo-mark">Kodehax</p>
-                                <h2 class="mobile-logo-name">Academy</h2>
+                        <div class="mobile-topbar-row">
+                            <a href="/" class="mobile-logo">
+                                <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo">
+                                <div>
+                                    <p class="mobile-logo-mark">Kodehax</p>
+                                    <h2 class="mobile-logo-name">Academy</h2>
+                                </div>
+                            </a>
+                            <div class="mobile-auth-row">
+                                <a href="{% url 'student_login' %}" class="mobile-auth-link">Login</a>
+                                <a href="{% url 'student_register' %}" class="mobile-auth-link register">Join Now</a>
                             </div>
-                        </a>
-                        <a href="{% url 'student_login' %}" class="mobile-menu-btn" aria-label="Login">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M4 7h16"></path>
-                                <path d="M8 12h12"></path>
-                                <path d="M12 17h8"></path>
-                            </svg>
-                        </a>
+                        </div>
+                        <div class="mobile-debug-banner">New Mobile Nav</div>
+                        <nav class="mobile-nav" aria-label="Mobile navigation">
+                            <div class="mobile-nav-row">
+                            <a href="#mobile-home" class="mobile-nav-link active">Home</a>
+                            <a href="#mobile-profile" class="mobile-nav-link">About</a>
+                            <a href="#mobile-ai" class="mobile-nav-link">Services</a>
+                            <a href="#mobile-courses" class="mobile-nav-link">Courses</a>
+                            <a href="#mobile-profile" class="mobile-nav-link">Contact</a>
+                            </div>
+                        </nav>
                     </div>
                 </header>
 
@@ -797,38 +810,6 @@
                 </section>
             </div>
 
-            <nav class="glass mobile-nav" aria-label="Bottom navigation">
-                <a href="#mobile-home" class="mobile-nav-link active">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M3 11.5L12 4l9 7.5"></path>
-                        <path d="M5 10.5V20h14v-9.5"></path>
-                    </svg>
-                    <span>Home</span>
-                </a>
-                <a href="#mobile-courses" class="mobile-nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v14H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
-                        <path d="M8 7h8"></path>
-                        <path d="M8 11h8"></path>
-                    </svg>
-                    <span>Courses</span>
-                </a>
-                <a href="#mobile-ai" class="mobile-nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M12 3l7 4v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V7l7-4z"></path>
-                        <path d="M9.5 11.5h5"></path>
-                        <path d="M12 9v5"></path>
-                    </svg>
-                    <span>AI</span>
-                </a>
-                <a href="#mobile-profile" class="mobile-nav-link">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M20 21a8 8 0 1 0-16 0"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
-                    <span>Profile</span>
-                </a>
-            </nav>
         </div>
         {% endblock %}
     </div>
