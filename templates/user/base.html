@@ -6,334 +6,483 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Kodehax Academy{% endblock %}</title>
     <link rel="icon" type="image/png" href="{% static 'image/image.png' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
     <style>
-        :root {
-            --bg: #020617;
-            --surface: rgba(15, 23, 42, 0.72);
-            --surface-soft: rgba(30, 41, 59, 0.58);
-            --border: rgba(148, 163, 184, 0.28);
-            --text: #f1f5f9;
-            --muted: #94a3b8;
-            --accent: #6366f1;
-            --accent-2: #0ea5e9;
-        }
-
-        body {
-            background-color: var(--bg);
-            background-image:
-                radial-gradient(ellipse 80% 70% at 50% -10%, rgba(99, 102, 241, 0.25), transparent),
-                radial-gradient(circle at 85% 15%, rgba(14, 165, 233, 0.18), transparent 34%),
-                radial-gradient(circle at 15% 80%, rgba(16, 185, 129, 0.15), transparent 32%);
-            color: var(--text);
-            color-scheme: dark;
-        }
-
-        .glass-card {
-            background: linear-gradient(180deg, var(--surface-soft), var(--surface));
-            border: 1px solid var(--border);
-            border-radius: 1rem;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 20px 40px rgba(2, 6, 23, 0.35);
-            position: relative;
-            overflow: hidden;
-            transition: transform 260ms ease, box-shadow 260ms ease, border-color 260ms ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-6px);
-            border-color: rgba(129, 140, 248, 0.52);
-            box-shadow: 0 24px 50px rgba(2, 6, 23, 0.46), 0 0 0 1px rgba(14, 165, 233, 0.2) inset;
-        }
-
-        .home-grid {
-            background-image:
-                linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
-            background-size: 26px 26px;
-            transition: background-position 320ms ease;
-        }
-
-        .home-grid:hover {
-            background-position: 12px 12px;
-        }
-
-        .nav-link {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-link::after {
-            content: "";
-            position: absolute;
-            left: 0.65rem;
-            right: 0.65rem;
-            bottom: 0.35rem;
-            height: 2px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, var(--accent), var(--accent-2));
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 220ms ease;
-        }
-
-        .nav-link:hover::after {
-            transform: scaleX(1);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), #4f46e5);
-            color: #fff;
-            border-radius: 0.75rem;
-            font-weight: 700;
-            transition: transform 220ms ease, filter 220ms ease, box-shadow 220ms ease;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            filter: brightness(1.06);
-            box-shadow: 0 12px 26px rgba(79, 70, 229, 0.42);
-        }
-
-        .btn-outline {
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 0.75rem;
-            transition: transform 220ms ease, border-color 220ms ease, background 220ms ease, box-shadow 220ms ease;
-            background: rgba(15, 23, 42, 0.35);
-        }
-
-        .btn-outline:hover {
-            border-color: rgba(129, 140, 248, 0.7);
-            background: rgba(79, 70, 229, 0.12);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.24);
-        }
-
-        .reveal { animation: fadeUp 0.65s ease both; }
-        .delay-1 { animation-delay: 80ms; }
-        .delay-2 { animation-delay: 160ms; }
-        .delay-3 { animation-delay: 240ms; }
-        .delay-4 { animation-delay: 320ms; }
-
-        .field {
-            width: 100%;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-            background: rgba(2, 6, 23, 0.5);
-            color: #e2e8f0;
-            border-radius: 0.75rem;
-            padding: 0.75rem 0.9rem;
-            transition: 160ms ease;
-        }
-
-        .field::placeholder { color: #94a3b8; }
-
-        .field:focus {
-            outline: none;
-            border-color: rgba(129, 140, 248, 0.9);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
-        }
-
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        textarea:-webkit-autofill,
-        select:-webkit-autofill {
-            -webkit-text-fill-color: #e2e8f0;
-            -webkit-box-shadow: 0 0 0 1000px rgba(2, 6, 23, 0.95) inset;
-            box-shadow: 0 0 0 1000px rgba(2, 6, 23, 0.95) inset;
-            transition: background-color 9999s ease-in-out 0s;
-            border: 1px solid rgba(148, 163, 184, 0.35);
-        }
-
-        .stat-chip {
-            border: 1px solid rgba(148, 163, 184, 0.25);
-            background: rgba(2, 6, 23, 0.45);
-            border-radius: 0.9rem;
-            transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
-        }
-
-        .stat-chip:hover {
-            transform: translateY(-4px);
-            border-color: rgba(14, 165, 233, 0.45);
-            background: rgba(15, 23, 42, 0.72);
-        }
-
-        .accent-line {
-            height: 2px;
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.8), rgba(14, 165, 233, 0.2));
-        }
-
-        .mobile-nav-link {
-            border: 1px solid rgba(148, 163, 184, 0.22);
-            background: rgba(15, 23, 42, 0.45);
-            border-radius: 0.9rem;
-            transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-        }
-
-        .mobile-nav-link:hover {
-            transform: translateY(-1px);
-            border-color: rgba(129, 140, 248, 0.42);
-            background: rgba(30, 41, 59, 0.75);
-        }
+        :root{--bg1:#020617;--bg2:#0b1224;--bg3:#0f172a;--surface:rgba(255,255,255,.025);--surface-2:rgba(255,255,255,.04);--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.15);--text:#e5eefb;--muted:#8ea0b9;--title:#f8fbff}
+        html{scroll-behavior:smooth}body{margin:0;color:var(--text);color-scheme:dark;font-family:"Manrope",sans-serif;background:radial-gradient(circle at 18% 22%,rgba(59,130,246,.22),transparent 18%),radial-gradient(circle at 78% 14%,rgba(99,102,241,.18),transparent 16%),radial-gradient(circle at 55% 88%,rgba(59,130,246,.08),transparent 22%),linear-gradient(145deg,var(--bg1),var(--bg2) 52%,var(--bg3) 100%);background-size:160% 160%;animation:gradientDrift 18s ease-in-out infinite alternate;overflow-x:hidden}
+        h1,h2,h3,h4,.font-display{font-family:"Space Grotesk",sans-serif}
+        body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(148,163,184,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.09) 1px,transparent 1px);background-size:44px 44px;opacity:.28;pointer-events:none;mask-image:radial-gradient(circle at center,black 46%,transparent 88%);z-index:0}
+        body:after{content:"";position:fixed;inset:-10% -15%;background:radial-gradient(circle at 22% 28%,rgba(59,130,246,.07),transparent 18%),radial-gradient(circle at 74% 18%,rgba(99,102,241,.06),transparent 16%);filter:blur(26px);animation:floatLights 20s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+        .page-shell{position:relative;z-index:1}.glass{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border-strong);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 28px 70px rgba(2,6,23,.62),inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.015)}
+        .premium{position:relative;overflow:hidden;border-radius:1.25rem;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}.premium:after{content:"";position:absolute;inset:auto -18% -42% auto;width:12rem;height:12rem;border-radius:999px;background:radial-gradient(circle,rgba(99,102,241,.14),transparent 70%);opacity:0;transition:opacity .28s ease;pointer-events:none}.premium:hover{transform:translateY(-10px) scale(1.02);border-color:rgba(255,255,255,.22);box-shadow:0 38px 82px rgba(2,6,23,.66),0 0 0 1px rgba(255,255,255,.045) inset,0 0 30px rgba(59,130,246,.12)}.premium:hover:after{opacity:1}
+        .nav-link{position:relative;color:#cbd5e1;transition:.18s}.nav-link:after{content:"";position:absolute;left:.1rem;right:.1rem;bottom:-.35rem;height:2px;border-radius:999px;background:linear-gradient(90deg,rgba(59,130,246,.9),rgba(168,85,247,.8));transform:scaleX(0);transition:transform .22s ease}.nav-link:hover{color:#fff;transform:translateY(-1px)}.nav-link:hover:after{transform:scaleX(1)}
+        .btn-primary{color:#fff;font-weight:800;border-radius:1rem;background:linear-gradient(135deg,#2563eb,#4f46e5 48%,#7c3aed);box-shadow:0 24px 46px rgba(79,70,229,.42),0 0 0 1px rgba(255,255,255,.06) inset,0 0 34px rgba(59,130,246,.16);transition:transform .22s ease,box-shadow .22s ease,filter .22s ease;position:relative}.btn-primary:before{content:"";position:absolute;inset:-22% -14%;border-radius:inherit;background:radial-gradient(circle,rgba(99,102,241,.24),transparent 60%);z-index:-1;pointer-events:none}.btn-primary:hover{transform:translateY(-3px) scale(1.035);filter:brightness(1.08);box-shadow:0 30px 54px rgba(79,70,229,.5),0 0 44px rgba(99,102,241,.2)}
+        .btn-secondary{color:#f8fafc;font-weight:600;border-radius:1rem;border:1px solid rgba(255,255,255,.20);background:rgba(15,23,42,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease}.btn-secondary:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.30);background:rgba(15,23,42,.44);box-shadow:0 18px 32px rgba(2,6,23,.38),0 0 0 1px rgba(255,255,255,.035) inset}
+        .badge{border-radius:999px;border:1px solid rgba(129,140,248,.24);background:rgba(2,6,23,.56);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}.hero-radial{position:absolute;left:8%;top:6%;width:42rem;height:42rem;border-radius:999px;background:radial-gradient(circle,rgba(59,130,246,.16),rgba(99,102,241,.08) 28%,transparent 62%);pointer-events:none;filter:blur(14px)}
+        .hero-orb{position:absolute;border-radius:999px;filter:blur(18px);opacity:.7;pointer-events:none}.hero-orb.one{top:-3rem;right:14%;width:10rem;height:10rem;background:rgba(59,130,246,.26)}.hero-orb.two{right:-2rem;bottom:10%;width:12rem;height:12rem;background:rgba(168,85,247,.18)}
+        .chat-shell{position:relative;border-radius:1.65rem;overflow:hidden;box-shadow:0 40px 94px rgba(2,6,23,.72),0 0 48px rgba(99,102,241,.14)}.chat-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(99,102,241,.20),transparent 22%),linear-gradient(180deg,rgba(2,6,23,.94),rgba(15,23,42,.82));pointer-events:none}.chat-shell:after{content:"";position:absolute;inset:auto -6% -12% auto;width:16rem;height:16rem;border-radius:999px;background:radial-gradient(circle,rgba(59,130,246,.16),transparent 68%);pointer-events:none}.chat-shell>*{position:relative;z-index:1}
+        .bubble{border-radius:1.2rem;border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(8px);animation:messageSlideIn .62s ease both}.bubble.user{background:rgba(2,6,23,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}.bubble.ai{background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(79,70,229,.18));box-shadow:0 18px 42px rgba(59,130,246,.18),0 0 28px rgba(99,102,241,.12),inset 0 1px 0 rgba(255,255,255,.07)}.bubble.ai [data-ai-response]{animation:responseGlow 2.6s ease-in-out infinite}
+        .typing-dot{width:.45rem;height:.45rem;border-radius:999px;background:rgba(191,219,254,.9);animation:typingPulse 1s infinite ease-in-out}.typing-dot:nth-child(2){animation-delay:.15s}.typing-dot:nth-child(3){animation-delay:.3s}
+        .icon-wrap{width:3rem;height:3rem;border-radius:1rem;border:1px solid rgba(129,140,248,.18);background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+        .progress-track{height:.55rem;border-radius:999px;background:rgba(148,163,184,.12);overflow:hidden}.progress-bar{height:100%;border-radius:inherit;background:linear-gradient(90deg,#3b82f6,#6366f1,#8b5cf6);box-shadow:0 0 18px rgba(99,102,241,.24)}
+        .reveal{opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s ease}.reveal.visible{opacity:1;transform:translateY(0)}.s1{transition-delay:.09s}.s2{transition-delay:.18s}.s3{transition-delay:.27s}.s4{transition-delay:.36s}
+        .cta{position:relative;overflow:hidden;border-radius:1.5rem;background:radial-gradient(circle at top left,rgba(59,130,246,.28),transparent 30%),radial-gradient(circle at top right,rgba(168,85,247,.24),transparent 26%),linear-gradient(135deg,rgba(30,41,59,.88),rgba(15,23,42,.94))}.cta:after{content:"";position:absolute;inset:auto -10% -55% auto;width:18rem;height:18rem;border-radius:999px;background:radial-gradient(circle,rgba(99,102,241,.24),transparent 70%);pointer-events:none}
+        .layout-main{padding-top:1.25rem}
+        .layout-stack{display:flex;flex-direction:column;gap:4.5rem}
+        .hero-section{margin-top:0;padding:3.5rem}
+        .hero-grid{align-items:stretch;gap:2.5rem}
+        .hero-copy{max-width:none;width:100%;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+        .hero-copy .hero-lead{max-width:42rem}
+        .hero-chat{margin-top:0;min-width:0}
+        .chat-shell.ai-chat-shell{min-height:100%;padding:2rem;display:flex;flex-direction:column}
+        .feature-cards{margin-top:2.5rem;gap:2.5rem;align-items:stretch}
+        .feature-cards .feature-card{height:100%;padding:2.5rem}
+        .text-\[11px\]{font-size:11px;line-height:1rem}
+        .text-\[1\.15rem\]{font-size:1.15rem}
+        .leading-\[0\.96\]{line-height:.96}
+        .tracking-\[-0\.04em\]{letter-spacing:-.04em}
+        .tracking-\[0\.16em\]{letter-spacing:.16em}
+        .tracking-\[0\.18em\]{letter-spacing:.18em}
+        .tracking-\[0\.2em\]{letter-spacing:.2em}
+        .tracking-\[0\.22em\]{letter-spacing:.22em}
+        .tracking-\[0\.24em\]{letter-spacing:.24em}
+        .tracking-\[0\.28em\]{letter-spacing:.28em}
+        .rounded-\[1\.25rem\]{border-radius:1.25rem}
+        .rounded-\[1\.35rem\]{border-radius:1.35rem}
+        .rounded-\[1\.4rem\]{border-radius:1.4rem}
+        .rounded-\[1\.6rem\]{border-radius:1.6rem}
+        .rounded-\[1\.75rem\]{border-radius:1.75rem}
+        .max-w-\[72\%\]{max-width:72%}
+        .max-w-\[90\%\]{max-width:90%}
+        .w-\[74\%\]{width:74%}
+        .w-\[82\%\]{width:82%}
+        .w-\[91\%\]{width:91%}
+        .shadow-\[0_0_16px_rgba\(56\,189\,248\,0\.9\)\]{box-shadow:0 0 16px rgba(56,189,248,.9)}
+        .shadow-\[0_12px_30px_rgba\(15\,23\,42\,0\.28\)\]{box-shadow:0 12px 30px rgba(15,23,42,.28)}
+        .spotlight-line{min-height:2rem}
+        .hero-title{max-width:44rem;font-size:clamp(4rem,6vw,5.7rem);line-height:.92;letter-spacing:-.05em;text-wrap:balance}
+        .hero-body{max-width:41rem;font-size:1.08rem;line-height:1.95;color:#d7e3f7}
+        .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
+        .hero-spotlight{width:100%;max-width:46rem;padding:1.15rem 1.45rem;border-radius:1.4rem}
+        .hero-support-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;width:100%;max-width:46rem}
+        .hero-mini-card{min-height:11.75rem;height:100%;padding:1.35rem 1.3rem;border-radius:1.35rem;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.022));border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);display:flex;flex-direction:column;justify-content:flex-start}
+        .hero-mini-card p:first-child{margin:0}
+        .hero-mini-card p:last-child{margin-top:1rem;font-size:.98rem;line-height:1.9;color:#dbe6f7}
+        .hero-card-label{font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;color:#6f7f9a}
+        .hero-meta-card{min-height:10.5rem;padding:1.4rem 1.5rem;border-radius:1.4rem;display:flex;flex-direction:column;justify-content:space-between}
+        .hero-meta-card p:first-child{margin:0}
+        .hero-meta-card p:last-child{margin-top:1rem;font-size:1.2rem;line-height:1.45;max-width:16rem}
+        .hero-chat-grid{gap:1rem;padding-top:0;align-items:stretch}
+        .hero-window{display:flex;flex-direction:column;gap:1.2rem;flex:1}
+        .hero-bubble-user{margin-left:auto;max-width:82%;padding:1.55rem 1.75rem}
+        .hero-bubble-ai{max-width:100%;padding:1.85rem 1.95rem;min-height:15rem;display:flex;flex-direction:column;justify-content:flex-start}
+        .hero-window-head{padding-bottom:1.25rem}
+        .hero-window-copy{display:flex;flex-direction:column;gap:1.35rem;flex:1}
+        .hero-panel-glow{position:absolute;inset:auto -10% -16% auto;width:18rem;height:18rem;border-radius:999px;background:radial-gradient(circle,rgba(99,102,241,.22),transparent 70%);pointer-events:none;opacity:.85}
+        .hero-meta-shell{margin-top:auto;padding-top:.25rem}
+        .hero-bottom-strip{margin-top:1rem;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem}
+        .hero-strip-card{border:1px solid rgba(255,255,255,.08);border-radius:1rem;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));padding:1rem 1.05rem}
+        .hero-strip-card .value{margin-top:.45rem;font-size:1rem;line-height:1.45;color:#f4f7ff;font-weight:700}
+        .hero-strip-card .note{margin-top:.3rem;font-size:.82rem;line-height:1.45;color:#aebdd7}
+        .pill-tabs{display:flex;flex-wrap:wrap;gap:.75rem}
+        .pill-tab{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#dcefe5;padding:.8rem 1rem;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:.2s}
+        .pill-tab:hover,.pill-tab.active{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));border-color:rgba(129,140,248,.38);color:#fff}
+        .tab-panel{display:none}
+        .tab-panel.active{display:block}
+        .course-chip{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:999px;padding:.4rem .7rem;font-size:.78rem;color:#d6e8de}
+        .course-panel{padding:2rem;border-radius:1.55rem;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.028));border:1px solid rgba(255,255,255,.09);box-shadow:0 20px 48px rgba(2,6,23,.22),inset 0 1px 0 rgba(255,255,255,.04)}
+        .course-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(18rem,.8fr);gap:2rem;align-items:stretch}
+        .course-copy{display:flex;flex-direction:column;justify-content:flex-start;gap:1.25rem;min-width:0}
+        .course-title{font-size:2rem;line-height:1.15;font-weight:800;color:#fff;text-wrap:balance}
+        .course-subtitle{margin-top:.55rem;font-size:.88rem;letter-spacing:.18em;text-transform:uppercase;color:#6f7f9a}
+        .course-description{margin-top:0;font-size:1.06rem;line-height:2.05;color:#d9e5f7;max-width:40rem}
+        .course-chip-row{margin-top:.15rem;display:flex;flex-wrap:wrap;gap:.75rem}
+        .course-aside{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:.9rem}
+        .course-detail-card{border:1px solid rgba(255,255,255,.09);border-radius:1.2rem;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));padding:1.15rem 1.2rem;display:flex;flex-direction:column;justify-content:space-between}
+        .course-detail-card .eyebrow{font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:#7084a8}
+        .course-detail-card .value{margin-top:.55rem;font-size:1.02rem;line-height:1.6;color:#f5f8ff;font-weight:700}
+        .course-detail-card .note{margin-top:.4rem;font-size:.9rem;line-height:1.55;color:#c7d3e9}
+        .accordion-trigger{width:100%;text-align:left}
+        .accordion-trigger svg{transition:transform .2s ease}
+        .accordion-item.open .accordion-trigger svg{transform:rotate(45deg)}
+        .accordion-panel{display:none}
+        .accordion-item.open .accordion-panel{display:block}
+        .info-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.09)}
+        .mobile-stack{display:flex;flex-direction:column;gap:1rem}
+        @media (min-width:1024px){.lg\:px-16{padding-left:4rem;padding-right:4rem}.lg\:py-24{padding-top:6rem;padding-bottom:6rem}}
+        @media (min-width:1280px){.xl\:mt-24{margin-top:6rem}.xl\:text-\[5\.5rem\]{font-size:5.5rem;line-height:1}.xl\:grid-cols-\[1\.06fr_0\.94fr\]{grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr)}.xl\:grid-cols-\[1\.08fr_0\.92fr\]{grid-template-columns:1.08fr .92fr}}
+        .grid-cols-\[1\.15fr_0\.85fr\]{grid-template-columns:1.15fr .85fr}
+        .desktop-only{display:block}.mobile-fallback{display:none}
+        @media (max-width:1279px){.hero-section{padding:2.5rem}.hero-grid{grid-template-columns:1fr}.hero-copy .hero-lead,.hero-spotlight,.hero-support-grid{max-width:none}.hero-support-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-chat{margin-top:0}.hero-window{gap:1.25rem}}
+        @media (max-width:900px){.hero-support-grid{grid-template-columns:1fr}.hero-mini-card,.hero-meta-card{min-height:auto}.hero-chat-grid,.hero-bottom-strip{grid-template-columns:1fr}.course-layout{grid-template-columns:1fr}.course-aside{grid-template-rows:none;grid-template-columns:1fr}}
+        @media (max-width:1023px){body{background-size:auto;animation:none}.desktop-only{display:none}.mobile-fallback{display:block}}
+        @keyframes gradientDrift{from{background-position:0 50%}to{background-position:100% 50%}}@keyframes floatLights{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(2%,-1.5%,0) scale(1.04)}}@keyframes messageSlideIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@keyframes typingPulse{0%,80%,100%{transform:scale(.7);opacity:.45}40%{transform:scale(1);opacity:1}}@keyframes responseGlow{0%,100%{text-shadow:0 0 0 rgba(125,211,252,0);filter:brightness(1)}50%{text-shadow:0 0 16px rgba(125,211,252,.16),0 0 30px rgba(99,102,241,.12);filter:brightness(1.04)}}
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen flex flex-col">
-    <nav class="sticky top-0 z-20 border-b border-slate-700/60 bg-black/30 backdrop-blur-xl">
-        <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <a href="/" class="flex items-center gap-3">
-                <img src="{% static 'image/image.png' %}" alt="Kodehax Academy Logo" class="h-9 w-9 rounded-xl object-cover">
-                <div>
-                    <p class="text-xs tracking-[0.2em] uppercase text-slate-400">Kodehax</p>
-                    <h1 class="text-white font-bold leading-tight">Academy</h1>
-                </div>
-            </a>
-            <div class="hidden items-center gap-2 text-sm sm:flex">
-                <a href="/" class="nav-link px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">Home</a>
-                <a href="{% url 'student_login' %}" class="nav-link px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">Student</a>
-                <a href="{% url 'teacher_login' %}" class="nav-link px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition">Teacher</a>
-            </div>
-            <div class="flex items-center gap-2 sm:hidden">
-                <a href="{% url 'student_login' %}" class="btn-outline px-3 py-2 text-sm">Student</a>
-                <a href="{% url 'teacher_login' %}" class="btn-primary px-3 py-2 text-sm">Teacher</a>
-            </div>
-        </div>
-    </nav>
-
-    <main class="flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+<body class="min-h-screen">
+    <div class="page-shell">
         {% if messages %}
-        <div class="w-full fixed top-4 left-0 right-0 z-50 flex justify-center px-4">
-            <div class="max-w-2xl w-full space-y-3">
+        <div class="fixed left-0 right-0 top-4 z-50 flex justify-center px-4">
+            <div class="w-full max-w-3xl space-y-3">
                 {% for message in messages %}
-                    {% if message.tags == "success" %}
-                        <div class="glass-card border-emerald-500/45 text-emerald-200 px-5 py-3 flex items-center justify-between reveal">
-                            <span>{{ message }}</span>
-                            <button onclick="this.parentElement.style.display='none'" class="text-emerald-300 hover:text-emerald-100">x</button>
-                        </div>
-                    {% elif message.tags == "info" %}
-                        <div class="glass-card border-sky-500/45 text-sky-200 px-5 py-3 flex items-center justify-between reveal">
-                            <span>{{ message }}</span>
-                            <button onclick="this.parentElement.style.display='none'" class="text-sky-300 hover:text-sky-100">x</button>
-                        </div>
-                    {% elif message.tags == "error" %}
-                        <div class="glass-card border-rose-500/45 text-rose-200 px-5 py-3 flex items-center justify-between reveal">
-                            <span>{{ message }}</span>
-                            <button onclick="this.parentElement.style.display='none'" class="text-rose-300 hover:text-rose-100">x</button>
-                        </div>
-                    {% endif %}
+                <div class="glass rounded-2xl px-5 py-3 text-sm {% if message.tags == 'success' %}border-emerald-500/40 text-emerald-100{% elif message.tags == 'error' %}border-rose-500/40 text-rose-100{% else %}border-sky-500/40 text-sky-100{% endif %}">
+                    <div class="flex items-center justify-between gap-3"><span>{{ message }}</span><button onclick="this.parentElement.parentElement.style.display='none'" class="text-slate-300 transition hover:text-white">x</button></div>
+                </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
-
         {% block content %}
-        <div class="mx-auto max-w-7xl space-y-6 sm:space-y-8">
-            <section class="glass-card home-grid p-5 sm:p-8 md:p-10 reveal">
-                <div class="grid items-center gap-8 lg:grid-cols-2">
-                    <div>
-                        <p class="text-xs tracking-[0.18em] uppercase text-slate-400">Empowering Tech Careers</p>
-                        <h2 class="mt-3 text-3xl font-black leading-tight text-white animate-float-slow sm:text-4xl md:text-5xl">
-                            Kodehax Academy
-                        </h2>
-                        <p class="mt-4 max-w-xl text-sm text-slate-300 sm:text-base">
-                            Industry-focused learning for Full Stack Development, Data Science, Cyber Security, and AI/ML with practical projects and mentorship.
-                        </p>
-                        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                            <a href="{% url 'student_register' %}" class="btn-primary inline-flex h-11 items-center justify-center px-5">Join as Student</a>
-                            <a href="{% url 'teacher_login' %}" class="btn-outline inline-flex h-11 items-center justify-center px-5">Teacher Portal</a>
-                        </div>
+        <div class="desktop-only">
+            <div class="hero-radial"></div>
+            <nav class="sticky top-4 z-40 mb-8 px-6 pt-6">
+                <div class="glass mx-auto flex max-w-7xl items-center justify-between rounded-[1.25rem] px-6 py-4 lg:px-7">
+                    <a href="/" class="flex items-center gap-3">
+                        <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-11 w-11 rounded-2xl object-cover shadow-[0_12px_30px_rgba(15,23,42,0.28)]">
+                        <div><p class="text-[11px] uppercase tracking-[0.28em] text-slate-400">Kodehax</p><h1 class="text-base font-black text-white">Academy</h1></div>
+                    </a>
+                    <div class="flex items-center gap-8 text-sm">
+                        <a href="/" class="nav-link">Home</a>
+                        <a href="{% url 'student_login' %}" class="nav-link">Student</a>
+                        <a href="{% url 'teacher_login' %}" class="nav-link">Teacher</a>
                     </div>
-                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <div class="stat-chip p-4">
-                            <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Mode</p>
-                            <p class="mt-2 text-xl font-bold text-white">Live Online</p>
-                        </div>
-                        <div class="stat-chip p-4">
-                            <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Approach</p>
-                            <p class="mt-2 text-xl font-bold text-white">Hands-on</p>
-                        </div>
-                        <div class="stat-chip p-4">
-                            <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Focus</p>
-                            <p class="mt-2 text-xl font-bold text-white">Career Ready</p>
-                        </div>
-                        <div class="stat-chip p-4">
-                            <p class="text-xs uppercase tracking-[0.12em] text-slate-400">Support</p>
-                            <p class="mt-2 text-xl font-bold text-white">Mentorship</p>
-                        </div>
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'teacher_login' %}" class="btn-secondary inline-flex h-11 items-center justify-center px-5">Login</a>
+                        <a href="{% url 'student_register' %}" class="btn-primary inline-flex h-11 items-center justify-center px-5">Join Now</a>
                     </div>
                 </div>
-            </section>
+            </nav>
 
-            <section class="grid gap-4 reveal delay-1 md:grid-cols-3">
-                <article class="glass-card p-5">
-                    <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Trust</p>
-                    <h3 class="mt-2 text-lg font-bold text-white">Transparent Training</h3>
-                    <p class="mt-2 text-slate-300 text-sm">Clear outcomes, practical curriculum, and mentor-led sessions without inflated promises.</p>
-                </article>
-                <article class="glass-card p-5">
-                    <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Learning</p>
-                    <h3 class="mt-2 text-lg font-bold text-white">Project Driven</h3>
-                    <p class="mt-2 text-slate-300 text-sm">Build portfolio-ready projects across modern tech stacks and real-world use cases.</p>
-                </article>
-                <article class="glass-card p-5">
-                    <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Career</p>
-                    <h3 class="mt-2 text-lg font-bold text-white">Industry Mentorship</h3>
-                    <p class="mt-2 text-slate-300 text-sm">Guidance for interviews, internships, and growth with personalized feedback.</p>
-                </article>
-            </section>
+            <main class="layout-main px-8 pb-24 lg:px-10">
+                <div class="layout-stack mx-auto max-w-7xl">
+                    <section class="hero-section relative overflow-hidden rounded-[1.75rem] border border-white/10">
+                        <div class="absolute inset-0 rounded-[1.75rem] glass"></div>
+                        <div class="hero-orb one"></div><div class="hero-orb two"></div>
+                        <div class="hero-grid relative grid xl:grid-cols-[1.06fr_0.94fr]">
+                            <div class="hero-copy reveal visible">
+                                <div class="badge inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-300"><span class="inline-block h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_16px_rgba(56,189,248,0.9)]"></span>DPIIT Recognized EdTech</div>
+                                <h2 class="hero-title mt-7 text-white">Ethical tech education with real career momentum.</h2>
+                                <p class="hero-body hero-lead mt-7">This version lifts the strongest information from the public Kodehax site into a richer landing page: live classes, practical programs, mentorship, internships, placement support, and transparent pricing.</p>
+                                <div class="hero-actions mt-10">
+                                    <a href="{% url 'student_register' %}" class="btn-primary inline-flex h-14 items-center justify-center px-7 text-base">Join Kodehax</a>
+                                    <a href="{% url 'teacher_login' %}" class="btn-secondary inline-flex h-14 items-center justify-center px-7 text-base">Talk to a Mentor</a>
+                                </div>
+                                <div class="hero-spotlight mt-8 glass">
+                                    <p class="hero-card-label">Public-site highlights</p>
+                                    <div class="spotlight-line mt-3 text-lg font-semibold text-white" data-spotlight></div>
+                                </div>
+                                <div class="hero-support-grid mt-5">
+                                    <div class="hero-mini-card glass"><p class="hero-card-label">Trust First</p><p>Clear emphasis on ethical training and "no scams, no false promises".</p></div>
+                                    <div class="hero-mini-card glass"><p class="hero-card-label">Live Delivery</p><p>100% live classes with mentor-led sessions and practical assignments.</p></div>
+                                    <div class="hero-mini-card glass"><p class="hero-card-label">Career Support</p><p>Internships, certification help, placement assistance, and networking support.</p></div>
+                                </div>
+                            </div>
 
-            <section class="glass-card p-5 sm:p-7 reveal delay-2">
-                <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-                    <h3 class="text-2xl font-black text-white sm:text-3xl">Course Tracks</h3>
-                    <p class="text-sm text-slate-400">Popular learning paths at Kodehax Academy</p>
+                            <div class="hero-chat reveal visible s1">
+                                <div class="ai-chat-shell chat-shell glass premium">
+                                    <div class="hero-window-head flex items-center justify-between border-b border-white/10">
+                                        <div class="flex items-center gap-3"><div class="flex gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-400/80"></span><span class="h-2.5 w-2.5 rounded-full bg-amber-300/80"></span><span class="h-2.5 w-2.5 rounded-full bg-emerald-400/80"></span></div><p class="text-sm font-semibold text-white">Kodehax Experience</p></div>
+                                        <span class="rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-sky-200">Live Preview</span>
+                                    </div>
+                                    <div class="hero-window mt-7">
+                                        <div class="bubble user hero-bubble-user"><p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Student</p><p class="mt-3 text-sm leading-7 text-slate-100">What makes Kodehax Academy stand out?</p></div>
+                                        <div class="bubble ai hero-bubble-ai">
+                                            <p class="text-[11px] uppercase tracking-[0.16em] text-blue-200/80">Kodehax AI</p>
+                                            <div class="hero-window-copy mt-5">
+                                                <div class="flex items-center gap-2" data-typing><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
+                                                <div class="hidden text-sm leading-8 text-slate-100" data-ai-response>Kodehax focuses on transparent pricing, live mentor-led classes, practical programs, internships, certification support, and placement-oriented learning rather than inflated promises.</div>
+                                            </div>
+                                        </div>
+                                        <div class="hero-meta-shell">
+                                            <div class="hero-chat-grid grid grid-cols-2 items-stretch">
+                                                <div class="hero-meta-card glass"><p class="hero-card-label">Recognition</p><p class="font-semibold text-white">Startup India / DPIIT</p></div>
+                                                <div class="hero-meta-card glass"><p class="hero-card-label">Location</p><p class="font-semibold text-white">Koramangala, Bengaluru</p></div>
+                                            </div>
+                                            <div class="hero-bottom-strip">
+                                                <div class="hero-strip-card">
+                                                    <p class="hero-card-label">Format</p>
+                                                    <p class="value">100% Live</p>
+                                                    <p class="note">Mentor-led learning sessions</p>
+                                                </div>
+                                                <div class="hero-strip-card">
+                                                    <p class="hero-card-label">Support</p>
+                                                    <p class="value">1-on-1 Guidance</p>
+                                                    <p class="note">Direct mentorship and direction</p>
+                                                </div>
+                                                <div class="hero-strip-card">
+                                                    <p class="hero-card-label">Outcome</p>
+                                                    <p class="value">Career Focused</p>
+                                                    <p class="note">Projects, internships, placement help</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="hero-panel-glow"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="feature-cards mt-16 grid grid-cols-4 gap-8">
+                        <article class="feature-card glass premium reveal rounded-3xl p-8 s1"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18"/><path d="M6 8h12"/><path d="M8 21h8"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">100% Live Classes</h3><p class="mt-4 text-sm leading-8 text-slate-300">The site's strongest promise now gets top-level visibility in the first content band.</p></article>
+                        <article class="feature-card glass premium reveal rounded-3xl p-8 s2"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19h14"/><path d="M7 16V8"/><path d="M12 16V5"/><path d="M17 16v-4"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">Practical Learning</h3><p class="mt-4 text-sm leading-8 text-slate-300">Projects, assignments, and internships are framed as the bridge between learning and work.</p></article>
+                        <article class="feature-card glass premium reveal rounded-3xl p-8 s3"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 8h8"/><path d="M8 12h5"/><path d="M8 16h7"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">Career-Ready Tracks</h3><p class="mt-4 text-sm leading-8 text-slate-300">Web, Data, Cyber Security, AI/ML, and Python are surfaced as clear flagship pathways.</p></article>
+                        <article class="feature-card glass premium reveal rounded-3xl p-8 s4"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17c2.5-5 5.5-7.5 9-7.5S19.5 12 20 17"/><path d="M8 7a4 4 0 1 0 8 0"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">Mentor Support</h3><p class="mt-4 text-sm leading-8 text-slate-300">The messaging now makes mentorship, placement help, and networking easier to notice.</p></article>
+                    </section>
+
+                    <section class="grid grid-cols-3 gap-8">
+                        <article class="glass premium reveal rounded-[1.25rem] p-8 s1"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Promise</p><h3 class="mt-4 text-xl font-bold text-white">No scams. No false promises.</h3><p class="mt-4 text-sm leading-9 text-slate-300">That public-facing promise is now visually promoted instead of getting buried in generic product copy.</p></article>
+                        <article class="glass premium reveal rounded-[1.25rem] p-8 s2"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Mission</p><h3 class="mt-4 text-xl font-bold text-white">Break overpriced low-value learning</h3><p class="mt-4 text-sm leading-9 text-slate-300">The value section now reflects the academy's real market positioning and affordability story.</p></article>
+                        <article class="glass premium reveal rounded-[1.25rem] p-8 s3"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Support</p><h3 class="mt-4 text-xl font-bold text-white">Mentorship to placement assistance</h3><p class="mt-4 text-sm leading-9 text-slate-300">Students can quickly understand that Kodehax is selling outcomes, not just access to lessons.</p></article>
+                    </section>
+
+                    <section class="grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
+                        <div class="glass reveal rounded-[1.6rem] p-9 s1">
+                            <div class="flex items-start justify-between gap-8">
+                                <div><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Programs</p><h3 class="mt-3 text-3xl font-black text-white">Flagship courses presented as an interactive explorer</h3><p class="mt-4 max-w-xl text-sm leading-8 text-slate-300">This keeps the original product-style structure, but turns it into a tabbed section based on the strongest public Kodehax course offerings.</p></div>
+                                <div class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-right"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">View</p><p class="mt-2 text-lg font-bold text-white">Course Explorer</p></div>
+                            </div>
+                            <div class="mt-10 space-y-6">
+                                <div class="pill-tabs" data-tabs>
+                                    <button class="pill-tab active" type="button" data-tab-trigger="web">Web Dev</button>
+                                    <button class="pill-tab" type="button" data-tab-trigger="data">Data Science</button>
+                                    <button class="pill-tab" type="button" data-tab-trigger="cyber">Cyber Security</button>
+                                    <button class="pill-tab" type="button" data-tab-trigger="aiml">AI / ML</button>
+                                    <button class="pill-tab" type="button" data-tab-trigger="python">Python</button>
+                                </div>
+                                <div class="tab-panel active course-panel" data-tab-panel="web">
+                                    <div class="course-layout">
+                                        <div class="course-copy">
+                                            <div><p class="course-title">Advanced Diploma in Full Stack Web Development</p><p class="course-subtitle">Industry 4.0 edition</p></div>
+                                            <p class="course-description">Includes Python, Django, Flask, MEARN, Angular, MySQL, and AI integration through project-focused learning.</p>
+                                            <div class="course-chip-row"><span class="course-chip">Python</span><span class="course-chip">Django</span><span class="course-chip">Flask</span><span class="course-chip">MEARN</span><span class="course-chip">Angular</span></div>
+                                        </div>
+                                        <div class="course-aside">
+                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Frontend + backend product building</p><p class="note">Built for learners who want broad real-world development coverage.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Project-first workflow</p><p class="note">Pairs frameworks with implementation-ready practice instead of theory-only modules.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Portfolio-ready full stack foundation</p><p class="note">Strong fit for web app development and software delivery roles.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-panel course-panel" data-tab-panel="data">
+                                    <div class="course-layout">
+                                        <div class="course-copy">
+                                            <div><p class="course-title">Advanced Diploma in Data Science</p><p class="course-subtitle">ML to MLOps</p></div>
+                                            <p class="course-description">Build skills in ML, deep learning, NLP, generative AI, big data, cloud, and deployment-ready workflows.</p>
+                                            <div class="course-chip-row"><span class="course-chip">ML</span><span class="course-chip">Deep Learning</span><span class="course-chip">NLP</span><span class="course-chip">Generative AI</span><span class="course-chip">MLOps</span></div>
+                                        </div>
+                                        <div class="course-aside">
+                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Analytics, modeling, and AI systems</p><p class="note">A broader path that extends from classic data work into deployment.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">From experimentation to production</p><p class="note">Helps learners connect model-building with operational thinking.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Modern data portfolio direction</p><p class="note">Useful for data science, analytics, and applied AI career tracks.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-panel course-panel" data-tab-panel="cyber">
+                                    <div class="course-layout">
+                                        <div class="course-copy">
+                                            <div><p class="course-title">Advanced Diploma in Cyber Security</p><p class="course-subtitle">8-month program</p></div>
+                                            <p class="course-description">Includes offensive security, defensive security, DFIR, cloud security, application security, and GRC concepts.</p>
+                                            <div class="course-chip-row"><span class="course-chip">Ethical Hacking</span><span class="course-chip">DFIR</span><span class="course-chip">Cloud Security</span><span class="course-chip">GRC</span></div>
+                                        </div>
+                                        <div class="course-aside">
+                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Offensive + defensive security coverage</p><p class="note">Balances attack awareness with protection, investigation, and governance.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Hands-on security exposure</p><p class="note">Brings multiple cyber domains together inside one guided path.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Foundation for cyber specialization</p><p class="note">Supports learners moving toward security operations and risk-oriented roles.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-panel course-panel" data-tab-panel="aiml">
+                                    <div class="course-layout">
+                                        <div class="course-copy">
+                                            <div><p class="course-title">Advanced Diploma in AI &amp; Machine Learning</p><p class="course-subtitle">Modern AI path</p></div>
+                                            <p class="course-description">Adds deep learning, generative AI, NLP, cloud AI, and deployment skills for future-facing AI roles.</p>
+                                            <div class="course-chip-row"><span class="course-chip">Generative AI</span><span class="course-chip">NLP</span><span class="course-chip">Cloud AI</span><span class="course-chip">Deployment</span></div>
+                                        </div>
+                                        <div class="course-aside">
+                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Applied AI beyond basics</p><p class="note">Expands from model fundamentals into current AI tooling and deployment context.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Modern stack orientation</p><p class="note">Keeps the curriculum aligned with how current AI systems are actually used.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Future-facing AI readiness</p><p class="note">A stronger fit for learners aiming at applied ML and AI product workflows.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-panel course-panel" data-tab-panel="python">
+                                    <div class="course-layout">
+                                        <div class="course-copy">
+                                            <div><p class="course-title">Master in Python</p><p class="course-subtitle">3-month intensive</p></div>
+                                            <p class="course-description">Covers core Python, OOP, modules, APIs, web scraping, databases, and automation with mini-projects.</p>
+                                            <div class="course-chip-row"><span class="course-chip">Core Python</span><span class="course-chip">OOP</span><span class="course-chip">APIs</span><span class="course-chip">Automation</span></div>
+                                        </div>
+                                        <div class="course-aside">
+                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Strong Python fundamentals</p><p class="note">Centers on practical fluency across language basics and applied scripting.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Fast, compact, and hands-on</p><p class="note">A concise path for learners who want focused skill-building without extra complexity.</p></div>
+                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Utility-driven coding confidence</p><p class="note">Helps prepare for automation, scripting, and Python-based entry paths.</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div class="glass premium reveal rounded-[1.6rem] p-8 s2">
+                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Core Signals</p>
+                                <div class="mt-8 grid grid-cols-2 gap-5">
+                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Live Classes</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="100">0</p><p class="mt-3 text-sm leading-8 text-slate-300">mentor-led delivery</p></div>
+                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Support Areas</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="6">0</p><p class="mt-3 text-sm leading-8 text-slate-300">career-focused services</p></div>
+                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Internship Tracks</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="3">0</p><p class="mt-3 text-sm leading-8 text-slate-300">web, data, cyber</p></div>
+                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Campus Base</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="1">0</p><p class="mt-3 text-sm leading-8 text-slate-300">Koramangala, Bengaluru</p></div>
+                                </div>
+                            </div>
+                            <div class="glass premium reveal rounded-[1.6rem] p-8 s3">
+                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Services</p>
+                                <h3 class="mt-4 text-2xl font-black text-white">Expandable support stack</h3>
+                                <div class="mt-6 space-y-4" data-accordion>
+                                    <div class="accordion-item info-card rounded-2xl open">
+                                        <button class="accordion-trigger flex items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white" type="button"><span>Career guidance and interview prep</span><svg class="h-4 w-4 text-sky-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
+                                        <div class="accordion-panel px-5 pb-5 text-sm leading-8 text-slate-300">Resume guidance, interview readiness, and placement assistance are now highlighted in a clearer way.</div>
+                                    </div>
+                                    <div class="accordion-item info-card rounded-2xl">
+                                        <button class="accordion-trigger flex items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white" type="button"><span>Internships and live projects</span><svg class="h-4 w-4 text-sky-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
+                                        <div class="accordion-panel px-5 pb-5 text-sm leading-8 text-slate-300">Internship pathways in web development, data science, analytics, and cyber security are more visible.</div>
+                                    </div>
+                                    <div class="accordion-item info-card rounded-2xl">
+                                        <button class="accordion-trigger flex items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white" type="button"><span>1-on-1 mentorship and certifications</span><svg class="h-4 w-4 text-sky-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
+                                        <div class="accordion-panel px-5 pb-5 text-sm leading-8 text-slate-300">The page now better communicates personal guidance and help toward globally recognized certifications.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="cta reveal rounded-[1.75rem] border border-white/10 px-12 py-14 s2">
+                        <div class="relative z-10 flex items-center justify-between gap-10">
+                            <div><p class="text-xs uppercase tracking-[0.2em] text-slate-400">Get Started</p><h3 class="mt-4 text-4xl font-black text-white">Explore live classes, mentorship, and career-ready programs</h3><p class="mt-4 max-w-xl text-base leading-9 text-slate-300">The closing CTA now matches the public Kodehax message instead of ending with a generic AI LMS statement.</p></div>
+                            <a href="{% url 'student_register' %}" class="btn-primary inline-flex h-14 shrink-0 items-center justify-center px-8 text-base">Apply With Kodehax</a>
+                        </div>
+                    </section>
                 </div>
-                <div class="accent-line my-4"></div>
-                <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <div class="stat-chip p-4"><p class="text-white font-semibold">Full Stack Development</p><p class="text-slate-400 text-sm mt-1">Frontend, backend, databases, deployment</p></div>
-                    <div class="stat-chip p-4"><p class="text-white font-semibold">Data Science & Analytics</p><p class="text-slate-400 text-sm mt-1">Data analysis, ML, BI, visualization</p></div>
-                    <div class="stat-chip p-4"><p class="text-white font-semibold">Cyber Security</p><p class="text-slate-400 text-sm mt-1">Defensive and offensive security basics</p></div>
-                    <div class="stat-chip p-4"><p class="text-white font-semibold">AI / ML</p><p class="text-slate-400 text-sm mt-1">Applied AI workflows and model thinking</p></div>
+            </main>
+            <footer class="px-6 pb-8 pt-2">
+                <div class="glass mx-auto flex max-w-7xl items-center justify-between rounded-[1.35rem] px-6 py-4">
+                    <p class="text-sm text-slate-400">&copy; 2026 Kodehax Academy</p>
+                    <div class="flex items-center gap-6 text-sm text-slate-400"><a href="{% url 'student_login' %}" class="transition hover:text-white">Student Portal</a><a href="{% url 'teacher_login' %}" class="transition hover:text-white">Teacher Portal</a></div>
                 </div>
-            </section>
+            </footer>
+        </div>
 
-            <section class="glass-card p-5 sm:p-7 reveal delay-3">
-                <div class="grid items-center gap-6 md:grid-cols-2">
-                    <div>
-                        <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Get Started</p>
-                        <h3 class="mt-2 text-2xl font-black text-white sm:text-3xl">Choose your portal and begin</h3>
-                        <p class="mt-2 text-sm text-slate-300 sm:text-base">Students learn and practice. Teachers create, manage, and track progress from one workspace.</p>
+        <div class="mobile-fallback px-4 py-8">
+            <div class="mx-auto max-w-2xl space-y-5">
+                <div class="glass rounded-3xl p-6">
+                    <div class="flex items-center gap-3"><img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-11 w-11 rounded-2xl object-cover"><div><p class="text-xs uppercase tracking-[0.22em] text-slate-500">Kodehax</p><h2 class="text-lg font-black text-white">Academy</h2></div></div>
+                    <h3 class="mt-6 text-3xl font-black leading-tight text-white">Ethical, practical tech training that feels premium.</h3>
+                    <p class="mt-3 text-sm leading-7 text-slate-300">Live classes, real projects, mentorship, internships, and honest career-focused programs inspired by the public Kodehax Academy site.</p>
+                    <div class="mt-5 mobile-stack">
+                        <div class="glass rounded-2xl px-4 py-4"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Top promise</p><p class="mt-2 text-sm font-semibold text-white">No scams. No false promises.</p></div>
+                        <div class="glass rounded-2xl px-4 py-4"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Programs</p><p class="mt-2 text-sm font-semibold text-white">Web, Data Science, Cyber Security, AI/ML, Python</p></div>
                     </div>
-                    <div class="flex flex-col gap-3 md:justify-end lg:flex-row">
-                        <a href="{% url 'student_login' %}" class="btn-primary inline-flex h-11 items-center justify-center px-5">Student Login</a>
-                        <a href="{% url 'teacher_login' %}" class="btn-outline inline-flex h-11 items-center justify-center px-5">Teacher Login</a>
-                    </div>
+                    <div class="mt-6 flex flex-col gap-3"><a href="{% url 'student_register' %}" class="btn-primary inline-flex h-12 items-center justify-center px-5">Join Now</a><a href="{% url 'teacher_login' %}" class="btn-secondary inline-flex h-12 items-center justify-center px-5">Teacher Portal</a></div>
                 </div>
-            </section>
-
-            <section class="grid gap-3 sm:hidden reveal delay-4">
-                <a href="{% url 'student_register' %}" class="mobile-nav-link flex min-h-14 items-center justify-between px-4 py-3 text-slate-100">
-                    <span class="font-semibold">Student Registration</span>
-                    <span class="text-slate-400">Start</span>
-                </a>
-                <a href="{% url 'student_login' %}" class="mobile-nav-link flex min-h-14 items-center justify-between px-4 py-3 text-slate-100">
-                    <span class="font-semibold">Student Login</span>
-                    <span class="text-slate-400">Open</span>
-                </a>
-                <a href="{% url 'teacher_login' %}" class="mobile-nav-link flex min-h-14 items-center justify-between px-4 py-3 text-slate-100">
-                    <span class="font-semibold">Teacher Portal</span>
-                    <span class="text-slate-400">Open</span>
-                </a>
-            </section>
+            </div>
         </div>
         {% endblock %}
-    </main>
+    </div>
 
-    <footer class="border-t border-slate-700/60 bg-black/30 backdrop-blur text-center py-4">
-        <p class="text-sm text-slate-400">&copy; 2026 Kodehax Academy</p>
-    </footer>
+    <script>
+        (() => {
+            const revealItems = document.querySelectorAll(".reveal");
+            if (revealItems.length) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target);
+                    });
+                }, { threshold: 0.18 });
+                revealItems.forEach((item) => { if (!item.classList.contains("visible")) observer.observe(item); });
+            }
 
+            const typing = document.querySelector("[data-typing]");
+            const response = document.querySelector("[data-ai-response]");
+            if (typing && response) {
+                window.setTimeout(() => {
+                    typing.classList.add("hidden");
+                    response.classList.remove("hidden");
+                    response.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 420, easing: "ease-out", fill: "forwards" });
+                }, 1800);
+            }
+
+            const counters = document.querySelectorAll("[data-counter]");
+            if (counters.length) {
+                const runCounter = (element) => {
+                    const target = Number(element.dataset.target || "0");
+                    const start = performance.now();
+                    const duration = 1400;
+                    const step = (now) => {
+                        const progress = Math.min((now - start) / duration, 1);
+                        const eased = 1 - Math.pow(1 - progress, 3);
+                        element.textContent = Math.round(target * eased) + (target >= 10 ? "%" : "");
+                        if (progress < 1) requestAnimationFrame(step);
+                    };
+                    requestAnimationFrame(step);
+                };
+                const counterObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        runCounter(entry.target);
+                        counterObserver.unobserve(entry.target);
+                    });
+                }, { threshold: 0.45 });
+                counters.forEach((counter) => counterObserver.observe(counter));
+            }
+
+            const spotlight = document.querySelector("[data-spotlight]");
+            if (spotlight) {
+                const lines = [
+                    "Recognized by DPIIT under the Startup India initiative.",
+                    "Focused on 100% live classes, practical learning, and career growth.",
+                    "Built around transparent pricing, mentorship, and internship support."
+                ];
+                let lineIndex = 0;
+                const rotateSpotlight = () => {
+                    spotlight.textContent = lines[lineIndex];
+                    spotlight.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 320, easing: "ease-out" });
+                    lineIndex = (lineIndex + 1) % lines.length;
+                };
+                rotateSpotlight();
+                window.setInterval(rotateSpotlight, 3200);
+            }
+
+            document.querySelectorAll("[data-tabs]").forEach((tabGroup) => {
+                const triggers = tabGroup.querySelectorAll("[data-tab-trigger]");
+                const panels = tabGroup.parentElement.querySelectorAll("[data-tab-panel]");
+                triggers.forEach((trigger) => {
+                    trigger.addEventListener("click", () => {
+                        const target = trigger.dataset.tabTrigger;
+                        triggers.forEach((item) => item.classList.toggle("active", item === trigger));
+                        panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.tabPanel === target));
+                    });
+                });
+            });
+
+            document.querySelectorAll("[data-accordion]").forEach((accordion) => {
+                accordion.querySelectorAll(".accordion-item").forEach((item) => {
+                    const trigger = item.querySelector(".accordion-trigger");
+                    if (!trigger) return;
+                    trigger.addEventListener("click", () => {
+                        const wasOpen = item.classList.contains("open");
+                        accordion.querySelectorAll(".accordion-item").forEach((entry) => entry.classList.remove("open"));
+                        if (!wasOpen) item.classList.add("open");
+                    });
+                });
+            });
+        })();
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
+
+

@@ -1,4 +1,5 @@
 {% extends "mobile/base.html" %}
+{% load static %}
 {% block title %}Sign In | Kodehax Academy{% endblock %}
 {% block extra_head %}
 <style>
@@ -23,7 +24,17 @@
 </style>
 {% endblock %}
 {% block content %}
-<main class="min-h-[82vh] flex items-center">
+<div class="pt-2 pb-6">
+<header class="mb-6">
+    <nav class="card flex items-center justify-between px-4 py-3 reveal-1">
+        <a href="/" class="flex items-center gap-2">
+            <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-8 w-8 rounded-lg object-cover">
+            <span class="text-sm font-semibold text-slate-800">Kodehax Academy</span>
+        </a>
+        <a href="{% url 'register' %}" class="text-sm font-semibold auth-link">Register</a>
+    </nav>
+</header>
+<main class="min-h-[74vh] flex items-start pt-2">
     <section class="card auth-card w-full p-5 reveal-1">
         <p class="text-xs uppercase tracking-[0.2em] text-indigo-200/80">Kodehax Academy</p>
         <h1 class="mt-2 text-2xl font-semibold">Student Login</h1>
@@ -56,4 +67,5 @@
         </div>
     </section>
 </main>
+</div>
 {% endblock %}

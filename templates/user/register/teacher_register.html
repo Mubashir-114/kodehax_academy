@@ -1,3 +1,4 @@
+{% load static %}
 {% extends "user/base.html" %}
 
 {% block title %}Teacher Register{% endblock %}
@@ -28,26 +29,47 @@
 {% endblock %}
 
 {% block content %}
-<div class="mx-auto w-full max-w-md reveal">
-    <div class="auth-card p-7 md:p-8">
-        <p class="text-xs font-semibold tracking-[0.2em] text-cyan-300 text-center mb-2">WELCOME TEACHER</p>
-        <h2 class="text-2xl font-black text-center mb-6 text-white">Teacher Registration</h2>
+<div class="px-4 pb-16 pt-6 sm:px-6 lg:px-8 lg:pt-8">
+    <div class="mx-auto max-w-7xl">
+        <nav class="glass mb-10 rounded-2xl px-5 py-4 sm:px-6">
+            <div class="flex items-center justify-between gap-4">
+                <a href="/" class="flex items-center gap-3">
+                    <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-10 w-10 rounded-xl object-cover">
+                    <div>
+                        <p class="text-[11px] uppercase tracking-[0.2em] text-slate-400">Kodehax</p>
+                        <p class="text-base font-black text-white">Academy</p>
+                    </div>
+                </a>
+                <div class="flex items-center gap-6 text-sm">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="{% url 'student_login' %}" class="nav-link">Student Login</a>
+                    <a href="{% url 'teacher_login' %}" class="nav-link">Teacher Login</a>
+                </div>
+            </div>
+        </nav>
 
-        <form method="POST" class="space-y-4">
-            {% csrf_token %}
+        <div class="mx-auto w-full max-w-md reveal">
+            <div class="auth-card p-7 md:p-8">
+                <p class="text-xs font-semibold tracking-[0.2em] text-cyan-300 text-center mb-2">WELCOME TEACHER</p>
+                <h2 class="text-2xl font-black text-center mb-6 text-white">Teacher Registration</h2>
 
-            <input type="text" name="username" placeholder="Username" class="field">
-            <input type="email" name="email" placeholder="Email" class="field">
-            <input type="password" name="password1" placeholder="Password" class="field">
-            <input type="password" name="password2" placeholder="Confirm Password" class="field">
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
 
-            <button class="auth-btn">Register as Teacher</button>
-        </form>
+                    <input type="text" name="username" placeholder="Username" class="field">
+                    <input type="email" name="email" placeholder="Email" class="field">
+                    <input type="password" name="password1" placeholder="Password" class="field">
+                    <input type="password" name="password2" placeholder="Confirm Password" class="field">
 
-        <p class="text-center text-sm mt-4 text-slate-300">
-            Already have an account?
-            <a href="{% url 'teacher_login' %}" class="text-cyan-300 hover:text-cyan-200 underline-offset-2 hover:underline">Login</a>
-        </p>
+                    <button class="auth-btn">Register as Teacher</button>
+                </form>
+
+                <p class="text-center text-sm mt-4 text-slate-300">
+                    Already have an account?
+                    <a href="{% url 'teacher_login' %}" class="text-cyan-300 hover:text-cyan-200 underline-offset-2 hover:underline">Login</a>
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

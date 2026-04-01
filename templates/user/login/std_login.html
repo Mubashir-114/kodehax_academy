@@ -1,4 +1,5 @@
 {% extends "user/base.html" %}
+{% load static %}
 
 {% block title %}Student Login{% endblock %}
 {% block extra_head %}
@@ -28,28 +29,49 @@
 {% endblock %}
 
 {% block content %}
-<div class="mx-auto w-full max-w-md reveal">
-    <div class="auth-card p-7 md:p-8">
-        <p class="text-xs font-semibold tracking-[0.2em] text-emerald-300 text-center mb-2">WELCOME BACK</p>
-        <h2 class="text-2xl font-black text-center mb-6 text-white">Student Login</h2>
+<div class="px-4 pb-24 pt-8 sm:px-6 lg:px-8 lg:pt-10">
+    <div class="mx-auto max-w-7xl">
+        <nav class="glass mb-4 rounded-2xl px-5 py-4 sm:px-6">
+            <div class="flex items-center justify-between gap-4">
+                <a href="/" class="flex items-center gap-3">
+                    <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-10 w-10 rounded-xl object-cover">
+                    <div>
+                        <p class="text-[11px] uppercase tracking-[0.2em] text-slate-400">Kodehax</p>
+                        <p class="text-base font-black text-white">Academy</p>
+                    </div>
+                </a>
+                <div class="flex items-center gap-6 text-sm">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="{% url 'student_register' %}" class="nav-link">Register</a>
+                    <a href="{% url 'teacher_login' %}" class="nav-link">Teacher</a>
+                </div>
+            </div>
+        </nav>
 
-        <form method="POST" class="space-y-4">
-            {% csrf_token %}
+        <div class="mx-auto w-full max-w-md pb-6 reveal">
+            <div class="auth-card p-7 md:p-8">
+                <p class="mb-2 text-center text-xs font-semibold tracking-[0.2em] text-emerald-300">WELCOME BACK</p>
+                <h2 class="mb-6 text-center text-2xl font-black text-white">Student Login</h2>
 
-            {{ form.username }}
-            {{ form.password }}
+                <form method="POST" class="space-y-4">
+                    {% csrf_token %}
 
-            <button class="auth-btn">Login as Student</button>
-        </form>
+                    {{ form.username }}
+                    {{ form.password }}
 
-        <p class="text-center text-sm mt-4 text-slate-300">
-            <a href="{% url 'forgot_password' %}" class="text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline">Forgot password?</a>
-        </p>
+                    <button class="auth-btn">Login as Student</button>
+                </form>
 
-        <p class="text-center text-sm mt-4 text-slate-300">
-            Don't have an account?
-            <a href="{% url 'student_register' %}" class="text-emerald-300 hover:text-emerald-200 underline-offset-2 hover:underline">Register</a>
-        </p>
+                <p class="mt-4 text-center text-sm text-slate-300">
+                    <a href="{% url 'forgot_password' %}" class="text-emerald-300 underline-offset-2 hover:text-emerald-200 hover:underline">Forgot password?</a>
+                </p>
+
+                <p class="mt-4 text-center text-sm text-slate-300">
+                    Don't have an account?
+                    <a href="{% url 'student_register' %}" class="text-emerald-300 underline-offset-2 hover:text-emerald-200 hover:underline">Register</a>
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

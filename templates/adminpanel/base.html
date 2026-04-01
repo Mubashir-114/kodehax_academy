@@ -14,11 +14,68 @@
                 radial-gradient(circle at top right, rgba(16, 185, 129, 0.09), transparent 22%),
                 linear-gradient(180deg, #f8fbff 0%, #eef4f8 100%);
         }
+
+        @media (min-width: 1024px) {
+            body {
+                background:
+                    radial-gradient(circle at 8% 10%, rgba(14, 165, 233, 0.16), transparent 24%),
+                    radial-gradient(circle at 90% 10%, rgba(16, 185, 129, 0.14), transparent 20%),
+                    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.10), transparent 34%),
+                    linear-gradient(180deg, #f7fbff 0%, #eef4f8 56%, #edf3f8 100%);
+            }
+
+            .admin-shell {
+                padding: 1.5rem;
+            }
+
+            .admin-frame {
+                position: relative;
+                overflow: hidden;
+                border: 1px solid rgba(148, 163, 184, 0.35);
+                border-radius: 2rem;
+                background: rgba(255, 255, 255, 0.82);
+                box-shadow: 0 30px 70px rgba(15, 23, 42, 0.10);
+                backdrop-filter: blur(18px);
+            }
+
+            .admin-frame::before {
+                content: "";
+                position: absolute;
+                inset: 0 0 auto 0;
+                height: 13rem;
+                background:
+                    radial-gradient(circle at top left, rgba(14, 165, 233, 0.10), transparent 42%),
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.56), transparent);
+                pointer-events: none;
+            }
+
+            .admin-header {
+                position: relative;
+                z-index: 1;
+                border-bottom-color: rgba(226, 232, 240, 0.8);
+                background: rgba(255, 255, 255, 0.68);
+                backdrop-filter: blur(16px);
+            }
+
+            .admin-nav a {
+                border: 1px solid transparent;
+            }
+
+            .admin-nav a:hover {
+                border-color: rgba(148, 163, 184, 0.32);
+            }
+
+            .admin-main {
+                position: relative;
+                z-index: 1;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen text-slate-800">
-    <div class="min-h-screen">
-        <header class="border-b border-slate-200 bg-white">
+    <div class="admin-shell min-h-screen">
+        <div class="admin-frame min-h-screen">
+        <header class="admin-header border-b border-slate-200 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
                 <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                     <div class="flex items-center gap-4">
@@ -38,7 +95,7 @@
                         <a href="{% url 'home' %}" class="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50">Exit</a>
                     </div>
                 </div>
-                <nav class="mt-4 flex flex-wrap gap-2 text-sm">
+                <nav class="admin-nav mt-4 flex flex-wrap gap-2 text-sm">
                     <a href="{% url 'adminpanel_dashboard' %}" class="rounded-xl px-4 py-2.5 transition {% if current_section == 'dashboard' %}bg-slate-900 text-white shadow-sm{% else %}bg-slate-100 text-slate-700 hover:bg-slate-200{% endif %}">Dashboard</a>
                     <a href="{% url 'adminpanel_users' %}" class="rounded-xl px-4 py-2.5 transition {% if current_section == 'users' %}bg-slate-900 text-white shadow-sm{% else %}bg-slate-100 text-slate-700 hover:bg-slate-200{% endif %}">Users</a>
                     <a href="{% url 'adminpanel_teachers' %}" class="rounded-xl px-4 py-2.5 transition {% if current_section == 'teachers' %}bg-slate-900 text-white shadow-sm{% else %}bg-slate-100 text-slate-700 hover:bg-slate-200{% endif %}">Teachers</a>
@@ -52,7 +109,7 @@
             </div>
         </header>
 
-        <main>
+        <main class="admin-main">
             <section class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
                 {% if messages %}
                     <div class="space-y-2 mb-4">
@@ -66,6 +123,7 @@
                 {% block content %}{% endblock %}
             </section>
         </main>
+        </div>
     </div>
 </body>
 </html>
