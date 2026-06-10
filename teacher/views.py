@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import ClassRoomForm, TeacherProfileForm
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required as django_login_required
 from django.contrib import messages
 from .models import (
     Assignment,
@@ -32,6 +32,10 @@ from .services.performance import (
     get_teacher_dashboard_analytics,
     snapshot_assignment_performance,
 )
+
+
+def login_required(view_func):
+    return django_login_required(view_func, login_url="teacher_login")
 
 
 def _get_submission_count(assignment):

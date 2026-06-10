@@ -1,5 +1,7 @@
 import re
 
+from django.conf import settings
+
 from chat.gemini_client import generate_text
 
 
@@ -57,7 +59,20 @@ def _count_generated_questions(text):
     return len(matches)
 
 
+def _configuration_error():
+    if not settings.GEMINI_API_KEY:
+        return (
+            "AI generation is not configured yet. Add a valid GEMINI_API_KEY "
+            "to your .env file, then restart the Django server."
+        )
+    return ""
+
+
 def generate_quiz(topic, requested_count=None):
+    config_error = _configuration_error()
+    if config_error:
+        return config_error
+
     if isinstance(requested_count, int) and requested_count > 0:
         question_count = max(1, min(requested_count, 30))
     else:
@@ -118,10 +133,13 @@ Topic: {topic}
         return second_pass or first_pass
     except Exception as exc:
         print(f"Error generating quiz: {exc}")
-        return ""
+        return f"AI generation failed: {exc}"
 
 
 def generate_notes(topic):
+    config_error = _configuration_error()
+    if config_error:
+        return config_error
 
     prompt = f"""
 Create concise classroom lecture notes for: {topic}
@@ -143,7 +161,7 @@ Rules:
         return generate_text("gemini-2.5-flash", prompt)
     except Exception as exc:
         print(f"Error generating notes: {exc}")
-        return ""
+        return f"AI generation failed: {exc}"
 
 
 def strip_quiz_answers(quiz_text):
@@ -159,6 +177,9 @@ def strip_quiz_answers(quiz_text):
 
 
 def generate_coding_assignment(topic):
+    config_error = _configuration_error()
+    if config_error:
+        return config_error
 
     prompt = f"""
 You are creating a standalone coding assignment for students.
@@ -184,4 +205,4 @@ CRITICAL: Provide ONLY the coding problem details. Do NOT output MCQs or notes.
         return generate_text("gemini-2.5-flash", prompt)
     except Exception as exc:
         print(f"Error generating coding assignment: {exc}")
-        return ""
+        return f"AI generation failed: {exc}"

@@ -1,5 +1,6 @@
 from django import forms
 from .models import ClassRoom, TeacherProfile
+from student.upload_validation import validate_profile_image
 
 
 class ClassRoomForm(forms.ModelForm):
@@ -33,6 +34,11 @@ class ClassRoomForm(forms.ModelForm):
 
 
 class TeacherProfileForm(forms.ModelForm):
+    def clean_profile_picture(self):
+        profile_picture = self.cleaned_data.get("profile_picture")
+        if profile_picture:
+            validate_profile_image(profile_picture)
+        return profile_picture
 
     class Meta:
         model = TeacherProfile

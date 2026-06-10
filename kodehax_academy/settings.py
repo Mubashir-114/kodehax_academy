@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import importlib.util
 from pathlib import Path
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,16 +41,35 @@ def _load_env_file():
 _load_env_file()
 
 
+PRODUCTION = os.getenv("PRODUCTION", "False").lower() == "true"
+
+
+def _env_bool(name, default=False):
+    return os.getenv(name, str(default)).lower() == "true"
+
+
+def _env_list(name, default=""):
+    return [item.strip() for item in os.getenv(name, default).split(",") if item.strip()]
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&%ol@$%$r9j_54+*q3*dizg3xy6l=j)mhl=3ub!3+h=*b4ctzi'
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+if not SECRET_KEY:
+    if PRODUCTION:
+        raise ImproperlyConfigured("SECRET_KEY must be set in production.")
+    SECRET_KEY = "django-insecure-dev-only-change-me"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+DEBUG = _env_bool("DEBUG", False)
+if PRODUCTION and DEBUG:
+    raise ImproperlyConfigured("DEBUG must be False in production.")
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
+ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
+if PRODUCTION and not ALLOWED_HOSTS:
+    raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production.")
 
 
 # Application definition
@@ -71,7 +92,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'kodehax_academy.middleware.DeviceDetectionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -81,6 +101,9 @@ MIDDLEWARE = [
     'adminpanel.middleware.MaintenanceModeMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if importlib.util.find_spec("whitenoise"):
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'kodehax_academy.urls'
 
@@ -110,23 +133,29 @@ WSGI_APPLICATION = 'kodehax_academy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-PRODUCTION = os.getenv("PRODUCTION", "False").lower() == "true"
-
-if PRODUCTION and dj_database_url:
+if PRODUCTION:
+    db_url = os.environ.get('DB_URL')
+    if not db_url:
+        raise ImproperlyConfigured("DB_URL must be set in production.")
     DATABASES = {
-        'default': dj_database_url.parse(os.environ.get('DB_URL'))
+        'default': dj_database_url.parse(db_url)
     }
 else:
+    db_engine = os.getenv('DB_ENGINE', 'django.db.backends.mysql')
+    db_name = os.getenv('DB_NAME', 'kodehax_academy')
+    if db_engine == 'django.db.backends.sqlite3' and not os.path.isabs(db_name):
+        db_name = BASE_DIR / db_name
+
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'kodehax_academy',
-        'USER': 'root',
-        'PASSWORD': 'abc@123',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'default': {
+            'ENGINE': db_engine,
+            'NAME': db_name,
+            'USER': os.getenv('DB_USER', 'root'),
+            'PASSWORD': os.getenv('DB_PASSWORD', ''),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '3306'),
+        }
     }
-}
 
 
 # Password validation
@@ -174,11 +203,15 @@ STATICFILES_DIRS = [
     BASE_DIR / "static"
 ]
 AUTH_USER_MODEL = 'users.User'
+LOGIN_URL = "student_login"
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(10 * 1024 * 1024)))
+FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(5 * 1024 * 1024)))
 
 # SMTP is enabled when EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are provided.
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
@@ -196,7 +229,17 @@ EMAIL_BACKEND = os.getenv(
 )
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@kodehaxacademy.local")
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.ngrok-free.dev",
-    "https://*.ngrok-free.app",
-]
+CSRF_TRUSTED_ORIGINS = _env_list("CSRF_TRUSTED_ORIGINS")
+if not PRODUCTION:
+    CSRF_TRUSTED_ORIGINS.extend([
+        "https://*.ngrok-free.dev",
+        "https://*.ngrok-free.app",
+    ])
+
+SECURE_SSL_REDIRECT = _env_bool("SECURE_SSL_REDIRECT", PRODUCTION)
+SESSION_COOKIE_SECURE = _env_bool("SESSION_COOKIE_SECURE", PRODUCTION)
+CSRF_COOKIE_SECURE = _env_bool("CSRF_COOKIE_SECURE", PRODUCTION)
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000" if PRODUCTION else "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", PRODUCTION)
+SECURE_HSTS_PRELOAD = _env_bool("SECURE_HSTS_PRELOAD", PRODUCTION)
+SECURE_REFERRER_POLICY = os.getenv("SECURE_REFERRER_POLICY", "same-origin")

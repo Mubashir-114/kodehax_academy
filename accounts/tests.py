@@ -59,7 +59,7 @@ class LoginOTPFlowTests(TestCase):
 
         verify_response = self.client.post(reverse("verify_login_otp"), {"otp": self._extract_otp()})
 
-        self.assertRedirects(verify_response, reverse("student_dashboard"))
+        self.assertRedirects(verify_response, reverse("student_dashboard"), fetch_redirect_response=False)
         self.assertEqual(self.client.session.get("_auth_user_id"), str(self.student.pk))
         self.assertIsNone(self._pending_state())
 

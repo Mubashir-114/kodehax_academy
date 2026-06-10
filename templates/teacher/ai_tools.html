@@ -137,7 +137,7 @@
         <span class="px-3 py-1 bg-blue-900/20 text-blue-300 text-xs font-bold rounded-full uppercase tracking-wider">{{ tool_used|default:"content" }}</span>
       </div>
       <div class="bg-slate-900/50 rounded-2xl p-5 border border-slate-800 max-h-[520px] overflow-y-auto custom-scroll">
-        <div id="ai-output-render" class="ai-output"></div>
+        <div id="ai-output-render" class="ai-output"><pre class="whitespace-pre-wrap">{{ result }}</pre></div>
         <textarea id="ai-output-raw" class="hidden">{{ result }}</textarea>
       </div>
     </article>

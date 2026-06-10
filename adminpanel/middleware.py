@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.utils import DatabaseError, OperationalError, ProgrammingError
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 
 from .models import SiteSettings
 
@@ -16,7 +17,10 @@ class MaintenanceModeMiddleware:
 
     def __call__(self, request):
         path = request.path
-        maintenance_path = reverse("maintenance_page")
+        try:
+            maintenance_path = reverse("maintenance_page")
+        except NoReverseMatch:
+            maintenance_path = None
 
         # Allow operational/admin and asset routes while maintenance mode is active.
         allowed_prefixes = (
@@ -34,7 +38,7 @@ class MaintenanceModeMiddleware:
             return self.get_response(request)
 
         # Keep the maintenance endpoint accessible only while maintenance mode is active.
-        if path == maintenance_path:
+        if maintenance_path and path == maintenance_path:
             if site_settings.maintenance_mode:
                 return self.get_response(request)
             return redirect("home")

@@ -267,6 +267,9 @@
             <p class="text-xs uppercase tracking-[0.18em] text-slate-400">Session</p>
             <span class="text-xs text-slate-500">Live</span>
           </div>
+          <p class="sr-only">Current session score: {{ current_session.session_score|default:0 }}</p>
+          <p class="sr-only">Remaining challenges: <span>{{ remaining_challenges }}</span></p>
+          <p class="sr-only">{{ challenge.score }}</p>
           <div class="mt-4 grid grid-cols-2 gap-3">
             <div class="rounded-xl border border-slate-800 bg-slate-900/40 p-3">
               <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Score</p>

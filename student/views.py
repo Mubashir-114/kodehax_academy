@@ -4,12 +4,12 @@ from django.contrib import messages
 from django.conf import settings
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.core.exceptions import ValidationError
 import ast
 from .models import StudentProfile
 import json
 import re
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from chat.views import RESPONSE_STYLE_INSTRUCTION, format_ai_reply
@@ -45,6 +45,7 @@ from teacher.services.performance import (
     sync_code_submission_record,
     sync_file_submission_record,
 )
+from .upload_validation import validate_assignment_upload, validate_profile_image
 from teacher.services.course_readme import render_course_readme_html
 from kodehax_academy.mobile import render_for_device
 
@@ -552,11 +553,9 @@ def _run_text_chat(user, user_message, mode, history, memory_context=None):
         },
     }
 
-@csrf_exempt
+@login_required
+@require_POST
 def llama_chat(request):
-    if request.method != "POST":
-        return JsonResponse({"error": "POST method required"}, status=405)
-
     try:
         body = json.loads(request.body)
         user_message = body.get("message", "")
@@ -1155,6 +1154,11 @@ def submit_assignment(request, assignment_id):
         if not uploaded_file:
             messages.error(request, "Please select a file to submit.")
             return redirect("submit_assignment", assignment_id=assignment.id)
+        try:
+            validate_assignment_upload(uploaded_file)
+        except ValidationError as exc:
+            messages.error(request, exc.messages[0])
+            return redirect("submit_assignment", assignment_id=assignment.id)
 
         if existing_submission:
             existing_submission.file = uploaded_file
@@ -1425,7 +1429,13 @@ def edit_student_profile(request):
         profile.guardian_relation = request.POST.get("guardian_relation", "")
 
         if request.FILES.get("profile_picture"):
-            profile.profile_picture = request.FILES.get("profile_picture")
+            profile_picture = request.FILES.get("profile_picture")
+            try:
+                validate_profile_image(profile_picture)
+            except ValidationError as exc:
+                messages.error(request, exc.messages[0])
+                return redirect("edit_student_profile")
+            profile.profile_picture = profile_picture
 
         profile.save()
 
