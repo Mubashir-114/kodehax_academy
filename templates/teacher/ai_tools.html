@@ -115,6 +115,38 @@
     background: rgba(13, 148, 136, 0.14);
     color: #ccfbf1;
   }
+
+  .task-switch {
+    display: inline-flex;
+    gap: 0.45rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    background: rgba(15, 23, 42, 0.58);
+    padding: 0.35rem;
+  }
+
+  .task-tab {
+    min-height: 2.65rem;
+    border-radius: 0.75rem;
+    padding: 0 1rem;
+    color: #cbd5e1;
+    font-weight: 800;
+    transition: 0.2s ease;
+  }
+
+  .task-tab.is-active {
+    background: linear-gradient(135deg, #6366f1, #14b8a6);
+    color: #fff;
+    box-shadow: 0 12px 30px rgba(20, 184, 166, 0.18);
+  }
+
+  .task-panel {
+    display: none;
+  }
+
+  .task-panel.is-active {
+    display: block;
+  }
 </style>
 {% endblock %}
 
@@ -131,32 +163,61 @@
   </section>
 
   <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-1">
-    <form method="POST" class="space-y-6">
-      {% csrf_token %}
-      <input type="hidden" name="action" value="generate">
+    <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <label class="block text-sm font-semibold text-slate-200 mb-2">Topic or Subject</label>
-        <input type="text" name="topic" required value="{{ topic|default:'' }}" placeholder="Example: Neural Networks" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400 transition">
+        <p class="text-xs uppercase tracking-[0.14em] text-slate-400">Choose task</p>
+        <h4 class="mt-1 text-xl font-bold text-white">Separate AI workspaces</h4>
       </div>
-      <div>
-        <label class="block text-sm font-semibold text-slate-200 mb-2">Number of Quiz Questions</label>
-        <input
-          type="number"
-          name="question_count"
-          min="1"
-          max="30"
-          value="{{ question_count|default:'5' }}"
-          class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400 transition"
-        >
-        <p class="mt-1 text-xs text-slate-400">Used only for Quiz generation. Range: 1 to 30.</p>
+      <div class="task-switch" role="tablist" aria-label="AI task selector">
+        <button type="button" class="task-tab {% if not tool_used or tool_used == 'quiz' %}is-active{% endif %}" data-task-tab="quiz">Quiz</button>
+        <button type="button" class="task-tab {% if tool_used == 'notes' %}is-active{% endif %}" data-task-tab="notes">Notes</button>
+        <button type="button" class="task-tab {% if tool_used == 'coding' %}is-active{% endif %}" data-task-tab="coding">Coding</button>
       </div>
+    </div>
 
-      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-        <button type="submit" name="tool" value="quiz" class="btn-primary h-11 px-6">Generate Quiz</button>
-        <button type="submit" name="tool" value="notes" class="btn-muted h-11 border-emerald-500/40 px-6 hover:bg-emerald-900/20">Generate Lecture Notes</button>
-        <button type="submit" name="tool" value="coding" class="btn-muted h-11 border-purple-500/40 px-6 hover:bg-purple-900/20">Generate Coding Task</button>
-      </div>
-    </form>
+    <div class="task-panel {% if not tool_used or tool_used == 'quiz' %}is-active{% endif %}" data-task-panel="quiz">
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="generate">
+        <input type="hidden" name="tool" value="quiz">
+        <div>
+          <label class="block text-sm font-semibold text-slate-200 mb-2">Quiz Topic</label>
+          <input type="text" name="quiz_topic" required value="{{ quiz_topic|default:'' }}" placeholder="Example: Python strings and slicing" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400 transition">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-200 mb-2">Number of Quiz Questions</label>
+          <input type="number" name="question_count" min="1" max="30" value="{{ question_count|default:'5' }}" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-indigo-500/30 focus:border-indigo-400 transition">
+          <p class="mt-1 text-xs text-slate-400">Range: 1 to 30.</p>
+        </div>
+        <button type="submit" class="btn-primary h-11 px-6">Generate Quiz</button>
+      </form>
+    </div>
+
+    <div class="task-panel {% if tool_used == 'notes' %}is-active{% endif %}" data-task-panel="notes">
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="generate">
+        <input type="hidden" name="tool" value="notes">
+        <div>
+          <label class="block text-sm font-semibold text-slate-200 mb-2">Lecture Notes Topic</label>
+          <input type="text" name="notes_topic" required value="{{ notes_topic|default:'' }}" placeholder="Example: Recursion with stack tracing" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/25 focus:border-emerald-400 transition">
+        </div>
+        <button type="submit" class="btn-muted h-11 border-emerald-500/40 px-6 hover:bg-emerald-900/20">Generate Lecture Notes</button>
+      </form>
+    </div>
+
+    <div class="task-panel {% if tool_used == 'coding' %}is-active{% endif %}" data-task-panel="coding">
+      <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="generate">
+        <input type="hidden" name="tool" value="coding">
+        <div>
+          <label class="block text-sm font-semibold text-slate-200 mb-2">Coding Task Topic</label>
+          <input type="text" name="coding_topic" required value="{{ coding_topic|default:'' }}" placeholder="Example: Two pointer array problems" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-purple-500/25 focus:border-purple-400 transition">
+        </div>
+        <button type="submit" class="btn-muted h-11 border-purple-500/40 px-6 hover:bg-purple-900/20">Generate Coding Task</button>
+      </form>
+    </div>
   </section>
 
   {% if upload_success %}
@@ -251,6 +312,34 @@
         <button type="submit" class="btn-primary w-full px-4 py-2.5">Upload To Assignments</button>
       </form>
     </aside>
+    {% elif tool_used == "notes" %}
+    <aside class="xl:col-span-2 glass-card hover-lift p-4 sm:p-6 reveal delay-3">
+      <h4 class="text-lg font-bold text-white">Send Notes To Students</h4>
+      <p class="text-sm text-slate-300 mt-2">Publishes these lecture notes into each enrolled student&apos;s dashboard and class area.</p>
+
+      <form method="POST" class="mt-5 space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="publish_notes">
+        <textarea name="notes_content" class="hidden">{{ result }}</textarea>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-200 mb-2">Classroom</label>
+          <select name="class_id" required class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/25 focus:border-emerald-400 transition">
+            <option value="">Select classroom</option>
+            {% for class in classes %}
+            <option value="{{ class.id }}">{{ class.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-semibold text-slate-200 mb-2">Note Title</label>
+          <input type="text" name="notes_title" value="{% if topic %}{{ topic }}{% endif %}" placeholder="Example: Lecture Notes - Recursion" class="w-full rounded-xl border border-slate-600 bg-slate-900/50 px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-4 focus:ring-emerald-500/25 focus:border-emerald-400 transition">
+        </div>
+
+        <button type="submit" class="btn-primary w-full px-4 py-2.5">Send To Students</button>
+      </form>
+    </aside>
     {% endif %}
   </section>
   {% endif %}
@@ -264,6 +353,23 @@
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <script>
   (function () {
+    const tabs = Array.from(document.querySelectorAll("[data-task-tab]"));
+    const panels = Array.from(document.querySelectorAll("[data-task-panel]"));
+    const aiErrorPanel = document.querySelector(".ai-error-panel");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.taskTab;
+        tabs.forEach((item) => item.classList.toggle("is-active", item === tab));
+        panels.forEach((panel) => {
+          panel.classList.toggle("is-active", panel.dataset.taskPanel === target);
+        });
+        if (aiErrorPanel) {
+          aiErrorPanel.classList.add("hidden");
+        }
+      });
+    });
+
     const output = document.getElementById("ai-output-render");
     const raw = document.getElementById("ai-output-raw");
     if (!output || !raw) return;

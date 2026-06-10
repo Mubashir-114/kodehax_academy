@@ -33,6 +33,7 @@ from teacher.models import (
     Assignment,
     ClassRoom,
     CodeSubmission,
+    LectureNote,
     PerformanceRecord,
     QuizAnswer,
     QuizQuestion,
@@ -960,11 +961,15 @@ def student_dashboard(request):
     ).select_related("classroom")
     assignment_rows = _build_assignment_rows(assignments, request.user)
     submission_map = {row["assignment"].id: row for row in assignment_rows}
+    personal_notes = LectureNote.objects.filter(
+        classroom__students=request.user,
+    ).select_related("classroom", "teacher")[:4]
 
     return render_for_device(request, "student/dashboard.html", {
         "profile": profile,
         "joined_classes": joined_classes,
         "submission_map": submission_map,
+        "personal_notes": personal_notes,
         "skill_profile": skill_profile,
         "medium_topics": skill_profile.assessment_snapshot.get("medium_topics", []),
         "daily_challenge_set": daily_challenge_set,
@@ -1022,11 +1027,13 @@ def class_detail(request, class_id):
     archived_assignments = classroom.assignments.filter(
         due_date__lt=now
     ).order_by("-due_date")
+    lecture_notes = classroom.lecture_notes.select_related("teacher")[:10]
 
     return render_for_device(request, "student/class_detail.html", {
         "classroom": classroom,
         "active_assignment_rows": _build_assignment_rows(active_assignments, request.user),
         "archived_assignment_rows": _build_assignment_rows(archived_assignments, request.user),
+        "lecture_notes": lecture_notes,
         "classroom_readme_html": render_course_readme_html(classroom.readme_content),
         "has_classroom_readme": bool((classroom.readme_content or "").strip()),
     })

@@ -104,6 +104,32 @@ class Assignment(models.Model):
         return self.attempt_policy == self.ATTEMPT_POLICY_MULTIPLE
 
 
+class LectureNote(models.Model):
+    classroom = models.ForeignKey(
+        ClassRoom,
+        on_delete=models.CASCADE,
+        related_name="lecture_notes",
+    )
+    teacher = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="published_lecture_notes",
+    )
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["classroom", "created_at"]),
+            models.Index(fields=["teacher", "created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.title} - {self.classroom.name}"
+
+
 # -----------------------------
 # SUBMISSION
 # -----------------------------

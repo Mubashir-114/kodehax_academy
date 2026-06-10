@@ -9,6 +9,7 @@ from .models import (
     CodeSubmission,
     QuizAnswer,
     QuizQuestion,
+    LectureNote,
     Submission,
     TeacherProfile,
 )
@@ -857,9 +858,40 @@ def ai_tools(request):
                 result = quiz_content
                 tool_used = "quiz"
 
+        elif action == "publish_notes":
+            class_id = request.POST.get("class_id")
+            notes_title = request.POST.get("notes_title", "").strip()
+            notes_content = request.POST.get("notes_content", "")
+
+            if not class_id or not notes_content.strip():
+                upload_error = "Classroom and notes content are required."
+                result = notes_content
+                tool_used = "notes"
+            else:
+                classroom = get_object_or_404(
+                    ClassRoom,
+                    id=class_id,
+                    teacher=request.user,
+                )
+                title = notes_title or f"Lecture Notes - {classroom.name}"
+                LectureNote.objects.create(
+                    classroom=classroom,
+                    teacher=request.user,
+                    title=title,
+                    content=notes_content,
+                )
+                upload_success = f"Lecture notes sent to students in {classroom.name}."
+                result = notes_content
+                tool_used = "notes"
+
         else:
-            topic = request.POST.get("topic", "").strip()
             tool_used = request.POST.get("tool")
+            topic_field_map = {
+                "quiz": "quiz_topic",
+                "notes": "notes_topic",
+                "coding": "coding_topic",
+            }
+            topic = request.POST.get(topic_field_map.get(tool_used, "topic"), "").strip()
             raw_question_count = (request.POST.get("question_count") or "").strip()
             question_count = None
             if raw_question_count.isdigit():
@@ -881,6 +913,9 @@ def ai_tools(request):
         "result": result,
         "tool_used": tool_used,
         "topic": topic,
+        "quiz_topic": request.POST.get("quiz_topic", topic if tool_used == "quiz" else ""),
+        "notes_topic": request.POST.get("notes_topic", topic if tool_used == "notes" else ""),
+        "coding_topic": request.POST.get("coding_topic", topic if tool_used == "coding" else ""),
         "question_count": request.POST.get("question_count", "5") if request.method == "POST" else "5",
         "classes": classes,
         "upload_success": upload_success,
