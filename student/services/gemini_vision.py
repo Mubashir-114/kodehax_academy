@@ -9,7 +9,7 @@ from typing import Any
 from PIL import Image, UnidentifiedImageError
 
 from django.conf import settings
-from chat.gemini_client import generate_multimodal, list_generate_content_models
+from chat.gemini_client import GeminiServiceError, ai_error_payload, generate_multimodal, list_generate_content_models
 
 VISION_MODEL_CANDIDATES = (
     "models/gemini-2.5-flash-image",
@@ -165,7 +165,15 @@ def upload_image_to_gemini(uploaded_file) -> dict[str, Any]:
         uploaded_file.seek(0)
 
     if not settings.GEMINI_API_KEY:
-        raise ImageQueryError("Gemini API key is missing.", "Set GEMINI_API_KEY before using image analysis.")
+        error = ai_error_payload(
+            GeminiServiceError(
+                "missing_key",
+                "AI key is not connected",
+                "GEMINI_API_KEY is missing or empty in the active environment.",
+                "Add a valid GEMINI_API_KEY to .env, then restart the Django server.",
+            )
+        )
+        raise ImageQueryError(error["title"], error["suggestion"])
 
     response = None
     last_exc = None
@@ -186,13 +194,15 @@ def upload_image_to_gemini(uploaded_file) -> dict[str, Any]:
             uploaded_file.seek(0)
 
     if response is None:
-        detail = str(last_exc).strip() if last_exc else "No compatible Gemini vision model was available."
-        if settings.DEBUG and detail:
-            raise ImageQueryError(
-                f"Image analysis failed: {detail}. Attempted models: {', '.join(attempted_models)}",
-                "Check the Gemini model/API response, then retry.",
-            ) from last_exc
-        raise ImageQueryError("Image analysis failed.", "Try again in a moment or upload a clearer image.") from last_exc
+        if last_exc:
+            error = ai_error_payload(last_exc)
+            if settings.DEBUG:
+                raise ImageQueryError(
+                    f"{error['title']}: {error['message']} Attempted models: {', '.join(attempted_models)}",
+                    error["suggestion"],
+                ) from last_exc
+            raise ImageQueryError(error["title"], error["suggestion"]) from last_exc
+        raise ImageQueryError("No compatible Gemini vision model was available.", "Check Gemini model access, then retry.")
 
     raw_text = response or ""
     return process_response(raw_text)

@@ -34,6 +34,28 @@
     </div>
   </section>
 
+  <section class="rounded-[28px] border {% if ai_service_status.ok %}border-emerald-200 bg-emerald-50{% else %}border-amber-200 bg-amber-50{% endif %} p-6 shadow-sm">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div>
+        <p class="text-xs uppercase tracking-[0.22em] {% if ai_service_status.ok %}text-emerald-700{% else %}text-amber-700{% endif %}">AI Service Health</p>
+        <h3 class="mt-2 text-xl font-semibold text-slate-900">{{ ai_service_status.title }}</h3>
+        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-700">{{ ai_service_status.message }}</p>
+        {% if ai_service_status.suggestion %}
+        <p class="mt-3 rounded-2xl border border-white/70 bg-white/70 px-4 py-3 text-sm font-medium text-slate-800">{{ ai_service_status.suggestion }}</p>
+        {% endif %}
+      </div>
+      <div class="min-w-[180px] rounded-2xl border border-white/70 bg-white/75 px-4 py-3">
+        <p class="text-xs uppercase tracking-[0.14em] text-slate-500">Status Code</p>
+        <p class="mt-2 text-lg font-semibold text-slate-900">{{ ai_service_status.code }}</p>
+        {% if ai_service_status.last_seen %}
+        <p class="mt-1 text-xs text-slate-500">Last seen {{ ai_service_status.last_seen }}</p>
+        {% else %}
+        <p class="mt-1 text-xs text-slate-500">No recent issue recorded</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
   <section class="grid grid-cols-1 gap-4 md:grid-cols-3">
     {% for meter in analytics.meters %}
     <article class="rounded-3xl border border-slate-200 bg-white/90 p-5 shadow-sm">

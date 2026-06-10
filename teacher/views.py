@@ -18,6 +18,7 @@ from django.db.models import Count
 from datetime import timedelta
 import re
 from student.models import StudentProfile
+from chat.gemini_client import ai_error_payload, normalize_gemini_exception
 from .services.ai_tools import generate_quiz, generate_notes, generate_coding_assignment
 from .services.evaluation import (
     evaluate_quiz_for_assignment,
@@ -120,6 +121,13 @@ def _get_teacher_assignment_or_redirect(request, assignment_id):
         messages.error(request, "Assignment not found or you do not have access.")
         return None, redirect("teacher_dashboard")
     return assignment, None
+
+
+def _looks_like_ai_service_feedback(feedback):
+    return (feedback or "").startswith((
+        "AI service is busy",
+        "AI service is temporarily unavailable",
+    ))
 
 @login_required
 def teacher_dashboard(request):
@@ -514,7 +522,10 @@ def grade_file_submission(request, submission_id):
         action = request.POST.get("action", "manual")
         if action == "ai":
             grade_file_submission_ai(submission)
-            messages.success(request, "AI grading completed for file submission.")
+            if _looks_like_ai_service_feedback(submission.ai_feedback):
+                messages.error(request, "AI grading could not run. The feedback panel explains what needs attention.")
+            else:
+                messages.success(request, "AI grading completed for file submission.")
         else:
             score = request.POST.get("score", "0")
             feedback = request.POST.get("feedback", "")
@@ -549,7 +560,10 @@ def grade_code_submission(request, submission_id):
         action = request.POST.get("action", "manual")
         if action == "ai":
             grade_code_submission_ai(submission)
-            messages.success(request, "AI grading completed for code submission.")
+            if _looks_like_ai_service_feedback(submission.ai_feedback):
+                messages.error(request, "AI grading could not run. The feedback panel explains what needs attention.")
+            else:
+                messages.success(request, "AI grading completed for code submission.")
         else:
             score = request.POST.get("score", "0")
             feedback = request.POST.get("feedback", "")
@@ -767,6 +781,7 @@ def ai_tools(request):
     topic = ""
     upload_success = None
     upload_error = None
+    ai_error = None
 
     classes = ClassRoom.objects.filter(teacher=request.user)
 
@@ -850,12 +865,17 @@ def ai_tools(request):
             if raw_question_count.isdigit():
                 question_count = max(1, min(int(raw_question_count), 30))
 
-            if tool_used == "quiz" and topic:
-                result = generate_quiz(topic, requested_count=question_count)
-            elif tool_used == "notes" and topic:
-                result = generate_notes(topic)
-            elif tool_used == "coding" and topic:
-                result = generate_coding_assignment(topic)
+            try:
+                if tool_used == "quiz" and topic:
+                    result = generate_quiz(topic, requested_count=question_count)
+                elif tool_used == "notes" and topic:
+                    result = generate_notes(topic)
+                elif tool_used == "coding" and topic:
+                    result = generate_coding_assignment(topic)
+            except Exception as exc:  # noqa: BLE001
+                error = normalize_gemini_exception(exc)
+                ai_error = ai_error_payload(error)
+                messages.error(request, error.title)
 
     return render(request, "teacher/ai_tools.html", {
         "result": result,
@@ -865,4 +885,5 @@ def ai_tools(request):
         "classes": classes,
         "upload_success": upload_success,
         "upload_error": upload_error,
+        "ai_error": ai_error,
     })

@@ -379,6 +379,55 @@
     border-radius: 14px 14px 14px 2px;
   }
 
+  .ai-notice-bubble {
+    border-color: rgba(45, 212, 191, 0.35);
+    background:
+      linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(30, 41, 59, 0.82)),
+      repeating-linear-gradient(90deg, rgba(45, 212, 191, 0.08) 0 1px, transparent 1px 18px);
+    box-shadow: 0 18px 42px rgba(2, 6, 23, 0.28);
+  }
+
+  .ai-notice-card {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .ai-notice-kicker {
+    width: fit-content;
+    border-radius: 999px;
+    border: 1px solid rgba(45, 212, 191, 0.34);
+    background: rgba(20, 184, 166, 0.12);
+    padding: 0.28rem 0.62rem;
+    color: #99f6e4;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .ai-notice-title {
+    margin: 0;
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .ai-notice-text {
+    margin: 0;
+    color: #cbd5e1;
+    line-height: 1.65;
+  }
+
+  .ai-notice-suggestion {
+    margin: 0;
+    border-radius: 0.8rem;
+    border: 1px solid rgba(125, 211, 252, 0.26);
+    background: rgba(14, 165, 233, 0.1);
+    padding: 0.7rem 0.85rem;
+    color: #bae6fd;
+    line-height: 1.55;
+  }
+
   .assistant-name {
     color: var(--chat-accent);
   }
@@ -1723,6 +1772,36 @@
     chatBox.scrollTop = chatBox.scrollHeight;
   }
 
+  function appendAiNotice(payload = {}) {
+    const placeholder = document.getElementById("placeholder");
+    if (placeholder) placeholder.remove();
+
+    const chatBox = document.getElementById("chat-box");
+    const bubble = document.createElement("div");
+    bubble.classList.add("chat-bubble", "assistant-bubble", "ai-notice-bubble");
+
+    const title = payload.title || "AI is on standby";
+    const message = payload.message || payload.error || "The assistant could not complete that request.";
+    const suggestion = payload.suggestion || "Please try again later. The platform team can see the service details.";
+    const code = payload.code ? String(payload.code).replace(/_/g, " ") : "service notice";
+
+    bubble.innerHTML = `
+      <div class="bubble-meta">
+        <span class="bubble-name assistant-name">Assistant</span>
+        <span class="bubble-time">${nowTime()}</span>
+      </div>
+      <div class="ai-notice-card">
+        <span class="ai-notice-kicker">${escapeHtml(code)}</span>
+        <h4 class="ai-notice-title">${escapeHtml(title)}</h4>
+        <p class="ai-notice-text">${escapeHtml(message)}</p>
+        <p class="ai-notice-suggestion">${escapeHtml(suggestion)}</p>
+      </div>
+    `;
+
+    chatBox.appendChild(bubble);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }
+
   function appendImageMessage(imageUrl, label = "Uploaded image", timestamp = null) {
     const placeholder = document.getElementById("placeholder");
     if (placeholder) placeholder.remove();
@@ -1841,13 +1920,23 @@
 
     const validTypes = ["image/jpeg", "image/png"];
     if (!validTypes.includes(file.type)) {
-      appendMessage("assistant", "Error: Unsupported image type. Use a JPG or PNG image.");
+      appendAiNotice({
+        title: "Unsupported image type",
+        message: "That file cannot be analyzed by the image assistant.",
+        suggestion: "Use a JPG or PNG image.",
+        code: "image"
+      });
       event.target.value = "";
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      appendMessage("assistant", "Error: Image exceeds the 5MB limit. Upload a smaller image.");
+      appendAiNotice({
+        title: "Image is too large",
+        message: "The upload is above the 5MB image analysis limit.",
+        suggestion: "Compress the image or upload a smaller screenshot.",
+        code: "image"
+      });
       event.target.value = "";
       return;
     }
@@ -1892,7 +1981,12 @@
       removeTyping();
 
       if (!response.ok) {
-        appendMessage("assistant", `Error: ${data.error || "Image analysis failed."}\n\nSuggestion: ${data.suggestion || "Try clearer image."}`);
+        appendAiNotice({
+          title: data.error || "Image analysis paused",
+          message: "The image request could not be completed.",
+          suggestion: data.suggestion || "Try a clearer image or retry in a moment.",
+          code: "image"
+        });
         const previewRow = document.getElementById("image-preview-row");
         previewRow.classList.remove("hidden");
         previewRow.innerHTML = `
@@ -1921,7 +2015,12 @@
       await fetchSessions();
     } catch (err) {
       removeTyping();
-      appendMessage("assistant", "Error: Could not upload the image.\n\nSuggestion: Check your connection and try again.");
+      appendAiNotice({
+        title: "Could not upload the image",
+        message: "The image stayed on your screen, but the upload did not finish.",
+        suggestion: "Check your connection and try again.",
+        code: "network"
+      });
     } finally {
       input.disabled = false;
       sendBtn.disabled = false;
@@ -1975,11 +2074,21 @@
         }
         await fetchSessions();
       } else {
-        appendMessage("assistant", "Error: " + (data.error || "Unknown error"));
+        appendAiNotice(data.ai_error || {
+          title: "AI response paused",
+          message: data.error || "The assistant could not complete that request.",
+          suggestion: "Try again in a moment.",
+          code: "chat"
+        });
       }
     } catch (err) {
       removeTyping();
-      appendMessage("assistant", "Could not connect to the AI service. Check your Gemini API key and server logs.");
+      appendAiNotice({
+        title: "Could not reach the AI service",
+        message: "The page stayed open, but the request could not connect to the server.",
+        suggestion: "Check your connection, then send the message again.",
+        code: "network"
+      });
     } finally {
       input.disabled = false;
       syncSendButton();

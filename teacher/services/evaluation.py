@@ -7,7 +7,7 @@ from typing import Any
 
 from django.conf import settings
 from teacher.models import Assignment, CodeSubmission, QuizAnswer, QuizResult, Submission
-from chat.gemini_client import generate_text
+from chat.gemini_client import ai_error_payload, generate_text
 
 
 def clamp_score(score: float, max_score: float) -> float:
@@ -59,7 +59,8 @@ def _ai_grade(prompt: str, max_score: float) -> tuple[float, str]:
     try:
         content = generate_text("gemini-2.5-flash", prompt).strip()
     except Exception as exc:  # noqa: BLE001
-        return 0.0, f"AI grading failed: {exc}"
+        error = ai_error_payload(exc)
+        return 0.0, f"{error['title']}\n{error['message']}\nSuggestion: {error['suggestion']}"
 
     score_value = 0.0
     for token in content.replace("\n", " ").split():
@@ -104,6 +105,13 @@ def _parse_rubric_score(value: Any, maximum: float = 10.0) -> float:
     if numeric > maximum:
         return maximum
     return numeric
+
+
+def _is_ai_service_feedback(feedback: str) -> bool:
+    return (feedback or "").startswith((
+        "AI service is busy",
+        "AI service is temporarily unavailable",
+    ))
 
 
 def _check_python_syntax(code: str) -> tuple[bool, str]:
@@ -158,9 +166,20 @@ def grade_code_submission_ai(code_submission: CodeSubmission) -> CodeSubmission:
     try:
         raw_feedback = generate_text("gemini-2.5-flash", prompt).strip()
     except Exception as exc:  # noqa: BLE001
-        raw_feedback = f"AI grading failed: {exc}"
+        error = ai_error_payload(exc)
+        raw_feedback = f"{error['title']}\n{error['message']}\nSuggestion: {error['suggestion']}"
 
     rubric_data = _extract_json_dict(raw_feedback)
+
+    if not rubric_data and _is_ai_service_feedback(raw_feedback):
+        code_submission.score = 0.0
+        code_submission.ai_feedback = raw_feedback
+        code_submission.save(update_fields=["score", "ai_feedback"])
+        from teacher.services.performance import sync_code_submission_record
+
+        sync_code_submission_record(code_submission, evaluation_type="ai")
+        return code_submission
+
     syntax_score = _parse_rubric_score(rubric_data.get("syntax"))
     logic_score = _parse_rubric_score(rubric_data.get("logic"))
     structure_score = _parse_rubric_score(rubric_data.get("structure"))

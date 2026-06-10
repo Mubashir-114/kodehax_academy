@@ -2,7 +2,7 @@ import re
 
 from django.conf import settings
 
-from chat.gemini_client import generate_text
+from chat.gemini_client import GeminiServiceError, generate_text, normalize_gemini_exception
 
 
 _NUMBER_WORDS = {
@@ -61,17 +61,16 @@ def _count_generated_questions(text):
 
 def _configuration_error():
     if not settings.GEMINI_API_KEY:
-        return (
-            "AI generation is not configured yet. Add a valid GEMINI_API_KEY "
-            "to your .env file, then restart the Django server."
+        raise GeminiServiceError(
+            "missing_key",
+            "AI key is not connected",
+            "The content studio is ready, but the Gemini API key is missing or not loaded.",
+            "Add GEMINI_API_KEY to .env and restart the Django server.",
         )
-    return ""
 
 
 def generate_quiz(topic, requested_count=None):
-    config_error = _configuration_error()
-    if config_error:
-        return config_error
+    _configuration_error()
 
     if isinstance(requested_count, int) and requested_count > 0:
         question_count = max(1, min(requested_count, 30))
@@ -133,13 +132,11 @@ Topic: {topic}
         return second_pass or first_pass
     except Exception as exc:
         print(f"Error generating quiz: {exc}")
-        return f"AI generation failed: {exc}"
+        raise normalize_gemini_exception(exc) from exc
 
 
 def generate_notes(topic):
-    config_error = _configuration_error()
-    if config_error:
-        return config_error
+    _configuration_error()
 
     prompt = f"""
 Create concise classroom lecture notes for: {topic}
@@ -161,7 +158,7 @@ Rules:
         return generate_text("gemini-2.5-flash", prompt)
     except Exception as exc:
         print(f"Error generating notes: {exc}")
-        return f"AI generation failed: {exc}"
+        raise normalize_gemini_exception(exc) from exc
 
 
 def strip_quiz_answers(quiz_text):
@@ -177,9 +174,7 @@ def strip_quiz_answers(quiz_text):
 
 
 def generate_coding_assignment(topic):
-    config_error = _configuration_error()
-    if config_error:
-        return config_error
+    _configuration_error()
 
     prompt = f"""
 You are creating a standalone coding assignment for students.
@@ -205,4 +200,4 @@ CRITICAL: Provide ONLY the coding problem details. Do NOT output MCQs or notes.
         return generate_text("gemini-2.5-flash", prompt)
     except Exception as exc:
         print(f"Error generating coding assignment: {exc}")
-        return f"AI generation failed: {exc}"
+        raise normalize_gemini_exception(exc) from exc

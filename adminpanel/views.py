@@ -25,6 +25,7 @@ from teacher.models import (
 )
 from teacher.services.performance import get_admin_analytics_page, get_admin_dashboard_analytics
 from kodehax_academy.mobile import render_for_device
+from chat.gemini_client import get_ai_service_status
 
 from .decorators import admin_required
 from .models import AdminUserState, PlatformSettings, SiteSettings
@@ -74,6 +75,7 @@ def dashboard(request):
         "analytics": analytics,
         "recent_users": recent_users,
         "recent_assignments": recent_assignments,
+        "ai_service_status": get_ai_service_status(),
     }
     return _render_admin(request, "adminpanel/dashboard.html", context)
 

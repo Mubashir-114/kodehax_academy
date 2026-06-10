@@ -13,7 +13,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from chat.views import RESPONSE_STYLE_INSTRUCTION, format_ai_reply
-from chat.gemini_client import generate_text
+from chat.gemini_client import ai_error_payload, generate_text, normalize_gemini_exception
 from daily_challenges.models import DailyChallengeSession, StudentPoints
 from daily_challenges.services import get_today_challenge_set, refresh_challenge_set
 from skill_assessment.models import StudentSkill
@@ -570,7 +570,8 @@ def llama_chat(request):
     try:
         return JsonResponse(_run_text_chat(request.user, user_message, mode, history))
     except Exception as e:
-        return JsonResponse({"error": f"Gemini error: {type(e).__name__}: {str(e)}"}, status=500)
+        error = normalize_gemini_exception(e)
+        return JsonResponse({"error": error.message, "ai_error": ai_error_payload(error)}, status=error.status_code)
 
 def chat_page(request):
     cleanup_expired_sessions(delete=False)
@@ -743,7 +744,8 @@ def chat_session_message_api(request, session_id):
             memory_context=memory_context,
         )
     except Exception as exc:
-        return JsonResponse({"error": f"Gemini error: {type(exc).__name__}: {str(exc)}"}, status=500)
+        error = normalize_gemini_exception(exc)
+        return JsonResponse({"error": error.message, "ai_error": ai_error_payload(error)}, status=error.status_code)
 
     assistant_message = append_message(session, ChatMessage.ROLE_ASSISTANT, ai_payload["reply"])
     return JsonResponse({
