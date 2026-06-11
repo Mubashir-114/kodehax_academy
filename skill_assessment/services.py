@@ -713,7 +713,15 @@ def derive_topic_summary(topic_breakdown):
     strong_topics = []
     medium_topics = []
 
+    # Defensive check: ensure topic_breakdown is a dict
+    if not isinstance(topic_breakdown, dict):
+        return weak_topics, strong_topics, medium_topics
+
     for topic, stats in topic_breakdown.items():
+        # Defensive check: ensure stats is a dict
+        if not isinstance(stats, dict):
+            continue
+        
         status = stats.get("status", "medium")
         if status == "weak":
             weak_topics[topic] = stats

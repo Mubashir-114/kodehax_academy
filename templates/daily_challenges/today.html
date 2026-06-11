@@ -10,15 +10,15 @@
     <div class="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] xl:items-center">
       <div class="max-w-3xl">
         <p class="text-xs uppercase tracking-[0.2em] text-teal-300/80">Publishes Daily At 10:00 AM</p>
-        <h2 class="mt-2 text-xl font-black text-white md:text-2xl lg:text-3xl">9 adaptive coding problems</h2>
-        <p class="mt-2 max-w-3xl text-sm text-slate-300">Each day includes 3 Easy, 3 Medium, and 3 Hard challenges. Solve 2 Easy questions to unlock Medium, then solve 2 Medium questions to unlock Hard.</p>
+        <h2 class="mt-2 text-xl font-black text-white md:text-2xl lg:text-3xl">{{ total_challenges }} adaptive coding problems</h2>
+        <p class="mt-2 max-w-3xl text-sm text-slate-300">Today's mix adapts to your current skill profile. Solve 2 Easy questions to unlock Medium, then solve 2 Medium questions to unlock Hard.</p>
       </div>
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-[1.05fr_0.95fr]">
         <div class="grid grid-cols-1 gap-4">
           <div class="rounded-2xl border border-teal-400/20 bg-teal-400/10 px-5 py-4" data-countdown-card data-started-at="{{ challenge_set.published_at|default:challenge_set.created_at|date:'c' }}" data-expires-at="{{ challenge_set.expires_at|date:'c' }}">
             <p class="text-xs uppercase tracking-[0.18em] text-teal-200">Session Score</p>
             <div class="mt-2 flex items-end justify-between gap-4">
-              <p class="text-3xl font-black text-white">{{ current_session.session_score|default:0 }} / 105</p>
+              <p class="text-3xl font-black text-white">{{ current_session.session_score|default:0 }} / {{ max_score }}</p>
               <p class="text-xs uppercase tracking-[0.16em] text-teal-100/80">{{ current_session.questions_solved|default:0 }} solved</p>
             </div>
             <div class="mt-4 flex items-center gap-3 border-t border-teal-400/20 pt-3">
@@ -71,19 +71,19 @@
     <div class="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
       <div class="rounded-2xl border border-slate-700 bg-slate-950/35 p-4">
         <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Solved</p>
-        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.solved_count }} / 9</p>
+        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.solved_count }} / {{ total_challenges }}</p>
       </div>
       <div class="rounded-2xl border border-slate-700 bg-slate-950/35 p-4">
         <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Easy Cleared</p>
-        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.easy_solved_count }} / 3</p>
+        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.easy_solved_count }} / {{ easy_total }}</p>
       </div>
       <div class="rounded-2xl border border-slate-700 bg-slate-950/35 p-4">
         <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Medium Cleared</p>
-        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.medium_solved_count }} / 3</p>
+        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.medium_solved_count }} / {{ medium_total }}</p>
       </div>
       <div class="rounded-2xl border border-slate-700 bg-slate-950/35 p-4">
         <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Hard Cleared</p>
-        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.hard_solved_count }} / 3</p>
+        <p class="mt-2 text-2xl font-black text-white">{{ challenge_set.hard_solved_count }} / {{ hard_total }}</p>
       </div>
     </div>
   </section>

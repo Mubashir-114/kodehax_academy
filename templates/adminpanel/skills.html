@@ -73,11 +73,13 @@
             <td class="py-4 pr-4 font-semibold text-slate-900">{{ item.skill_score }}</td>
             <td class="py-4 pr-4">
               <div class="flex flex-wrap gap-2">
-                {% for topic, stats in item.weak_topics.items %}
-                <span class="inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700">{{ topic|title }}</span>
-                {% empty %}
-                <span class="text-slate-400">None</span>
-                {% endfor %}
+                {% if item.weak_topics %}
+                  {% for topic, stats in item.weak_topics.items %}
+                  <span class="inline-flex rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700">{{ topic|title }}</span>
+                  {% endfor %}
+                {% else %}
+                  <span class="text-slate-400">None</span>
+                {% endif %}
               </div>
             </td>
             <td class="py-4 pr-4 text-slate-500">{{ item.updated_at|date:"M d, Y H:i" }}</td>

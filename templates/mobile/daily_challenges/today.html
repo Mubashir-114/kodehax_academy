@@ -156,19 +156,19 @@
     <div class="dc-stat-grid mt-3">
         <div class="dc-stat-tile p-2.5">
             <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Solved</p>
-            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.solved_count|default:0 }} / 9</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.solved_count|default:0 }} / {{ total_challenges }}</p>
         </div>
         <div class="dc-stat-tile p-2.5">
             <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Easy Cleared</p>
-            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.easy_solved_count|default:0 }} / 3</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.easy_solved_count|default:0 }} / {{ easy_total }}</p>
         </div>
         <div class="dc-stat-tile p-2.5">
             <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Medium Cleared</p>
-            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.medium_solved_count|default:0 }} / 3</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.medium_solved_count|default:0 }} / {{ medium_total }}</p>
         </div>
         <div class="dc-stat-tile p-2.5">
             <p class="text-[11px] uppercase tracking-[0.16em] text-slate-400">Hard Cleared</p>
-            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.hard_solved_count|default:0 }} / 3</p>
+            <p class="mt-1.5 text-xl font-black text-white">{{ challenge_set.hard_solved_count|default:0 }} / {{ hard_total }}</p>
         </div>
     </div>
 </section>

@@ -132,11 +132,13 @@
     <article class="glass-card p-6">
       <p class="text-xs uppercase tracking-[0.18em] text-rose-300/80">Needs Improvement</p>
       <div class="mt-4 flex flex-wrap gap-2">
-        {% for topic, stats in skill_profile.weak_topics.items %}
-        <span class="rounded-full border border-rose-400/20 bg-rose-400/10 px-3 py-1 text-sm font-semibold text-rose-200">{{ topic|title }}</span>
-        {% empty %}
-        <p class="text-sm text-slate-400">No weak topics detected.</p>
-        {% endfor %}
+        {% if skill_profile.weak_topics %}
+          {% for topic, stats in skill_profile.weak_topics.items %}
+          <span class="rounded-full border border-rose-400/20 bg-rose-400/10 px-3 py-1 text-sm font-semibold text-rose-200">{{ topic|title }}</span>
+          {% endfor %}
+        {% else %}
+          <p class="text-sm text-slate-400">No weak topics detected.</p>
+        {% endif %}
       </div>
     </article>
   </section>

@@ -24,6 +24,8 @@ from .services import (
     refresh_challenge_set,
     submit_solution_for_challenge,
     unlock_hint,
+    _get_level_totals,
+    _calculate_completion_threshold,
 )
 
 User = get_user_model()
@@ -45,6 +47,8 @@ def _ensure_student(request):
 
 def _challenge_groups(challenge_set):
     unlocks = level_unlock_state(challenge_set)
+    level_totals = _get_level_totals(challenge_set)
+    
     labels = {
         1: ("Level 1", "Easy"),
         2: ("Level 2", "Medium"),
@@ -52,20 +56,45 @@ def _challenge_groups(challenge_set):
     }
     items = []
     ordered = list(challenge_set.challenges.select_related("problem").order_by("level", "question_number", "id"))
+    
+    # Calculate thresholds for each level
+    easy_threshold = _calculate_completion_threshold(level_totals[1])
+    medium_threshold = _calculate_completion_threshold(level_totals[2])
+    
     for level in (1, 2, 3):
+        if unlocks[level]:
+            required_text = "Available now"
+        else:
+            if level == 2:
+                required_text = f"Unlock after completing 75% of Easy questions ({easy_threshold}/{level_totals[1]} solved)"
+            else:  # level == 3
+                required_text = f"Unlock after completing 75% of Medium questions ({medium_threshold}/{level_totals[2]} solved)"
+        
         items.append(
             {
                 "level": level,
                 "title": labels[level][0],
                 "difficulty": labels[level][1],
                 "unlocked": unlocks[level],
-                "required_text": "Available now" if unlocks[level] else (
-                    "Unlocks after solving 2 Easy questions" if level == 2 else "Unlocks after solving 2 Medium questions"
-                ),
+                "required_text": required_text,
                 "challenges": [challenge for challenge in ordered if challenge.level == level],
             }
         )
     return items
+
+
+def _challenge_set_summary(challenge_set):
+    challenges = list(challenge_set.challenges.all())
+    easy_total = sum(1 for challenge in challenges if challenge.level == 1)
+    medium_total = sum(1 for challenge in challenges if challenge.level == 2)
+    hard_total = sum(1 for challenge in challenges if challenge.level == 3)
+    return {
+        "total_challenges": len(challenges),
+        "max_score": sum(challenge.points for challenge in challenges),
+        "easy_total": easy_total,
+        "medium_total": medium_total,
+        "hard_total": hard_total,
+    }
 
 
 def _workspace_navigation(challenge_set, current_challenge):
@@ -145,6 +174,16 @@ def today_challenges(request):
         .prefetch_related("challenges__problem")
         .get()
     )
+    
+    # Ensure all challenges have valid JSON fields
+    for challenge in challenge_set.challenges.all():
+        if not isinstance(challenge.test_cases, list):
+            challenge.test_cases = []
+        if not isinstance(challenge.generated_parameters, dict):
+            challenge.generated_parameters = {}
+        if not isinstance(challenge.latest_result, dict):
+            challenge.latest_result = {}
+    
     remaining_time = max(challenge_set.expires_at - timezone.now(), timedelta(0))
     remaining_time_seconds = int(remaining_time.total_seconds())
 
@@ -153,6 +192,11 @@ def today_challenges(request):
         student=request.user,
         date=challenge_set.date,
     ).first()
+    
+    # Ensure session has valid JSON fields
+    if current_session:
+        if not isinstance(current_session.attempted_challenge_ids, list):
+            current_session.attempted_challenge_ids = []
 
     return render_for_device(
         request,
@@ -163,6 +207,7 @@ def today_challenges(request):
             "remaining_time_seconds": remaining_time_seconds,
             "remaining_time_label": _format_remaining_time(remaining_time_seconds),
             "challenge_groups": _challenge_groups(challenge_set),
+            **_challenge_set_summary(challenge_set),
             "level_unlocks": level_unlock_state(challenge_set),
             "student_points": points,
             "current_session": current_session,
@@ -176,11 +221,15 @@ def submit_solution(request, challenge_id):
     if redirect_response:
         return redirect_response
 
-    challenge = get_object_or_404(
-        DailyChallenge.objects.select_related("student", "problem", "challenge_set"),
-        id=challenge_id,
-        student=request.user,
-    )
+    try:
+        challenge = DailyChallenge.objects.select_related("student", "problem", "challenge_set").get(id=challenge_id)
+    except DailyChallenge.DoesNotExist:
+        messages.error(request, "This challenge does not exist.")
+        return redirect("daily_challenges_today")
+    
+    if challenge.student != request.user:
+        messages.error(request, "You do not have permission to access this challenge.")
+        return redirect("daily_challenges_today")
     refresh_challenge_set(challenge.challenge_set)
     if not can_access_challenge(challenge):
         messages.error(request, "This level is locked. Solve the required earlier questions first.")
@@ -259,6 +308,7 @@ def submit_solution(request, challenge_id):
             "editor_code": editor_code,
             "level_unlocks": unlocks,
             "challenge_groups": _challenge_groups(challenge.challenge_set),
+            **_challenge_set_summary(challenge.challenge_set),
             "previous_challenge": previous_challenge,
             "next_challenge": next_challenge,
             "next_challenge_unlocked": bool(next_challenge and unlocks.get(next_challenge.level, False)),

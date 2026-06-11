@@ -940,6 +940,14 @@ def student_dashboard(request):
 
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
 
+    # Ensure weak_topics is always a dict, never None or a list
+    if not isinstance(skill_profile.weak_topics, dict):
+        skill_profile.weak_topics = {}
+    
+    # Ensure strong_topics is always a list
+    if not isinstance(skill_profile.strong_topics, list):
+        skill_profile.strong_topics = []
+
     joined_classes = ClassRoom.objects.filter(
         students=request.user
     ).select_related("teacher").prefetch_related("assignments").order_by("-created_at")

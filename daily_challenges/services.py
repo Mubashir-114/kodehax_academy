@@ -1,6 +1,8 @@
 import ast
 import json
 import itertools
+import logging
+import math
 import random
 import re
 import subprocess
@@ -34,10 +36,14 @@ from .models import (
 )
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 CHALLENGE_TZ = ZoneInfo(settings.DAILY_CHALLENGE_TIMEZONE)
 PUBLISH_HOUR = settings.DAILY_CHALLENGE_PUBLISH_HOUR
 
 HINT_COST = 5
+DAILY_CHALLENGE_SIZE = 15
+RECENT_SOLVED_LOOKBACK_DAYS = 14
+WEIGHTED_RANDOM_WINDOW = 5
 LEVEL_SIZE = 3
 SESSION_FAILURE_DEDUCTION = 1
 PENALTY_WEIGHTS = {
@@ -63,6 +69,38 @@ POOL_MAP = {
         CodingProblem.DIFFICULTY_INTERMEDIATE,
     ],
     DailyChallenge.DIFFICULTY_HARD: [CodingProblem.DIFFICULTY_ADVANCED],
+}
+ADJACENT_DIFFICULTIES = {
+    DailyChallenge.DIFFICULTY_EASY: [DailyChallenge.DIFFICULTY_MEDIUM, DailyChallenge.DIFFICULTY_HARD],
+    DailyChallenge.DIFFICULTY_MEDIUM: [DailyChallenge.DIFFICULTY_EASY, DailyChallenge.DIFFICULTY_HARD],
+    DailyChallenge.DIFFICULTY_HARD: [DailyChallenge.DIFFICULTY_MEDIUM, DailyChallenge.DIFFICULTY_EASY],
+}
+DIFFICULTY_DISTRIBUTION_BY_SKILL = {
+    StudentSkill.LEVEL_BEGINNER: {
+        DailyChallenge.DIFFICULTY_EASY: 9,
+        DailyChallenge.DIFFICULTY_MEDIUM: 5,
+        DailyChallenge.DIFFICULTY_HARD: 1,
+    },
+    StudentSkill.LEVEL_BASIC: {
+        DailyChallenge.DIFFICULTY_EASY: 6,
+        DailyChallenge.DIFFICULTY_MEDIUM: 7,
+        DailyChallenge.DIFFICULTY_HARD: 2,
+    },
+    StudentSkill.LEVEL_INTERMEDIATE: {
+        DailyChallenge.DIFFICULTY_EASY: 4,
+        DailyChallenge.DIFFICULTY_MEDIUM: 7,
+        DailyChallenge.DIFFICULTY_HARD: 4,
+    },
+    StudentSkill.LEVEL_ADVANCED: {
+        DailyChallenge.DIFFICULTY_EASY: 2,
+        DailyChallenge.DIFFICULTY_MEDIUM: 7,
+        DailyChallenge.DIFFICULTY_HARD: 6,
+    },
+    StudentSkill.LEVEL_EXPERT: {
+        DailyChallenge.DIFFICULTY_EASY: 1,
+        DailyChallenge.DIFFICULTY_MEDIUM: 5,
+        DailyChallenge.DIFFICULTY_HARD: 9,
+    },
 }
 
 RUNNER_SCRIPT = r"""
@@ -386,6 +424,8 @@ def _publish_at_for_date(challenge_date):
 def _normalized_topic_keys(weak_topics):
     if isinstance(weak_topics, dict):
         return [key.lower() for key in weak_topics.keys()]
+    if isinstance(weak_topics, list):
+        return [str(key).lower() for key in weak_topics]
     return []
 
 
@@ -405,22 +445,152 @@ def _level_for_difficulty(difficulty):
     }[difficulty]
 
 
-def _pick_problems(all_problems, selected_ids, difficulty, weak_topics):
-    allowed = POOL_MAP[difficulty]
-    candidates = [problem for problem in all_problems if problem.id not in selected_ids and problem.difficulty in allowed]
-    weak_candidates = [problem for problem in candidates if problem.topic.lower() in weak_topics]
-    pool = weak_candidates or candidates
-    random.shuffle(pool)
-    picked = list(pool[:LEVEL_SIZE])
-    if len(picked) < LEVEL_SIZE:
-        fallback = [
-            problem
-            for problem in all_problems
-            if problem.id not in selected_ids and problem.id not in {item.id for item in picked}
-        ]
-        random.shuffle(fallback)
-        picked.extend(fallback[: LEVEL_SIZE - len(picked)])
-    return picked
+def _difficulty_distribution_for_student(student):
+    profile = StudentSkill.objects.filter(student=student).only("skill_level").first()
+    skill_level = profile.skill_level if profile else StudentSkill.LEVEL_BEGINNER
+    return DIFFICULTY_DISTRIBUTION_BY_SKILL.get(
+        skill_level,
+        DIFFICULTY_DISTRIBUTION_BY_SKILL[StudentSkill.LEVEL_BEGINNER],
+    )
+
+
+def _recently_solved_problem_ids(student):
+    cutoff = timezone.now() - timedelta(days=RECENT_SOLVED_LOOKBACK_DAYS)
+    return set(
+        StudentChallengeAttempt.objects.filter(
+            student=student,
+            solved=True,
+            submitted_at__gte=cutoff,
+        ).values_list("challenge__problem_id", flat=True)
+    )
+
+
+def _weighted_problem_pool(problems, selected_ids, difficulty, weak_topics, excluded_problem_ids=None):
+    allowed = set(POOL_MAP[difficulty])
+    excluded_problem_ids = excluded_problem_ids or set()
+    candidates = [
+        problem
+        for problem in problems
+        if problem.id not in selected_ids
+        and problem.id not in excluded_problem_ids
+        and problem.difficulty in allowed
+    ]
+    random.shuffle(candidates)
+    return sorted(
+        candidates,
+        key=lambda problem: (
+            0 if (problem.topic or "").lower() in weak_topics else 1,
+            random.random(),
+        ),
+    )
+
+
+def _choose_weighted_problem(candidates):
+    if not candidates:
+        return None
+    return random.choice(candidates[:WEIGHTED_RANDOM_WINDOW])
+
+
+def _select_for_difficulty(problems, selected_ids, difficulty, quota, weak_topics, recent_problem_ids):
+    selected = []
+    for excluded_problem_ids in (recent_problem_ids, set()):
+        while len(selected) < quota:
+            pool = _weighted_problem_pool(
+                problems,
+                selected_ids,
+                difficulty,
+                weak_topics,
+                excluded_problem_ids=excluded_problem_ids,
+            )
+            problem = _choose_weighted_problem(pool)
+            if problem is None:
+                break
+            selected.append((problem, difficulty))
+            selected_ids.add(problem.id)
+        if len(selected) == quota:
+            return selected
+    return selected
+
+
+def select_daily_problems(student, challenge_date=None):
+    """
+    Select the 15 CodingProblem rows for a student's daily challenge set.
+
+    Step 1: read the student's current StudentSkill.skill_level at generation time
+    and map it to the required Easy/Medium/Hard distribution.
+
+    Step 2: filter active CodingProblem rows by the difficulty bucket used by
+    daily challenges. Beginner problems become Easy, Basic/Intermediate become
+    Medium, and Advanced problems become Hard.
+
+    Step 3: avoid problems this student solved in the last
+    RECENT_SOLVED_LOOKBACK_DAYS where the pool is large enough. If a bucket is
+    exhausted, the selector relaxes that repeat rule before borrowing from an
+    adjacent difficulty.
+
+    Step 4: sort candidates so topics in StudentSkill.weak_topics come first,
+    then randomly choose within the top WEIGHTED_RANDOM_WINDOW rows. That keeps
+    weak-topic practice likely without making the daily set predictable.
+
+    Step 5: when a difficulty bucket cannot fill its quota, borrow from adjacent
+    difficulties and log a warning instead of crashing. The returned tuples are
+    (problem, daily_difficulty), so borrowed problems still use the scoring and
+    attempt limits for the slot they filled.
+    """
+    challenge_date = challenge_date or _today()
+    del challenge_date  # Kept in the signature for cron/test callers and future date-aware tuning.
+
+    skill_profile = StudentSkill.objects.filter(student=student).first()
+    weak_topics = _normalized_topic_keys(skill_profile.weak_topics if skill_profile else {})
+    distribution = _difficulty_distribution_for_student(student)
+    recent_problem_ids = _recently_solved_problem_ids(student)
+    problems = list(CodingProblem.objects.filter(is_active=True).order_by("order", "id"))
+
+    selected = []
+    selected_ids = set()
+    for difficulty, quota in distribution.items():
+        picked = _select_for_difficulty(
+            problems,
+            selected_ids,
+            difficulty,
+            quota,
+            weak_topics,
+            recent_problem_ids,
+        )
+        selected.extend(picked)
+        missing = quota - len(picked)
+        if missing <= 0:
+            continue
+
+        logger.warning(
+            "Daily challenge pool is short for %s/%s; borrowing %s adjacent problem(s).",
+            student.pk,
+            difficulty,
+            missing,
+        )
+        for adjacent_difficulty in ADJACENT_DIFFICULTIES[difficulty]:
+            borrowed = _select_for_difficulty(
+                problems,
+                selected_ids,
+                adjacent_difficulty,
+                missing,
+                weak_topics,
+                recent_problem_ids,
+            )
+            selected.extend((problem, difficulty) for problem, _ in borrowed)
+            missing -= len(borrowed)
+            if missing <= 0:
+                break
+
+        if missing > 0:
+            logger.warning(
+                "Daily challenge pool could only select %s of %s problems for student %s.",
+                DAILY_CHALLENGE_SIZE - missing,
+                DAILY_CHALLENGE_SIZE,
+                student.pk,
+            )
+
+    return selected
 
 
 def _safe_format_string(template, params):
@@ -440,7 +610,8 @@ def _coerce_rendered_value(value):
         return value
     try:
         return ast.literal_eval(value)
-    except (ValueError, SyntaxError):
+    except (ValueError, SyntaxError, TypeError):
+        # TypeError can occur if trying to create a set with unhashable elements
         return value
 
 
@@ -849,23 +1020,25 @@ def _sanitize_unsolved_challenge_code(challenge):
 
 
 def _should_regenerate_existing_set(challenge_set):
-    expected_count = LEVEL_SIZE * 3
-    if challenge_set.challenges.count() != expected_count:
-        return True
-
-    has_approved_templates = QuestionTemplate.objects.filter(
-        is_active=True,
-        approval_status=QuestionTemplate.STATUS_APPROVED,
-    ).exists()
-    if not has_approved_templates:
+    current_count = challenge_set.challenges.count()
+    if current_count >= DAILY_CHALLENGE_SIZE:
         return False
 
-    # Legacy daily sets created before the template pool shipped contain only
-    # fixed CodingProblem rows with no template linkage.
-    if not challenge_set.challenges.filter(template__isnull=False).exists():
-        return True
+    has_student_progress = (
+        challenge_set.challenges.filter(attempts__gt=0).exists()
+        or challenge_set.challenges.exclude(status=DailyChallenge.STATUS_PENDING).exists()
+        or StudentChallengeAttempt.objects.filter(challenge__challenge_set=challenge_set).exists()
+    )
+    if has_student_progress:
+        return False
 
-    return False
+    logger.info(
+        "Regenerating unattempted daily challenge set %s with %s/%s rows.",
+        challenge_set.pk,
+        current_count,
+        DAILY_CHALLENGE_SIZE,
+    )
+    return True
 
 
 def generate_daily_challenges(student, challenge_date=None, force=False):
@@ -885,10 +1058,6 @@ def generate_daily_challenges(student, challenge_date=None, force=False):
         refresh_challenge_set(existing_set)
         return existing_set
 
-    skill_profile = StudentSkill.objects.filter(student=student).first()
-    weak_topics = _normalized_topic_keys(skill_profile.weak_topics if skill_profile else {})
-    all_problems = list(CodingProblem.objects.filter(is_active=True).order_by("order", "id"))
-
     challenge_set = DailyChallengeSet.objects.create(
         student=student,
         date=challenge_date,
@@ -896,43 +1065,22 @@ def generate_daily_challenges(student, challenge_date=None, force=False):
     )
 
     challenge_rows = []
-    chosen_topics = set()
-    question_number = 1
-    for difficulty in (
-        DailyChallenge.DIFFICULTY_EASY,
-        DailyChallenge.DIFFICULTY_MEDIUM,
-        DailyChallenge.DIFFICULTY_HARD,
-    ):
-        templates = _pick_templates_for_difficulty(
-            difficulty,
-            challenge_date,
-            preferred_topics=weak_topics,
-            excluded_topics=chosen_topics,
+    question_numbers = {
+        DailyChallenge.DIFFICULTY_EASY: 1,
+        DailyChallenge.DIFFICULTY_MEDIUM: 1,
+        DailyChallenge.DIFFICULTY_HARD: 1,
+    }
+    for problem, difficulty in select_daily_problems(student, challenge_date=challenge_date):
+        _ensure_problem_hints(problem)
+        challenge_rows.append(
+            _copy_problem(
+                problem,
+                challenge_set,
+                question_numbers[difficulty],
+                difficulty,
+            )
         )
-        for template in templates:
-            challenge_rows.append(_build_challenge_from_template(template, challenge_set, question_number, weak_topics))
-            chosen_topics.add(template.topic)
-            question_number += 1
-
-        selected_ids = {item.problem_id for item in challenge_rows if item.problem_id}
-        fallback = _pick_problems(all_problems, selected_ids, difficulty, weak_topics)
-        if len(templates) >= LEVEL_SIZE:
-            continue
-
-        used_problem_ids = set(
-            DailyChallenge.objects.filter(
-                date__gte=challenge_date - timedelta(days=30),
-                date__lt=challenge_date,
-            ).values_list("problem_id", flat=True)
-        )
-        remaining_slots = LEVEL_SIZE - len(templates)
-        fresh_fallback = [item for item in fallback if item.id not in used_problem_ids]
-        fallback_pool = fresh_fallback if len(fresh_fallback) >= remaining_slots else fallback
-        for problem in fallback_pool[:remaining_slots]:
-            _ensure_problem_hints(problem)
-            challenge_rows.append(_copy_problem(problem, challenge_set, question_number, difficulty))
-            chosen_topics.add(problem.topic.lower())
-            question_number += 1
+        question_numbers[difficulty] += 1
 
     DailyChallenge.objects.bulk_create(challenge_rows)
     stored_rows = list(DailyChallenge.objects.filter(challenge_set=challenge_set).select_related("template", "problem"))
@@ -1099,7 +1247,7 @@ def _refresh_daily_session(session, challenge_set=None):
     attempted_ids = {
         int(item)
         for item in (session.attempted_challenge_ids or [])
-        if str(item).isdigit()
+        if isinstance(item, int) or (isinstance(item, str) and str(item).isdigit())
     }
     attempted_ids.update(challenges.filter(attempts__gt=0).values_list("id", flat=True))
 
@@ -1107,7 +1255,8 @@ def _refresh_daily_session(session, challenge_set=None):
     session.questions_solved = challenges.filter(status=DailyChallenge.STATUS_SOLVED).count()
     session.points_earned = challenge_set.total_score if challenge_set else 0
     session.session_score = session.points_earned - session.points_deducted
-    session.attempted_challenge_ids = sorted(attempted_ids)
+    # Ensure attempted_challenge_ids is always a list, never a set
+    session.attempted_challenge_ids = sorted(list(attempted_ids))
     session.save(
         update_fields=[
             "questions_attempted",
@@ -1126,10 +1275,11 @@ def _apply_session_penalty(challenge, *, penalty_points=SESSION_FAILURE_DEDUCTIO
     attempted_ids = {
         int(item)
         for item in (session.attempted_challenge_ids or [])
-        if str(item).isdigit()
+        if isinstance(item, int) or (isinstance(item, str) and str(item).isdigit())
     }
     attempted_ids.add(challenge.id)
-    session.attempted_challenge_ids = sorted(attempted_ids)
+    # Ensure attempted_challenge_ids is always a list, never a set
+    session.attempted_challenge_ids = sorted(list(attempted_ids))
     session.points_deducted += penalty_points
     session.save(update_fields=["attempted_challenge_ids", "points_deducted", "updated_at"])
     return _refresh_daily_session(session, challenge.challenge_set)
@@ -1211,11 +1361,47 @@ def refresh_challenge_set(challenge_set):
     return challenge_set
 
 
+def _get_level_totals(challenge_set):
+    """Get total count of questions at each level."""
+    challenges = challenge_set.challenges.values_list('level').annotate(count=Count('id'))
+    totals = {1: 0, 2: 0, 3: 0}
+    for level, count in challenges:
+        if level in totals:
+            totals[level] = count
+    return totals
+
+
+def _calculate_completion_threshold(total_count):
+    """Calculate 75% completion threshold (rounded up)."""
+    if total_count == 0:
+        return 0
+    return math.ceil(total_count * 0.75)
+
+
 def level_unlock_state(challenge_set):
+    """
+    Check unlock state for each level based on 75% completion of previous level.
+    Level 1: Always unlocked
+    Level 2: Unlocked after completing 75% of Level 1 (Easy) questions
+    Level 3: Unlocked after completing 75% of Level 2 (Medium) questions
+    """
+    level_totals = _get_level_totals(challenge_set)
+    
+    # Level 1 is always unlocked
+    level_1_unlocked = True
+    
+    # Level 2 unlocked if 75% of easy questions are solved
+    easy_threshold = _calculate_completion_threshold(level_totals[1])
+    level_2_unlocked = level_1_unlocked and challenge_set.easy_solved_count >= easy_threshold if easy_threshold > 0 else level_1_unlocked
+    
+    # Level 3 unlocked if 75% of medium questions are solved
+    medium_threshold = _calculate_completion_threshold(level_totals[2])
+    level_3_unlocked = level_2_unlocked and challenge_set.medium_solved_count >= medium_threshold if medium_threshold > 0 else level_2_unlocked
+    
     return {
-        1: True,
-        2: challenge_set.easy_solved_count >= 2,
-        3: challenge_set.medium_solved_count >= 2,
+        1: level_1_unlocked,
+        2: level_2_unlocked,
+        3: level_3_unlocked,
     }
 
 

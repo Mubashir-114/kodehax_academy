@@ -1,0 +1,1079 @@
+[
+  {
+    "title": "Sum Values 1",
+    "topic": "arrays",
+    "description": "Return the sum of all integers in the list. Write a function named `sum_values_1`.",
+    "starter_code": "def sum_values_1(values):\n    return 0\n",
+    "function_name": "sum_values_1",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3
+          ]
+        ],
+        "expected": 6
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            -2,
+            5
+          ]
+        ],
+        "expected": 3
+      },
+      {
+        "input": [
+          [
+            10
+          ]
+        ],
+        "expected": 10
+      }
+    ],
+    "hint1": "Think about the arrays pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 1,
+    "is_active": true
+  },
+  {
+    "title": "Count Even Numbers 2",
+    "topic": "arrays",
+    "description": "Return how many numbers in the list are even. Write a function named `count_even_2`.",
+    "starter_code": "def count_even_2(values):\n    return 0\n",
+    "function_name": "count_even_2",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            4,
+            5
+          ]
+        ],
+        "expected": 2
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            -2,
+            -3,
+            0
+          ]
+        ],
+        "expected": 2
+      },
+      {
+        "input": [
+          [
+            7
+          ]
+        ],
+        "expected": 0
+      }
+    ],
+    "hint1": "Think about the arrays pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 2,
+    "is_active": true
+  },
+  {
+    "title": "Maximum Value 3",
+    "topic": "arrays",
+    "description": "Return the largest value in the list, or None for an empty list. Write a function named `max_value_3`.",
+    "starter_code": "def max_value_3(values):\n    return None\n",
+    "function_name": "max_value_3",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            5,
+            2
+          ]
+        ],
+        "expected": 5
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": null
+      },
+      {
+        "input": [
+          [
+            -4,
+            -1,
+            -9
+          ]
+        ],
+        "expected": -1
+      },
+      {
+        "input": [
+          [
+            3
+          ]
+        ],
+        "expected": 3
+      }
+    ],
+    "hint1": "Think about the arrays pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 3,
+    "is_active": true
+  },
+  {
+    "title": "Reverse Text 4",
+    "topic": "strings",
+    "description": "Return the given string reversed. Write a function named `reverse_text_4`.",
+    "starter_code": "def reverse_text_4(text):\n    return \"\"\n",
+    "function_name": "reverse_text_4",
+    "test_cases": [
+      {
+        "input": [
+          "abc"
+        ],
+        "expected": "cba"
+      },
+      {
+        "input": [
+          ""
+        ],
+        "expected": ""
+      },
+      {
+        "input": [
+          "a"
+        ],
+        "expected": "a"
+      },
+      {
+        "input": [
+          "Kodehax"
+        ],
+        "expected": "xahedoK"
+      }
+    ],
+    "hint1": "Think about the strings pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 4,
+    "is_active": true
+  },
+  {
+    "title": "Is Palindrome Text 5",
+    "topic": "strings",
+    "description": "Return True when the string reads the same forward and backward. Write a function named `is_palindrome_text_5`.",
+    "starter_code": "def is_palindrome_text_5(text):\n    return False\n",
+    "function_name": "is_palindrome_text_5",
+    "test_cases": [
+      {
+        "input": [
+          "level"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "code"
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          ""
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "a"
+        ],
+        "expected": true
+      }
+    ],
+    "hint1": "Think about the strings pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 5,
+    "is_active": true
+  },
+  {
+    "title": "Count Vowels 6",
+    "topic": "strings",
+    "description": "Return the number of vowels in the string. Write a function named `count_vowels_6`.",
+    "starter_code": "def count_vowels_6(text):\n    return 0\n",
+    "function_name": "count_vowels_6",
+    "test_cases": [
+      {
+        "input": [
+          "education"
+        ],
+        "expected": 5
+      },
+      {
+        "input": [
+          "sky"
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          "AEi"
+        ],
+        "expected": 3
+      },
+      {
+        "input": [
+          ""
+        ],
+        "expected": 0
+      }
+    ],
+    "hint1": "Think about the strings pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 6,
+    "is_active": true
+  },
+  {
+    "title": "Factorial Number 7",
+    "topic": "recursion",
+    "description": "Return n factorial for a non-negative integer n. Write a function named `factorial_number_7`.",
+    "starter_code": "def factorial_number_7(n):\n    return 1\n",
+    "function_name": "factorial_number_7",
+    "test_cases": [
+      {
+        "input": [
+          0
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          1
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          5
+        ],
+        "expected": 120
+      },
+      {
+        "input": [
+          7
+        ],
+        "expected": 5040
+      }
+    ],
+    "hint1": "Think about the recursion pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 7,
+    "is_active": true
+  },
+  {
+    "title": "Linear Search 8",
+    "topic": "searching",
+    "description": "Return the index of target in values, or -1 when missing. Write a function named `linear_search_8`.",
+    "starter_code": "def linear_search_8(values, target):\n    return -1\n",
+    "function_name": "linear_search_8",
+    "test_cases": [
+      {
+        "input": [
+          [
+            3,
+            1,
+            4
+          ],
+          4
+        ],
+        "expected": 2
+      },
+      {
+        "input": [
+          [],
+          5
+        ],
+        "expected": -1
+      },
+      {
+        "input": [
+          [
+            2,
+            2,
+            3
+          ],
+          2
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            -1,
+            0
+          ],
+          1
+        ],
+        "expected": -1
+      }
+    ],
+    "hint1": "Think about the searching pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 8,
+    "is_active": true
+  },
+  {
+    "title": "Sort Ascending 9",
+    "topic": "sorting",
+    "description": "Return a new list containing the values in ascending order. Write a function named `sort_ascending_9`.",
+    "starter_code": "def sort_ascending_9(values):\n    return values\n",
+    "function_name": "sort_ascending_9",
+    "test_cases": [
+      {
+        "input": [
+          [
+            3,
+            1,
+            2
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": []
+      },
+      {
+        "input": [
+          [
+            2,
+            2,
+            1
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          2
+        ]
+      },
+      {
+        "input": [
+          [
+            -1,
+            5,
+            0
+          ]
+        ],
+        "expected": [
+          -1,
+          0,
+          5
+        ]
+      }
+    ],
+    "hint1": "Think about the sorting pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 9,
+    "is_active": true
+  },
+  {
+    "title": "Binary Search Found 10",
+    "topic": "binary search",
+    "description": "Return True if target exists in the sorted list. Write a function named `binary_search_found_10`.",
+    "starter_code": "def binary_search_found_10(values, target):\n    return False\n",
+    "function_name": "binary_search_found_10",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            3,
+            5
+          ],
+          3
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          [],
+          1
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          [
+            2
+          ],
+          2
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          [
+            1,
+            4,
+            7
+          ],
+          6
+        ],
+        "expected": false
+      }
+    ],
+    "hint1": "Think about the binary search pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 10,
+    "is_active": true
+  },
+  {
+    "title": "Frequency Map 11",
+    "topic": "hashing",
+    "description": "Return a dictionary mapping each value to its frequency. Write a function named `frequency_map_11`.",
+    "starter_code": "def frequency_map_11(values):\n    return {}\n",
+    "function_name": "frequency_map_11",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            1
+          ]
+        ],
+        "expected": {
+          "1": 2,
+          "2": 1
+        }
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": {}
+      },
+      {
+        "input": [
+          [
+            "a",
+            "b",
+            "a"
+          ]
+        ],
+        "expected": {
+          "a": 2,
+          "b": 1
+        }
+      },
+      {
+        "input": [
+          [
+            -1,
+            -1,
+            0
+          ]
+        ],
+        "expected": {
+          "-1": 2,
+          "0": 1
+        }
+      }
+    ],
+    "hint1": "Think about the hashing pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 11,
+    "is_active": true
+  },
+  {
+    "title": "Valid Parentheses 12",
+    "topic": "stacks",
+    "description": "Return True when parentheses, brackets, and braces are balanced. Write a function named `valid_parentheses_12`.",
+    "starter_code": "def valid_parentheses_12(text):\n    return False\n",
+    "function_name": "valid_parentheses_12",
+    "test_cases": [
+      {
+        "input": [
+          "()[]{}"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "([)]"
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          ""
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "{[]}"
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          "("
+        ],
+        "expected": false
+      }
+    ],
+    "hint1": "Think about the stacks pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 12,
+    "is_active": true
+  },
+  {
+    "title": "Queue Rotate Left 13",
+    "topic": "queues",
+    "description": "Return the list after moving the first item to the end. Empty lists stay empty. Write a function named `queue_rotate_left_13`.",
+    "starter_code": "def queue_rotate_left_13(values):\n    return values\n",
+    "function_name": "queue_rotate_left_13",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3
+          ]
+        ],
+        "expected": [
+          2,
+          3,
+          1
+        ]
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": []
+      },
+      {
+        "input": [
+          [
+            5
+          ]
+        ],
+        "expected": [
+          5
+        ]
+      },
+      {
+        "input": [
+          [
+            1,
+            1,
+            2
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          1
+        ]
+      }
+    ],
+    "hint1": "Think about the queues pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 13,
+    "is_active": true
+  },
+  {
+    "title": "Fibonacci 14",
+    "topic": "dynamic programming",
+    "description": "Return the nth Fibonacci number where fibonacci(0) is 0 and fibonacci(1) is 1. Write a function named `fibonacci_14`.",
+    "starter_code": "def fibonacci_14(n):\n    return 0\n",
+    "function_name": "fibonacci_14",
+    "test_cases": [
+      {
+        "input": [
+          0
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          1
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          6
+        ],
+        "expected": 8
+      },
+      {
+        "input": [
+          10
+        ],
+        "expected": 55
+      }
+    ],
+    "hint1": "Think about the dynamic programming pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 14,
+    "is_active": true
+  },
+  {
+    "title": "Is Prime 15",
+    "topic": "math",
+    "description": "Return True if n is prime. Write a function named `is_prime_15`.",
+    "starter_code": "def is_prime_15(n):\n    return False\n",
+    "function_name": "is_prime_15",
+    "test_cases": [
+      {
+        "input": [
+          1
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          2
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          9
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          17
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          -3
+        ],
+        "expected": false
+      }
+    ],
+    "hint1": "Think about the math pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 15,
+    "is_active": true
+  },
+  {
+    "title": "Count Set Bits 16",
+    "topic": "bit manipulation",
+    "description": "Return the number of 1 bits in the non-negative integer n. Write a function named `count_set_bits_16`.",
+    "starter_code": "def count_set_bits_16(n):\n    return 0\n",
+    "function_name": "count_set_bits_16",
+    "test_cases": [
+      {
+        "input": [
+          0
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          1
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          7
+        ],
+        "expected": 3
+      },
+      {
+        "input": [
+          8
+        ],
+        "expected": 1
+      }
+    ],
+    "hint1": "Think about the bit manipulation pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 16,
+    "is_active": true
+  },
+  {
+    "title": "Has Pair Sum 17",
+    "topic": "two pointers",
+    "description": "Return True if any two numbers add to target. Write a function named `has_pair_sum_17`.",
+    "starter_code": "def has_pair_sum_17(values, target):\n    return False\n",
+    "function_name": "has_pair_sum_17",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3
+          ],
+          5
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          [],
+          1
+        ],
+        "expected": false
+      },
+      {
+        "input": [
+          [
+            2,
+            2
+          ],
+          4
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          [
+            -1,
+            4,
+            6
+          ],
+          3
+        ],
+        "expected": true
+      },
+      {
+        "input": [
+          [
+            1
+          ],
+          1
+        ],
+        "expected": false
+      }
+    ],
+    "hint1": "Think about the two pointers pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 17,
+    "is_active": true
+  },
+  {
+    "title": "Max Window Sum 18",
+    "topic": "sliding window",
+    "description": "Return the largest sum of any contiguous window of length k. Return 0 if k is invalid. Write a function named `max_window_sum_18`.",
+    "starter_code": "def max_window_sum_18(values, k):\n    return 0\n",
+    "function_name": "max_window_sum_18",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3,
+            4
+          ],
+          2
+        ],
+        "expected": 7
+      },
+      {
+        "input": [
+          [],
+          2
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            5
+          ],
+          1
+        ],
+        "expected": 5
+      },
+      {
+        "input": [
+          [
+            1,
+            2
+          ],
+          3
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            -2,
+            -1,
+            -3
+          ],
+          2
+        ],
+        "expected": -3
+      }
+    ],
+    "hint1": "Think about the sliding window pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 18,
+    "is_active": true
+  },
+  {
+    "title": "Min Coins Greedy 19",
+    "topic": "greedy",
+    "description": "Using coin values 10, 5, and 1, return the minimum number of coins for amount. Write a function named `min_coins_greedy_19`.",
+    "starter_code": "def min_coins_greedy_19(amount):\n    return 0\n",
+    "function_name": "min_coins_greedy_19",
+    "test_cases": [
+      {
+        "input": [
+          0
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          1
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          14
+        ],
+        "expected": 5
+      },
+      {
+        "input": [
+          28
+        ],
+        "expected": 6
+      }
+    ],
+    "hint1": "Think about the greedy pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 19,
+    "is_active": true
+  },
+  {
+    "title": "Fix Off By One Sum 20",
+    "topic": "debugging",
+    "description": "Return the sum of every item. Be careful not to skip the final element. Write a function named `off_by_one_sum_20`.",
+    "starter_code": "def off_by_one_sum_20(values):\n    return 0\n",
+    "function_name": "off_by_one_sum_20",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3
+          ]
+        ],
+        "expected": 6
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            10
+          ]
+        ],
+        "expected": 10
+      },
+      {
+        "input": [
+          [
+            -1,
+            1
+          ]
+        ],
+        "expected": 0
+      }
+    ],
+    "hint1": "Think about the debugging pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 20,
+    "is_active": true
+  },
+  {
+    "title": "Linked List Values 21",
+    "topic": "linked lists",
+    "description": "Treat values as linked-list node values and return them in the same order. Write a function named `linked_list_values_21`.",
+    "starter_code": "def linked_list_values_21(values):\n    return []\n",
+    "function_name": "linked_list_values_21",
+    "test_cases": [
+      {
+        "input": [
+          [
+            1,
+            2,
+            3
+          ]
+        ],
+        "expected": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": []
+      },
+      {
+        "input": [
+          [
+            5
+          ]
+        ],
+        "expected": [
+          5
+        ]
+      },
+      {
+        "input": [
+          [
+            2,
+            2,
+            1
+          ]
+        ],
+        "expected": [
+          2,
+          2,
+          1
+        ]
+      }
+    ],
+    "hint1": "Think about the linked lists pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 21,
+    "is_active": true
+  },
+  {
+    "title": "Graph Edge Count 22",
+    "topic": "graphs",
+    "description": "Given a list of undirected edges, return how many edges are present. Write a function named `graph_edge_count_22`.",
+    "starter_code": "def graph_edge_count_22(edges):\n    return 0\n",
+    "function_name": "graph_edge_count_22",
+    "test_cases": [
+      {
+        "input": [
+          [
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              3
+            ]
+          ]
+        ],
+        "expected": 2
+      },
+      {
+        "input": [
+          []
+        ],
+        "expected": 0
+      },
+      {
+        "input": [
+          [
+            [
+              1,
+              1
+            ]
+          ]
+        ],
+        "expected": 1
+      },
+      {
+        "input": [
+          [
+            [
+              0,
+              1
+            ],
+            [
+              1,
+              2
+            ],
+            [
+              2,
+              0
+            ]
+          ]
+        ],
+        "expected": 3
+      }
+    ],
+    "hint1": "Think about the graphs pattern before writing the loop or recursion.",
+    "hint2": "Handle empty inputs and single-item inputs before the general case.",
+    "difficulty": "beginner",
+    "order": 22,
+    "is_active": true
+  }
+]
