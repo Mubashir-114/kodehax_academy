@@ -94,6 +94,53 @@
   </section>
 
   <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-1">
+    <div class="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(260px,0.46fr)]">
+      <div>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.14em] text-cyan-300/80">Lecture Notes</p>
+            <h4 class="mt-1 text-xl font-bold text-white">Publish a class note</h4>
+          </div>
+          <a href="{% url 'ai_tools' %}" class="btn-muted inline-flex min-h-10 items-center justify-center px-4 text-sm">Use AI Studio</a>
+        </div>
+
+        <form method="post" action="{% url 'create_lecture_note' classroom.id %}" class="mt-5 space-y-4">
+          {% csrf_token %}
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">Topic</label>
+            <input type="text" name="notes_title" placeholder="Example: Python for loops" class="w-full rounded-xl border border-slate-600 bg-slate-900/55 px-4 py-2.5 text-slate-200 focus:border-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-500/20">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">Notes</label>
+            <textarea name="notes_content" rows="8" placeholder="Paste or write the note here. Markdown and LaTeX are supported." class="w-full rounded-xl border border-slate-600 bg-slate-900/55 px-4 py-3 text-sm leading-6 text-slate-200 focus:border-cyan-400 focus:outline-none focus:ring-4 focus:ring-cyan-500/20"></textarea>
+          </div>
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-xs text-slate-400">Students will see the topic on their dashboard and the full note inside this class.</p>
+            <button type="submit" class="btn-primary inline-flex min-h-11 items-center justify-center px-5 text-sm">Publish Note</button>
+          </div>
+        </form>
+      </div>
+
+      <aside class="rounded-2xl border border-slate-700/70 bg-slate-950/35 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Recent Topics</p>
+          <span class="rounded-full border border-cyan-400/25 bg-cyan-400/10 px-2.5 py-1 text-xs text-cyan-200">{{ lecture_notes|length }}</span>
+        </div>
+        <div class="mt-4 space-y-3">
+          {% for note in lecture_notes %}
+          <div class="rounded-xl border border-slate-700 bg-slate-900/45 p-3">
+            <p class="line-clamp-2 text-sm font-semibold text-slate-100">{{ note.title }}</p>
+            <p class="mt-1 text-xs text-slate-500">{{ note.created_at|date:"M d, Y H:i" }}</p>
+          </div>
+          {% empty %}
+          <p class="rounded-xl border border-dashed border-slate-700 bg-slate-900/35 p-4 text-sm leading-6 text-slate-400">No class notes yet.</p>
+          {% endfor %}
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-2">
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h4 class="text-xl font-bold text-white">Students</h4>
       <span class="text-sm rounded-full bg-slate-800 border border-slate-700 px-3 py-1 text-slate-300">
@@ -209,7 +256,7 @@
     </div>
   </section>
 
-  <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-2">
+  <section class="glass-card hover-lift p-4 sm:p-6 reveal delay-3">
     <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <h4 class="text-xl font-bold text-white">Assignments</h4>
         <a href="{% url 'assignment_type_selector' classroom.id %}"

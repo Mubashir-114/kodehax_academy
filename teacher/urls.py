@@ -6,6 +6,7 @@ urlpatterns = [
     path("dashboard/",views.teacher_dashboard,name="teacher_dashboard"),
     path("class/create/",views.create_class,name="create_class"),
     path("classes/<int:id>/",views.class_detail,name="class_detail"),
+    path("classes/<int:class_id>/notes/create/", views.create_lecture_note, name="create_lecture_note"),
     path("classes/<int:class_id>/assignments/new/", views.assignment_type_selector, name="assignment_type_selector"),
     path( "classes/<int:class_id>/assignments/create/",views.create_assignment,name="create_assignment"),
     path("classes/<int:class_id>/assignments/create/file/", views.create_file_assignment, name="create_file_assignment"),

@@ -28,6 +28,7 @@ from .services.evaluation import (
     grade_file_submission_ai,
     grade_file_submission_manual,
 )
+from .services.notes import default_lecture_note_title, normalize_lecture_note_content
 from .services.performance import (
     get_classroom_performance_analytics,
     get_student_detail_analytics,
@@ -217,10 +218,37 @@ def class_detail(request, id):
         "classroom": classroom,
         "students": students,
         "student_rows": student_rows,
-        "assignment_rows": assignment_rows
+        "assignment_rows": assignment_rows,
+        "lecture_notes": classroom.lecture_notes.select_related("teacher")[:6],
     }
 
     return render(request, "teacher/class_detail.html", context)
+
+
+@login_required
+def create_lecture_note(request, class_id):
+    classroom, redirect_response = _get_teacher_classroom_or_redirect(request, class_id)
+    if redirect_response:
+        return redirect_response
+
+    if request.method != "POST":
+        return redirect("class_detail", id=classroom.id)
+
+    title = default_lecture_note_title(request.POST.get("notes_title", ""), classroom)
+    content = normalize_lecture_note_content(request.POST.get("notes_content", ""))
+
+    if not content:
+        messages.error(request, "Add note content before publishing.")
+        return redirect("class_detail", id=classroom.id)
+
+    LectureNote.objects.create(
+        classroom=classroom,
+        teacher=request.user,
+        title=title,
+        content=content,
+    )
+    messages.success(request, f"Lecture note published to {classroom.name}.")
+    return redirect("class_detail", id=classroom.id)
 
 @login_required
 def assignment_list(request, class_id):
@@ -861,7 +889,7 @@ def ai_tools(request):
         elif action == "publish_notes":
             class_id = request.POST.get("class_id")
             notes_title = request.POST.get("notes_title", "").strip()
-            notes_content = request.POST.get("notes_content", "")
+            notes_content = normalize_lecture_note_content(request.POST.get("notes_content", ""))
 
             if not class_id or not notes_content.strip():
                 upload_error = "Classroom and notes content are required."
@@ -873,7 +901,7 @@ def ai_tools(request):
                     id=class_id,
                     teacher=request.user,
                 )
-                title = notes_title or f"Lecture Notes - {classroom.name}"
+                title = default_lecture_note_title(notes_title, classroom)
                 LectureNote.objects.create(
                     classroom=classroom,
                     teacher=request.user,

@@ -68,6 +68,7 @@ if PRODUCTION and DEBUG:
     raise ImproperlyConfigured("DEBUG must be False in production.")
 
 ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
+ALLOWED_HOSTS = ["*"]
 if PRODUCTION and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production.")
 

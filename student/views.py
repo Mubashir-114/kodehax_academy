@@ -1027,13 +1027,21 @@ def class_detail(request, class_id):
     archived_assignments = classroom.assignments.filter(
         due_date__lt=now
     ).order_by("-due_date")
-    lecture_notes = classroom.lecture_notes.select_related("teacher")[:10]
+    selected_note_id = request.GET.get("note")
+    lecture_notes = classroom.lecture_notes.select_related("teacher")
+    selected_note = None
+    if selected_note_id:
+        selected_note = lecture_notes.filter(id=selected_note_id).first()
+        lecture_notes = lecture_notes.filter(id=selected_note_id) if selected_note else lecture_notes[:10]
+    else:
+        lecture_notes = lecture_notes[:10]
 
     return render_for_device(request, "student/class_detail.html", {
         "classroom": classroom,
         "active_assignment_rows": _build_assignment_rows(active_assignments, request.user),
         "archived_assignment_rows": _build_assignment_rows(archived_assignments, request.user),
         "lecture_notes": lecture_notes,
+        "selected_note": selected_note,
         "classroom_readme_html": render_course_readme_html(classroom.readme_content),
         "has_classroom_readme": bool((classroom.readme_content or "").strip()),
     })

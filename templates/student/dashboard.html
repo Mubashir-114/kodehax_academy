@@ -57,20 +57,20 @@
           <span class="text-xs text-slate-400">{{ personal_notes|length }} recent</span>
         </div>
 
-        <div class="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {% for note in personal_notes %}
-          <article class="rounded-xl border border-slate-700 bg-slate-900/50 p-4">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p class="font-semibold text-slate-100">{{ note.title }}</p>
-                <p class="mt-1 text-xs text-slate-400">{{ note.classroom.name }} &bull; {{ note.created_at|date:"M d, Y H:i" }}</p>
-              </div>
-              <a href="{% url 'student_class_detail' note.classroom.id %}" class="btn-muted inline-flex min-h-10 items-center justify-center px-3 text-xs">Open Class</a>
+          <a href="{% url 'student_class_detail' note.classroom.id %}?note={{ note.id }}" class="group block rounded-xl border border-cyan-400/20 bg-gradient-to-br from-slate-900/80 via-slate-950/70 to-cyan-950/30 p-4 transition hover:-translate-y-0.5 hover:border-cyan-300/60 hover:shadow-lg hover:shadow-cyan-950/30">
+            <div class="flex items-start justify-between gap-3">
+              <span class="inline-flex h-9 shrink-0 items-center justify-center rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 text-xs font-black uppercase tracking-[0.12em] text-cyan-100">
+                Note
+              </span>
+              <span class="rounded-full border border-slate-700 bg-slate-950/50 px-2.5 py-1 text-[11px] text-slate-400">{{ note.created_at|date:"M d" }}</span>
             </div>
-            <p class="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-300">{{ note.content|truncatewords:42 }}</p>
-          </article>
+            <p class="mt-4 text-base font-bold leading-snug text-slate-100 group-hover:text-cyan-100">{{ note.title }}</p>
+            <p class="mt-2 text-xs text-slate-400">{{ note.classroom.name }}</p>
+          </a>
           {% empty %}
-          <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-6 text-center text-sm text-slate-400 lg:col-span-2">
+          <div class="rounded-xl border border-slate-700 bg-slate-900/40 p-6 text-center text-sm text-slate-400 sm:col-span-2 xl:col-span-4">
             No lecture notes posted for your joined classes yet.
           </div>
           {% endfor %}
