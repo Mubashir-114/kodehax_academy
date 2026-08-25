@@ -1,4 +1,9 @@
+# Environment variables & secrets
 .env
+.env.*
+!.env.example
+
+# Python virtual environment & cache
 .venv/
 env/
 venv/
@@ -6,8 +11,25 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .mypy_cache/
+
+# Node & Frontend builds
 node_modules/
 staticfiles/
+
+# Media & Database
 media/
 *.sqlite3
+*.db
+
+# Logs & Debugging
+*.log
 *_debug.txt
+runserver.log
+runserver.err.log
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+

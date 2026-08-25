@@ -190,6 +190,6 @@ Before running the application, make sure you have:
 
 ## 📄 License
 
-This repository does not currently declare a license. Add one before public distribution if you plan to open-source the project.
+This project is licensed under the [MIT License](LICENSE).
 
 <p align="center">Made with ❤️ for practical, AI-assisted technical education.</p>
