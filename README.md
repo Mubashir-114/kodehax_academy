@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/readme_banner.png" alt="Kodehax Academy Banner" width="100%" style="border-radius: 12px; margin-bottom: 20px;">
+  <img src="assets/kodehax_banner.png" alt="Kodehax Academy Banner" width="100%" style="border-radius: 12px; margin-bottom: 20px;">
 </p>
 
 <h1 align="center">🎓 Kodehax Academy — AI-Powered Learning Platform</h1>
@@ -26,13 +26,18 @@ Kodehax Academy is designed to be practical, technical, and AI-assisted from the
 | :--- | :--- | :---: |
 | **🔐 Role-Based Access** | Separate student, teacher, and admin flows with role-aware auth, redirects, and dashboards. | ✅ Done |
 | **🤖 AI-Assisted Teaching** | Gemini-powered quiz generation, lecture notes, coding-assignment authoring, and grading. | ✅ Done |
-| **🧠 Skill Assessment Engine** | UI-based assessments with skill-profile classification and weak-topic tracking. | ✅ Done |
+| **🧠 Skill Assessment Engine** | Weighted scoring across self-assessment, MCQs, and coding tasks, with skill-level classification. | ✅ Done |
 | **🔥 Daily Coding Challenges** | Adaptive challenge generation, sandboxed execution, hints, penalties, and points tracking. | ✅ Done |
 | **🏫 Classroom Management** | Create classes, manage enrollments, author assignments, auto-grade quizzes. | ✅ Done |
 | **📊 Performance Analytics** | Student progress records and classroom-level analytics views. | ✅ Done |
 | **💬 AI Chat Assistant** | Contextual Gemini-backed chat for tutoring, course Q&A, and quiz practice. | ✅ Done |
 | **🛠️ Admin Console** | Platform settings, maintenance mode, teacher approvals, platform-wide analytics. | ✅ Done |
 | **📱 Device-Aware Rendering** | Mobile template routing for a dedicated mobile UX on key screens. | ✅ Done |
+
+<p align="center">
+  <img src="assets/dashboards_preview.png" alt="Student, teacher, and admin dashboard preview" width="85%" style="border-radius: 10px; margin-top: 16px;">
+</p>
+<p align="center"><sub>Concept preview of the student, teacher, and admin dashboards</sub></p>
 
 ---
 
@@ -72,51 +77,52 @@ flowchart TB
 
 ## 📂 Project Structure
 
-```bash
+```text
 kodehax/
-├── kodehax_academy/   # project settings, middleware, mobile rendering, root urls
-├── accounts/           # account flows, OTP/email-related templates and services
-├── users/               # custom user model, auth redirects, shared entry views
-├── student/             # student dashboards, submissions, chat memory, APIs
-├── teacher/             # classroom, assignments, grading, AI tools, performance
+├── kodehax_academy/      # project settings, middleware, mobile rendering, root urls
+├── accounts/             # account flows, OTP/email-related templates and services
+├── users/                # custom user model, auth redirects, shared entry views
+├── student/              # student dashboards, submissions, chat memory, APIs
+├── teacher/              # classroom, assignments, grading, AI tools, performance
 ├── adminpanel/           # platform management, maintenance mode, admin dashboards
 ├── skill_assessment/     # assessment content, scoring, skill profile logic
 ├── daily_challenges/     # challenge generation, code runner, points, sessions
 ├── chat/                 # Gemini client integration and chat views
-├── templates/             # desktop, mobile, shared, role-specific templates
-├── static/                 # Tailwind source, compiled CSS, images
-├── media/                   # uploaded files and generated user content
-└── manage.py                 # Django entry point
+├── templates/            # desktop, mobile, shared, role-specific templates
+├── static/               # Tailwind source, compiled CSS, images
+├── media/                # uploaded files and generated user content
+└── manage.py             # Django entry point
 ```
+
 ---
 
 ## 🚀 Getting Started
 
-### 🧰 Prerequisites
+### 📋 Prerequisites
 
-- **Python 3.10+**
-- **Node.js** (for the Tailwind build)
-- **MySQL** — or use the included `kodehax_academy.test_settings` for SQLite
-- A **Gemini API key** for AI-assisted features (see `GEMINI_API_KEY` below)
+Before running the application, make sure you have:
+- [Python](https://www.python.org/) 3.10+
+- [Node.js](https://nodejs.org/) (for the Tailwind build)
+- [MySQL](https://www.mysql.com/) — or use the bundled test_settings for SQLite
+- A [Gemini API key](https://ai.google.dev/) for the AI-assisted features
 
-### ⚙️ Installation & Setup
+### 🛠️ Installation & Setup
 
-1. **Clone the repository and enter the directory**
+1. **Clone the project and enter the directory:**
    ```bash
-   git clone <repo-url>
-   cd kodehax
+   git clone https://github.com/DhruvarajK/kodehax_academy.git
+   cd kodehax_academy
    ```
 
-2. **Set up a virtual environment and install dependencies**
+2. **Install dependencies (Python + frontend):**
    ```bash
    python -m venv venv
-   source venv/bin/activate                  # Linux/macOS
-   # venv\Scripts\activate                   # Windows
+   # On Windows: venv\Scripts\activate | On Linux/Mac: source venv/bin/activate
    pip install -r requirements.txt
    npm install
    ```
 
-3. **Configure environment variables**
+3. **Configure environment variables:**
    Create a `.env` file in the project root:
    ```env
    DEBUG=True
@@ -134,40 +140,40 @@ kodehax/
    DB_URL=
    ```
 
-4. **Run migrations and create a superuser**
+   > [!TIP]
+   > No local MySQL? Run with `--settings=kodehax_academy.test_settings` to use SQLite instead.
+
+4. **Migrate the database and create a superuser:**
    ```bash
    python manage.py migrate
    python manage.py createsuperuser
    ```
 
-5. **Build the frontend and start the server**
+5. **Build the frontend and start the server:**
    ```bash
    npm run tailwind:build
    python manage.py runserver
    ```
-   Then open **http://127.0.0.1:8000/** 🎉
-
-> [!TIP]
-> No local MySQL? Run with `--settings=kodehax_academy.test_settings` to use SQLite instead.
+   Then open `http://127.0.0.1:8000/` 🎉
 
 ---
 
 ## 📦 Key Dependencies
 
-- **Backend Framework:** `Django`
-- **AI Integration:** `google-genai` (Gemini)
-- **Database:** `mysqlclient` · `dj-database-url`
-- **Static Files:** `whitenoise`
-- **Media Storage:** `Cloudinary` · `django-storages`
-- **Deployment:** `gunicorn` · Docker
+- **Backend Framework:** Django
+- **AI Integration:** google-genai (Gemini)
+- **Database:** mysqlclient · dj-database-url (Postgres-ready)
+- **Static Files:** whitenoise
+- **Media Storage:** Cloudinary · django-storages
+- **Deployment:** gunicorn · Docker
 
 ---
 
 ## 🔒 Security & Best Practices
 
-- Secrets (`SECRET_KEY`, `GEMINI_API_KEY`, DB/email credentials) are environment-managed via `.env` and never hardcoded.
+- Secrets (`SECRET_KEY`, `GEMINI_API_KEY`, DB and email credentials) are environment-managed via `.env` and never hardcoded.
 - Daily-challenge submissions run in a restricted sandbox — limited imports, blocked system calls, and wall-clock timeouts.
-- Account registration and recovery flows include OTP/email verification under `accounts/`.
+- Account registration and recovery flows include OTP/email-related templates under `accounts/`.
 - `PRODUCTION=True` switches the database over to a parsed `DB_URL` instead of local hardcoded credentials.
 
 ---
@@ -185,7 +191,5 @@ kodehax/
 ## 📄 License
 
 This repository does not currently declare a license. Add one before public distribution if you plan to open-source the project.
-
----
 
 <p align="center">Made with ❤️ for practical, AI-assisted technical education.</p>
