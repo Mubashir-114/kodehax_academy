@@ -1131,12 +1131,12 @@ def student_performance_dashboard(request):
     return render_for_device(request, "student/performance.html", {
         "summary": summary,
         "records": analytics["records"],
-        "score_progression_labels": json.dumps(charts["score_progression_labels"]),
-        "score_progression_values": json.dumps(charts["score_progression_values"]),
-        "assignment_score_labels": json.dumps(charts["assignment_score_labels"]),
-        "assignment_score_values": json.dumps(charts["assignment_score_values"]),
-        "submission_trend_labels": json.dumps(charts["submission_trend_labels"]),
-        "submission_trend_values": json.dumps(charts["submission_trend_values"]),
+        "score_progression_labels": charts["score_progression_labels"],
+        "score_progression_values": charts["score_progression_values"],
+        "assignment_score_labels": charts["assignment_score_labels"],
+        "assignment_score_values": charts["assignment_score_values"],
+        "submission_trend_labels": charts["submission_trend_labels"],
+        "submission_trend_values": charts["submission_trend_values"],
         "notifications": notifications[:20],
     })
 

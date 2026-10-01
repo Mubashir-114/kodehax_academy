@@ -1,5 +1,7 @@
 # Publication review — 2026-10-01
 
+This records the earlier Groq publication baseline. Subsequent security changes and current validation are in [SECURITY_REVIEW.md](SECURITY_REVIEW.md).
+
 Target: `Mubashir-114/kodehax_academy`, branch `cleanup/conservative-review-20261001`. Publication is authorized; no merge to main, deployment, forced push, database migration or live database operation is part of this work.
 
 ## Preservation and diagnosis

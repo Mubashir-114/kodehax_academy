@@ -1,3 +1,4 @@
+from code_execution.service import ExecutionUnavailable
 from datetime import timedelta
 
 from django.contrib import messages
@@ -164,7 +165,14 @@ def assessment_step(request, step):
             )
         form = CodingAssessmentForm(request.POST or None, initial=initial, problems=problems)
         if request.method == "POST" and form.is_valid():
-            result = evaluate_coding_responses(problems, form.cleaned_data)
+            try:
+                result = evaluate_coding_responses(problems, form.cleaned_data)
+            except ExecutionUnavailable as exc:
+                form.add_error(None, str(exc))
+                return render(request, "skill_assessment/assessment_form.html", {
+                    "assessment": assessment, "form": form, "questions": questions,
+                    "problems": problems, "step": step, "step_percent": 100, "total_steps": 3,
+                }, status=503)
             assessment.coding_answers = result["answers"]
             assessment.coding_score = int(result["normalized_score"])
             assessment.coding_breakdown = result["breakdown"]

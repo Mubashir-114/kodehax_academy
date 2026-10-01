@@ -1,7 +1,5 @@
+from code_execution.service import execute
 import ast
-import json
-import subprocess
-import sys
 from decimal import Decimal, ROUND_HALF_UP
 
 from django.utils import timezone
@@ -385,87 +383,7 @@ def build_starter_template(function_name, starter_code=""):
             break
     return f"{signature_line}\n    # Write your solution here\n    pass\n"
 
-RUNNER_SCRIPT = r"""
-import ast
-import builtins
-import contextlib
-import io
-import json
-import sys
 
-payload = json.loads(sys.stdin.read())
-code = payload["code"]
-function_name = payload["function_name"]
-test_cases = payload["test_cases"]
-
-blocked_calls = {"eval", "exec", "open", "__import__", "compile", "input", "globals", "locals", "vars"}
-blocked_modules = {"os", "sys", "subprocess", "socket", "pathlib", "shutil"}
-
-tree = ast.parse(code, mode="exec")
-for node in ast.walk(tree):
-    if isinstance(node, (ast.Import, ast.ImportFrom)):
-        names = []
-        if isinstance(node, ast.Import):
-            names = [alias.name.split(".")[0] for alias in node.names]
-        else:
-            if node.module:
-                names = [node.module.split(".")[0]]
-        if any(name in blocked_modules for name in names):
-            raise ValueError("Restricted import detected.")
-    if isinstance(node, ast.Call):
-        func = node.func
-        if isinstance(func, ast.Name) and func.id in blocked_calls:
-            raise ValueError("Restricted call detected.")
-    if isinstance(node, ast.Attribute) and node.attr.startswith("__"):
-        raise ValueError("Dunder attribute access is not allowed.")
-
-captured_stdout = io.StringIO()
-
-def safe_print(*args, **kwargs):
-    kwargs.setdefault("file", captured_stdout)
-    return builtins.print(*args, **kwargs)
-
-allowed_builtins = {
-    "abs": abs,
-    "all": all,
-    "any": any,
-    "bool": bool,
-    "dict": dict,
-    "enumerate": enumerate,
-    "float": float,
-    "int": int,
-    "len": len,
-    "list": list,
-    "max": max,
-    "min": min,
-    "print": safe_print,
-    "range": range,
-    "reversed": reversed,
-    "set": set,
-    "sorted": sorted,
-    "str": str,
-    "sum": sum,
-    "tuple": tuple,
-    "zip": zip,
-}
-
-namespace = {"__builtins__": allowed_builtins}
-with contextlib.redirect_stdout(captured_stdout):
-    exec(compile(tree, "<student-code>", "exec"), namespace, namespace)
-
-target = namespace.get(function_name)
-if not callable(target):
-    raise ValueError(f"Function '{function_name}' was not defined.")
-
-results = []
-for case in test_cases:
-    args = case.get("input", [])
-    expected = case.get("expected")
-    actual = target(*args)
-    results.append({"passed": actual == expected, "actual": actual, "expected": expected})
-
-sys.stdout.write(json.dumps({"results": results}))
-"""
 
 
 def ensure_default_assessment_content():
@@ -611,33 +529,11 @@ def evaluate_coding_responses(problems, cleaned_data):
 
 
 def run_code_against_test_cases(problem, code):
-    try:
-        completed = subprocess.run(
-            [sys.executable, "-I", "-c", RUNNER_SCRIPT],
-            input=json.dumps(
-                {
-                    "code": code,
-                    "function_name": problem.function_name,
-                    "test_cases": problem.test_cases,
-                }
-            ),
-            capture_output=True,
-            text=True,
-            timeout=3,
-            check=False,
-        )
-    except subprocess.TimeoutExpired:
-        return [], "Execution timed out."
-
-    if completed.returncode != 0:
-        return [], (completed.stderr or completed.stdout or "Execution failed.").strip()
-
-    try:
-        payload = json.loads(completed.stdout or "{}")
-    except json.JSONDecodeError:
-        return [], "Execution returned an invalid response."
-
-    return payload.get("results", []), None
+    payload = execute(code, problem.function_name, problem.test_cases, kind="assessment")
+    error = payload["fatal_error"]
+    # Keep the assessment's existing case response envelope and scoring logic.
+    results = [{key: row[key] for key in ("passed", "actual", "expected")} for row in payload["results"]]
+    return results, error["message"] if error else None
 
 
 def estimate_logic_score(problem, code):

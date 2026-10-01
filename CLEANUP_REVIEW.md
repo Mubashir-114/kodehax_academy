@@ -1,6 +1,6 @@
 # Conservative cleanup review
 
-Historical cleanup baseline, before the separate Groq migration. Current validation and publication are in [PUBLISH_REVIEW.md](PUBLISH_REVIEW.md).
+Historical cleanup baseline, before the separate Groq migration and security follow-up. Current issue status is in [SECURITY_REVIEW.md](SECURITY_REVIEW.md). Current validation and publication are in [PUBLISH_REVIEW.md](PUBLISH_REVIEW.md).
 
 Date: 2026-10-01. Branch: `cleanup/conservative-review-20261001`.
 

@@ -178,7 +178,7 @@ Before running the application, make sure you have:
 ## 🔒 Security & Best Practices
 
 - Secrets (`SECRET_KEY`, `GROQ_API_KEY`, DB and email credentials) are environment-managed via `.env` and never hardcoded.
-- Daily-challenge submissions run in a restricted sandbox — limited imports, blocked system calls, and wall-clock timeouts.
+- Daily challenges and skill-assessment code use a shared execution adapter. Public submissions require a separately isolated service; local development limits are not secure isolation. See [CODE_EXECUTION.md](CODE_EXECUTION.md).
 - Account registration and recovery flows include OTP/email-related templates under `accounts/`.
 - `PRODUCTION=True` requires explicit MySQL credentials and production security settings.
 
@@ -256,6 +256,8 @@ Free services do not offer this pre-deploy step or an interactive service shell.
 - **Email OTP:** verification, non-admin login OTP, and recovery need working email delivery. Set `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, and verified `DEFAULT_FROM_EMAIL`. `EMAIL_TIMEOUT` defaults to 30 seconds. Missing credentials default to console delivery, which sends no user email. [Free Render services block outbound SMTP ports 25, 465, and 587](https://render.com/docs/free); choose paid hosting for the existing SMTP implementation. An HTTPS email API requires separate work. Real delivery is unverified.
 - **Uploaded media:** uploads use local `media/`, Render's filesystem is ephemeral, and Django's production URL configuration does not serve media with DEBUG=False. Installed Cloudinary/storage packages do not activate storage. Durable object storage with Django configuration, or a paid persistent disk plus production media serving, and transfer of existing uploads remain necessary. These are not implemented here.
 - **AI:** set `GROQ_API_KEY`, `GROQ_TEXT_MODEL=openai/gpt-oss-20b`, and `GROQ_VISION_MODEL=qwen/qwen3.8-27b` server-side with usable quota. Qwen is a preview model; no model substitution is automatic. See [Groq migration and validation](GROQ_MIGRATION.md). Optional `TIME_ZONE`, `DAILY_CHALLENGE_TIMEZONE`, `DAILY_CHALLENGE_PUBLISH_HOUR` default to Asia/Kolkata and hour 10. Existing upload-limit/security environment overrides remain supported. No external scheduler was added.
+
+- **Code execution:** provision and independently verify the isolated HTTPS executor described in [CODE_EXECUTION.md](CODE_EXECUTION.md), then privately configure `CODE_EXECUTION_BACKEND=remote`, `CODE_EXECUTION_URL` and `CODE_EXECUTION_TOKEN`. Until configured, coding requests visibly return 503 without grading, score deductions or consumed attempts. No local fallback occurs in production. The native Render/MySQL deployment stays unchanged.
 
 ### Verification commands
 

@@ -254,3 +254,11 @@ SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000" if PRODUCT
 SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", PRODUCTION)
 SECURE_HSTS_PRELOAD = _env_bool("SECURE_HSTS_PRELOAD", PRODUCTION)
 SECURE_REFERRER_POLICY = os.getenv("SECURE_REFERRER_POLICY", "same-origin")
+
+# Production coding jobs require a separately isolated HTTPS execution service.
+# The local backend is a development mitigation, never a public sandbox.
+CODE_EXECUTION_BACKEND = os.getenv("CODE_EXECUTION_BACKEND", "remote" if PRODUCTION else "development")
+CODE_EXECUTION_URL = os.getenv("CODE_EXECUTION_URL", "")
+CODE_EXECUTION_TOKEN = os.getenv("CODE_EXECUTION_TOKEN", "")
+
+from code_execution import checks as execution_checks  # Register deployment readiness checks.

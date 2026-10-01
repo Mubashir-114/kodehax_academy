@@ -1,4 +1,5 @@
 {% extends base_template %}
+{% load static %}
 
 {% block title %}Edit Course README{% endblock %}
 {% block page_title %}Edit Course README{% endblock %}
@@ -263,6 +264,7 @@
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="{% static 'js/safe_markdown.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
 {% if not desktop_only %}
 <script>
@@ -280,7 +282,7 @@
       .find((row) => row.startsWith("csrftoken="))
       ?.split("=")[1];
 
-    marked.setOptions({
+    if (window.marked) marked.setOptions({
       breaks: true,
       gfm: true,
       highlight: function (code, lang) {
@@ -308,8 +310,7 @@
     }
 
     function renderPreview(markdownSource) {
-      const parsed = window.marked ? marked.parse(markdownSource || "") : (markdownSource || "");
-      preview.innerHTML = window.DOMPurify ? DOMPurify.sanitize(parsed) : parsed;
+      window.KodehaxMarkdown.render(preview, markdownSource);
       enhancePreview();
     }
 

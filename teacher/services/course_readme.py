@@ -1,8 +1,49 @@
 from __future__ import annotations
 
-from html import escape
+from html import escape, unescape
 from html.parser import HTMLParser
 import re
+import unicodedata
+from urllib.parse import unquote, urlsplit
+
+
+def is_safe_url(value: str, *, image: bool = False) -> bool:
+    """One conservative URI policy for package, HTML and Markdown paths."""
+    candidate = value.strip()
+    for _ in range(8):
+        try:
+            decoded = unquote(unescape(candidate), errors="strict")
+        except UnicodeError:
+            return False
+        if decoded == candidate:
+            break
+        candidate = decoded
+    else:
+        return False
+    if not candidate or "\\" in candidate:
+        return False
+    if any(unicodedata.category(char).startswith("C") for char in candidate):
+        return False
+    candidate = unicodedata.normalize("NFKC", candidate)
+    # Browsers tolerate whitespace/control tricks in scheme spellings.
+    compact = "".join(char for char in candidate if not char.isspace())
+    try:
+        parsed = urlsplit(compact)
+        if parsed.scheme:
+            allowed = {"http", "https"} if image else {"http", "https", "mailto"}
+            if parsed.scheme.lower() not in allowed:
+                return False
+            if parsed.scheme.lower() in {"http", "https"} and not parsed.hostname:
+                return False
+        elif ":" in compact.split("/", 1)[0].split("?", 1)[0].split("#", 1)[0]:
+            return False
+        if parsed.netloc:
+            if not parsed.hostname or parsed.username is not None or parsed.password is not None:
+                return False
+            parsed.port  # Reject malformed authorities/ports.
+        return not compact.startswith("///")
+    except (ValueError, UnicodeError):
+        return False
 
 
 DEFAULT_EMPTY_README = """# Course README
@@ -76,6 +117,8 @@ class _BasicHtmlSanitizer(HTMLParser):
         for key, value in attrs:
             if key not in allowed or value is None:
                 continue
+            if key in {"href", "src"} and not is_safe_url(value, image=key == "src"):
+                continue
             cleaned.append(f' {key}="{escape(value, quote=True)}"')
         return "".join(cleaned)
 
@@ -113,11 +156,15 @@ def _render_inline_markdown(text: str) -> str:
 
     def replace_image(match: re.Match[str]) -> str:
         alt = escape(match.group("alt"))
+        if not is_safe_url(match.group("src"), image=True):
+            return alt
         src = escape(match.group("src"), quote=True)
         return f'<img src="{src}" alt="{alt}" loading="lazy" referrerpolicy="no-referrer">'
 
     def replace_link(match: re.Match[str]) -> str:
         label = escape(match.group("label"))
+        if not is_safe_url(match.group("href")):
+            return label
         href = escape(match.group("href"), quote=True)
         return f'<a href="{href}" target="_blank" rel="noopener noreferrer">{label}</a>'
 
@@ -225,7 +272,7 @@ def _fallback_markdown_to_html(content: str) -> str:
     if in_code_block:
       flush_code_block()
 
-    return "".join(parts) or "<p>No README available yet.</p>"
+    return _sanitize_basic_html("".join(parts)) or "<p>No README available yet.</p>"
 
 
 def _render_markdown_with_packages(content: str) -> str | None:
@@ -282,13 +329,16 @@ def _render_markdown_with_packages(content: str) -> str | None:
         "th": ["colspan", "rowspan", "align"],
         "td": ["colspan", "rowspan", "align"],
     }
-    cleaned = bleach.clean(
-        rendered or "",
-        tags=allowed_tags,
-        attributes=allowed_attributes,
-        strip=True,
-    )
-    return bleach.linkify(cleaned) or "<p>No README available yet.</p>"
+    def allowed_attribute(tag, name, value):
+        permitted = name in allowed_attributes.get(tag, []) or name in allowed_attributes["*"]
+        return permitted and (name not in {"href", "src"} or is_safe_url(value, image=name == "src"))
+
+    def clean(html):
+        return bleach.clean(html, tags=allowed_tags, attributes=allowed_attribute,
+                            protocols={"http", "https", "mailto"}, strip=True)
+
+    # Linkification creates new attributes; apply the same policy afterward.
+    return clean(bleach.linkify(clean(rendered or ""))) or "<p>No README available yet.</p>"
 
 
 def render_course_readme_html(content: str | None) -> str:
