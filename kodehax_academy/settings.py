@@ -202,7 +202,9 @@ USE_TZ = True
 DAILY_CHALLENGE_TIMEZONE = os.getenv("DAILY_CHALLENGE_TIMEZONE", "Asia/Kolkata")
 DAILY_CHALLENGE_PUBLISH_HOUR = int(os.getenv("DAILY_CHALLENGE_PUBLISH_HOUR", "10"))
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_TEXT_MODEL = os.getenv("GROQ_TEXT_MODEL", "openai/gpt-oss-20b")
+GROQ_VISION_MODEL = os.getenv("GROQ_VISION_MODEL", "qwen/qwen3.8-27b")
 
 STATICFILES_DIRS = [
     BASE_DIR / "static"

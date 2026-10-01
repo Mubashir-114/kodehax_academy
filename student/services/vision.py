@@ -8,17 +8,9 @@ from typing import Any
 
 from PIL import Image, UnidentifiedImageError
 
-from django.conf import settings
-from chat.gemini_client import GeminiServiceError, ai_error_payload, generate_multimodal, list_generate_content_models
+from chat.ai_service import ai_error_payload, generate_image
+from chat.schemas import VISION_SCHEMA
 
-VISION_MODEL_CANDIDATES = (
-    "models/gemini-2.5-flash-image",
-    "models/gemini-3.1-flash-image-preview",
-    "models/gemini-3-pro-image-preview",
-    "models/gemini-flash-latest",
-    "models/gemini-2.5-flash",
-    "models/gemini-2.0-flash",
-)
 MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
 ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 JSON_BLOCK_PATTERN = re.compile(r"```(?:json)?\s*(\{[\s\S]*\})\s*```", re.IGNORECASE)
@@ -142,70 +134,28 @@ def validate_uploaded_image(uploaded_file) -> None:
         raise ImageQueryError("Image exceeds the 5MB limit.", "Upload a smaller image.")
 
 
-def _resolve_vision_models() -> list[str]:
-    try:
-        available_models = set(list_generate_content_models())
-    except Exception:
-        return list(VISION_MODEL_CANDIDATES)
-
-    preferred = [model_name for model_name in VISION_MODEL_CANDIDATES if model_name in available_models]
-    if preferred:
-        return preferred
-    return list(VISION_MODEL_CANDIDATES)
-
-
-def upload_image_to_gemini(uploaded_file) -> dict[str, Any]:
+def upload_image_to_ai(uploaded_file) -> dict[str, Any]:
     validate_uploaded_image(uploaded_file)
     try:
-        image = Image.open(uploaded_file).convert("RGB")
-        image.load()
-    except (UnidentifiedImageError, OSError) as exc:
+        with Image.open(uploaded_file) as source:
+            image = source.convert("RGB")
+            image.load()
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
         raise ImageQueryError("The uploaded file is not a valid image.", "Try a clearer JPG or PNG image.") from exc
     finally:
         uploaded_file.seek(0)
 
-    if not settings.GEMINI_API_KEY:
-        error = ai_error_payload(
-            GeminiServiceError(
-                "missing_key",
-                "AI key is not connected",
-                "GEMINI_API_KEY is missing or empty in the active environment.",
-                "Add a valid GEMINI_API_KEY to .env, then restart the Django server.",
-            )
-        )
-        raise ImageQueryError(error["title"], error["suggestion"])
-
-    response = None
-    last_exc = None
-    attempted_models = []
-    for model_name in _resolve_vision_models():
-        attempted_models.append(model_name)
-        try:
-            response = generate_multimodal(
-                model_name,
-                [VISION_PROMPT, image],
-                config={"response_mime_type": "application/json"},
-            )
-            break
-        except Exception as exc:  # noqa: BLE001
-            last_exc = exc
-            continue
-        finally:
-            uploaded_file.seek(0)
-
-    if response is None:
-        if last_exc:
-            error = ai_error_payload(last_exc)
-            if settings.DEBUG:
-                raise ImageQueryError(
-                    f"{error['title']}: {error['message']} Attempted models: {', '.join(attempted_models)}",
-                    error["suggestion"],
-                ) from last_exc
-            raise ImageQueryError(error["title"], error["suggestion"]) from last_exc
-        raise ImageQueryError("No compatible Gemini vision model was available.", "Check Gemini model access, then retry.")
-
-    raw_text = response or ""
-    return process_response(raw_text)
+    try:
+        response = generate_image(VISION_PROMPT, image, schema=VISION_SCHEMA)
+        return process_response(response)
+    except ImageQueryError:
+        raise
+    except Exception as exc:
+        error = ai_error_payload(exc)
+        raise ImageQueryError(error["title"], error["suggestion"]) from exc
+    finally:
+        image.close()
+        uploaded_file.seek(0)
 
 
 def process_response(raw_text: str) -> dict[str, Any]:

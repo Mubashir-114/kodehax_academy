@@ -20,7 +20,7 @@ from teacher.models import (
 )
 from teacher.services.performance import get_admin_analytics_page, get_admin_dashboard_analytics
 from kodehax_academy.mobile import render_for_device
-from chat.gemini_client import get_ai_service_status
+from chat.ai_service import get_ai_service_status
 
 from .decorators import admin_required
 from .models import AdminUserState, PlatformSettings, SiteSettings

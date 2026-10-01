@@ -6,7 +6,8 @@ import re
 from typing import Any
 
 from teacher.models import Assignment, CodeSubmission, QuizAnswer, QuizResult, Submission
-from chat.gemini_client import ai_error_payload, generate_text
+from chat.schemas import RUBRIC_SCHEMA
+from chat.ai_service import ai_error_payload, generate_text
 
 
 def clamp_score(score: float, max_score: float) -> float:
@@ -56,7 +57,7 @@ def _read_text_file(file_path: str, char_limit: int = 6000) -> str:
 
 def _ai_grade(prompt: str, max_score: float) -> tuple[float, str]:
     try:
-        content = generate_text("gemini-2.5-flash", prompt).strip()
+        content = generate_text(prompt).strip()
     except Exception as exc:  # noqa: BLE001
         error = ai_error_payload(exc)
         return 0.0, f"{error['title']}\n{error['message']}\nSuggestion: {error['suggestion']}"
@@ -163,7 +164,7 @@ def grade_code_submission_ai(code_submission: CodeSubmission) -> CodeSubmission:
         f"Student code:\n{code_submission.code}"
     )
     try:
-        raw_feedback = generate_text("gemini-2.5-flash", prompt).strip()
+        raw_feedback = generate_text(prompt, schema=RUBRIC_SCHEMA).strip()
     except Exception as exc:  # noqa: BLE001
         error = ai_error_payload(exc)
         raw_feedback = f"{error['title']}\n{error['message']}\nSuggestion: {error['suggestion']}"

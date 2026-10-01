@@ -12,7 +12,7 @@
   <img src="https://img.shields.io/badge/Django-5.2.5-092E20?logo=django&logoColor=white&style=for-the-badge" alt="Django">
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white&style=for-the-badge" alt="Python">
   <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge" alt="Tailwind CSS">
-  <img src="https://img.shields.io/badge/AI-Gemini-4285F4?logo=google&logoColor=white&style=for-the-badge" alt="Gemini AI">
+  <img src="https://img.shields.io/badge/AI-Groq-F55036?logo=groq&logoColor=white&style=for-the-badge" alt="Groq AI">
   <img src="https://img.shields.io/badge/Roles-Student%20%7C%20Teacher%20%7C%20Admin-blue?style=for-the-badge" alt="Supported Roles">
 </p>
 
@@ -25,12 +25,12 @@ Kodehax Academy is designed to be practical, technical, and AI-assisted from the
 | Feature | Description | Status |
 | :--- | :--- | :---: |
 | **🔐 Role-Based Access** | Separate student, teacher, and admin flows with role-aware auth, redirects, and dashboards. | ✅ Done |
-| **🤖 AI-Assisted Teaching** | Gemini-powered quiz generation, lecture notes, coding-assignment authoring, and grading. | ✅ Done |
+| **🤖 AI-Assisted Teaching** | Groq-powered quiz generation, lecture notes, coding-assignment authoring, and grading. | ✅ Done |
 | **🧠 Skill Assessment Engine** | Weighted scoring across self-assessment, MCQs, and coding tasks, with skill-level classification. | ✅ Done |
 | **🔥 Daily Coding Challenges** | Adaptive challenge generation, sandboxed execution, hints, penalties, and points tracking. | ✅ Done |
 | **🏫 Classroom Management** | Create classes, manage enrollments, author assignments, auto-grade quizzes. | ✅ Done |
 | **📊 Performance Analytics** | Student progress records and classroom-level analytics views. | ✅ Done |
-| **💬 AI Chat Assistant** | Contextual Gemini-backed chat for tutoring, course Q&A, and quiz practice. | ✅ Done |
+| **💬 AI Chat Assistant** | Contextual Groq-backed chat for tutoring, course Q&A, and quiz practice. | ✅ Done |
 | **🛠️ Admin Console** | Platform settings, maintenance mode, teacher approvals, platform-wide analytics. | ✅ Done |
 | **📱 Device-Aware Rendering** | Mobile template routing for a dedicated mobile UX on key screens. | ✅ Done |
 
@@ -43,7 +43,7 @@ Kodehax Academy is designed to be practical, technical, and AI-assisted from the
 
 ## 🏗️ Architecture & Data Flow
 
-Kodehax Academy is a single Django project split into purpose-built apps, with Gemini handling every AI-assisted flow:
+Kodehax Academy is a single Django project split into purpose-built apps, with Groq handling every AI-assisted flow:
 
 ```mermaid
 flowchart TB
@@ -63,7 +63,7 @@ flowchart TB
     ACC & USR & STU & TCH & ADM & SKA & DLC --> DB[(MySQL / SQLite)]
     TCH -- AI grading & generation --> CHT
     STU -- assistance --> CHT
-    CHT --> GEM[(Google Gemini API)]
+    CHT --> GEM[(Groq API)]
 
     classDef default fill:#1E1E2E,stroke:#313244,stroke-width:1px,color:#CDD6F4;
     classDef highlight fill:#89B4FA,stroke:#74C7EC,stroke-width:2px,color:#11111B;
@@ -87,7 +87,7 @@ kodehax/
 ├── adminpanel/           # platform management, maintenance mode, admin dashboards
 ├── skill_assessment/     # assessment content, scoring, skill profile logic
 ├── daily_challenges/     # challenge generation, code runner, points, sessions
-├── chat/                 # Gemini client integration and chat views
+├── chat/                 # Groq client integration and chat views
 ├── templates/            # desktop, mobile, shared, role-specific templates
 ├── static/               # Tailwind source, compiled CSS, images
 ├── media/                # uploaded files and generated user content
@@ -104,7 +104,7 @@ Before running the application, make sure you have:
 - [Python](https://www.python.org/) 3.10+
 - [Node.js](https://nodejs.org/) (for the Tailwind build)
 - [MySQL](https://www.mysql.com/) — or use the bundled test_settings for SQLite
-- A [Gemini API key](https://ai.google.dev/) for the AI-assisted features
+- A [Groq API key](https://console.groq.com/) for the AI-assisted features
 
 ### 🛠️ Installation & Setup
 
@@ -129,7 +129,9 @@ Before running the application, make sure you have:
    PRODUCTION=False
    SECRET_KEY=replace-me
    ALLOWED_HOSTS=127.0.0.1,localhost
-   GEMINI_API_KEY=replace-me
+   GROQ_API_KEY=replace-me
+   GROQ_TEXT_MODEL=openai/gpt-oss-20b
+   GROQ_VISION_MODEL=qwen/qwen3.8-27b
    EMAIL_HOST=smtp.gmail.com
    EMAIL_PORT=587
    EMAIL_HOST_USER=
@@ -165,7 +167,7 @@ Before running the application, make sure you have:
 ## 📦 Key Dependencies
 
 - **Backend Framework:** Django
-- **AI Integration:** google-genai (Gemini)
+- **AI Integration:** groq 1.7.0
 - **Database:** PyMySQL 1.1.1 with RSA authentication support
 - **Static Files:** whitenoise
 - **Media Storage:** Cloudinary · django-storages
@@ -175,7 +177,7 @@ Before running the application, make sure you have:
 
 ## 🔒 Security & Best Practices
 
-- Secrets (`SECRET_KEY`, `GEMINI_API_KEY`, DB and email credentials) are environment-managed via `.env` and never hardcoded.
+- Secrets (`SECRET_KEY`, `GROQ_API_KEY`, DB and email credentials) are environment-managed via `.env` and never hardcoded.
 - Daily-challenge submissions run in a restricted sandbox — limited imports, blocked system calls, and wall-clock timeouts.
 - Account registration and recovery flows include OTP/email-related templates under `accounts/`.
 - `PRODUCTION=True` requires explicit MySQL credentials and production security settings.
@@ -253,7 +255,7 @@ Free services do not offer this pre-deploy step or an interactive service shell.
 
 - **Email OTP:** verification, non-admin login OTP, and recovery need working email delivery. Set `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, and verified `DEFAULT_FROM_EMAIL`. `EMAIL_TIMEOUT` defaults to 30 seconds. Missing credentials default to console delivery, which sends no user email. [Free Render services block outbound SMTP ports 25, 465, and 587](https://render.com/docs/free); choose paid hosting for the existing SMTP implementation. An HTTPS email API requires separate work. Real delivery is unverified.
 - **Uploaded media:** uploads use local `media/`, Render's filesystem is ephemeral, and Django's production URL configuration does not serve media with DEBUG=False. Installed Cloudinary/storage packages do not activate storage. Durable object storage with Django configuration, or a paid persistent disk plus production media serving, and transfer of existing uploads remain necessary. These are not implemented here.
-- **AI:** set `GEMINI_API_KEY` with usable quota. Optional `TIME_ZONE`, `DAILY_CHALLENGE_TIMEZONE`, `DAILY_CHALLENGE_PUBLISH_HOUR` default to Asia/Kolkata and hour 10. Existing upload-limit/security environment overrides remain supported. No external scheduler was added.
+- **AI:** set `GROQ_API_KEY`, `GROQ_TEXT_MODEL=openai/gpt-oss-20b`, and `GROQ_VISION_MODEL=qwen/qwen3.8-27b` server-side with usable quota. Qwen is a preview model; no model substitution is automatic. See [Groq migration and validation](GROQ_MIGRATION.md). Optional `TIME_ZONE`, `DAILY_CHALLENGE_TIMEZONE`, `DAILY_CHALLENGE_PUBLISH_HOUR` default to Asia/Kolkata and hour 10. Existing upload-limit/security environment overrides remain supported. No external scheduler was added.
 
 ### Verification commands
 

@@ -1,3 +1,5 @@
+> Historical project summary: provider descriptions and code examples below predate the 2026-10-01 Groq migration. For current AI configuration, implementation, and verified results, use [GROQ_MIGRATION.md](GROQ_MIGRATION.md), [PUBLISH_REVIEW.md](PUBLISH_REVIEW.md), and [README.md](README.md). Removed Gemini paths below are historical references.
+
 # Kodehax Academy - Final Semester Project Summary
 
 ## 1. Project Title & One-Line Description

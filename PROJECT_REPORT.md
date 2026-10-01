@@ -1,6 +1,6 @@
 # Kodehax Academy: Project and Render Deployment Report
 
-**Inspection date:** 2026-10-01  
+**Inspection date:** 2026-10-01
 **Scope:** Native Python deployment configuration update; local credentials and database contents were not displayed.
 
 Evidence labels used below:
@@ -12,7 +12,7 @@ Evidence labels used below:
 
 Kodehax Academy is a single Django web application for coding education. Its intended users are students, teachers, and platform administrators. The implementation brings classroom, assignments, assessment, coding practice, and AI-assisted learning into one server-rendered application.
 
-Verified implemented workflows include student registration and email verification; password login followed by an email OTP for non-admin users; invitation-based teacher creation; role-aware dashboards; class enrollment; file, quiz, and coding assignments; manual/AI grading; skill assessments; daily Python challenges; student chat and image analysis using Gemini; and admin management and maintenance mode. Relevant code is in `accounts/`, `users/`, `student/`, `teacher/`, `skill_assessment/`, `daily_challenges/`, and `adminpanel/`.
+Verified implemented workflows include student registration and email verification; password login followed by an email OTP for non-admin users; invitation-based teacher creation; role-aware dashboards; class enrollment; file, quiz, and coding assignments; manual/AI grading; skill assessments; daily Python challenges; student chat and image analysis using the shared Groq service; and admin management and maintenance mode. Relevant code is in `accounts/`, `users/`, `student/`, `teacher/`, `skill_assessment/`, `daily_challenges/`, and `adminpanel/`.
 
 The README and semester summary describe these as finished product features, but that is not equivalent to end-to-end verification. Specific limitations found in the implementation:
 - Public teacher registration is disabled; teachers enter through admin invitations (`accounts.views.teacher_register_disabled`, `teacher_invite_register`).
@@ -34,3 +34,7 @@ Pinned requirements installed successfully in an isolated Python 3.14.2 environm
 No authorized reachable live MySQL connection was established. MySQL server checks, schema/migration status, queries, migration execution, and actual TLS negotiation were not verified. Render's Python 3.12.12 / Node 22.16.0 runtime and Linux Gunicorn startup were not executed locally; the host has Python 3.14.2 / Node 24.13.1 on Windows. Tailwind emitted an outdated Browserslist database notice; the build succeeded.
 
 No deployment, push, or live database modification was performed.
+
+## Subsequent AI migration
+
+The deployment validation above records the earlier baseline. The recovered Groq migration, current checks, and publication evidence are documented in [GROQ_MIGRATION.md](GROQ_MIGRATION.md) and [PUBLISH_REVIEW.md](PUBLISH_REVIEW.md). No deployment was performed.

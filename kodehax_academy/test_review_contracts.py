@@ -15,8 +15,9 @@ from django.utils.http import urlsafe_base64_encode
 from accounts.tokens import email_verification_token
 from adminpanel.models import SiteSettings
 from student.models import ChatSession
-from teacher.models import Assignment, ClassRoom, QuizAnswer, QuizQuestion, Submission
-from teacher.services.evaluation import evaluate_quiz_for_student
+from teacher.models import Assignment, ClassRoom, CodeSubmission, QuizAnswer, QuizQuestion, Submission
+from teacher.services.evaluation import evaluate_quiz_for_student, grade_code_submission_ai
+from chat.ai_service import AIServiceError
 from teacher.services.performance import get_student_performance_summary
 from users.models import User
 
@@ -24,7 +25,7 @@ from users.models import User
 @override_settings(
     ROOT_URLCONF="kodehax_academy.urls",
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
-    GEMINI_API_KEY="",
+    GROQ_API_KEY="",
     SECURE_SSL_REDIRECT=False,
 )
 class RealRouteJourneyTests(TestCase):
@@ -252,10 +253,10 @@ class RealRouteJourneyTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(set(response.json()), {"reply", "has_code", "structured", "context"})
         self.assertIn("A loop repeats an action.", response.json()["reply"])
-        self.assertEqual(generate.call_args.args[0], "gemini-2.5-flash")
-        self.assertEqual(generate.call_args.kwargs["config"], {"response_mime_type": "application/json"})
+        self.assertIn("Explain loops", generate.call_args.args[0])
+        self.assertEqual(set(generate.call_args.kwargs["schema"]), {"type", "title", "content", "examples", "quiz", "follow_up", "difficulty", "tags"})
 
-    @override_settings(GEMINI_API_KEY="review-only-placeholder")
+    @override_settings(GROQ_API_KEY="review-only-placeholder")
     def test_teacher_notes_generation_renders_with_mocked_ai(self):
         self.client.force_login(self.teacher)
         with patch("teacher.services.ai_tools.generate_text", return_value="# Loop notes\nRepeat actions.") as generate:
@@ -263,4 +264,62 @@ class RealRouteJourneyTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "teacher/ai_tools.html")
         self.assertEqual(response.context["result"], "# Loop notes\nRepeat actions.")
-        self.assertEqual(generate.call_args.args[0], "gemini-2.5-flash")
+        self.assertIn("Loops", generate.call_args.args[0])
+
+    def test_groq_rubric_preserves_score_scaling_and_snapshot(self):
+        submission = CodeSubmission.objects.create(assignment=self.assignment, student=self.student,
+                                                   language="python", code="print(1)")
+        rubric = {"syntax": 10, "logic": 8, "structure": 6, "readability": 8, "summary": "Synthetic feedback"}
+        with patch("teacher.services.evaluation.generate_text", return_value=json.dumps(rubric)) as generate:
+            grade_code_submission_ai(submission)
+        submission.refresh_from_db()
+        self.assertEqual(submission.score, 80)
+        self.assertIn("Logic: 8.0/10", submission.ai_feedback)
+        self.assertEqual(set(generate.call_args.kwargs["schema"]), set(rubric))
+        self.assertEqual(get_student_performance_summary(self.student)["summary"]["average_score"], 80)
+
+    def test_groq_rubric_retains_python_syntax_override(self):
+        submission = CodeSubmission.objects.create(assignment=self.assignment, student=self.student,
+                                                   language="python", code="if:")
+        rubric = {"syntax": 10, "logic": 10, "structure": 10, "readability": 10, "summary": "Synthetic"}
+        with patch("teacher.services.evaluation.generate_text", return_value=json.dumps(rubric)):
+            grade_code_submission_ai(submission)
+        self.assertEqual(submission.score, 75)
+        self.assertIn("Syntax: 0.0/10", submission.ai_feedback)
+
+    def test_malformed_groq_rubric_uses_existing_safe_failure_score(self):
+        submission = CodeSubmission.objects.create(assignment=self.assignment, student=self.student,
+                                                   language="python", code="print(1)")
+        error = AIServiceError("malformed_output", "Invalid provider output", "Invalid JSON", "Retry")
+        with patch("teacher.services.evaluation.generate_text", side_effect=error) as generate:
+            grade_code_submission_ai(submission)
+        self.assertEqual(submission.score, 0)
+        self.assertIn("AI service is temporarily unavailable", submission.ai_feedback)
+        self.assertEqual(generate.call_count, 1)
+
+    def test_groq_chat_quota_retains_route_status_and_payload(self):
+        self.client.force_login(self.student)
+        error = AIServiceError("quota", "AI limit reached", "Synthetic quota message", "Retry", 429)
+        with patch("student.views.generate_text", side_effect=error):
+            response = self.client.post(reverse("ai_chat"), json.dumps({"message": "Explain loops"}),
+                                        content_type="application/json")
+        self.assertEqual(response.status_code, 429)
+        self.assertEqual(set(response.json()), {"error", "ai_error"})
+        self.assertEqual(response.json()["ai_error"]["code"], "service_busy")
+
+    def test_image_route_preserves_response_schema(self):
+        from io import BytesIO
+        from PIL import Image
+        self.client.force_login(self.student)
+        buffer = BytesIO()
+        Image.new("RGB", (10, 10)).save(buffer, format="PNG")
+        payload = {"type": "math", "detected_content": "2+2", "explanation": "Add.", "steps": [],
+                   "solution": "4", "mistakes": [], "follow_up": ["Practice"]}
+        with tempfile.TemporaryDirectory(prefix="kodehax-vision-media-") as media_root:
+            with override_settings(MEDIA_ROOT=media_root), patch("student.views.upload_image_to_ai", return_value=payload):
+                response = self.client.post(reverse("api_image_query"), {
+                    "image": SimpleUploadedFile("synthetic.png", buffer.getvalue(), content_type="image/png"),
+                })
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(set(response.json()), {"reply", "has_code", "structured", "session", "image_query"})
+        self.assertEqual(response.json()["image_query"]["raw"], payload)

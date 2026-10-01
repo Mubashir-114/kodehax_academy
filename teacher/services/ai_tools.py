@@ -2,7 +2,7 @@ import re
 
 from django.conf import settings
 
-from chat.gemini_client import GeminiServiceError, generate_text, normalize_gemini_exception
+from chat.ai_service import AIServiceError, generate_text, normalize_ai_exception
 
 
 _NUMBER_WORDS = {
@@ -60,12 +60,12 @@ def _count_generated_questions(text):
 
 
 def _configuration_error():
-    if not settings.GEMINI_API_KEY:
-        raise GeminiServiceError(
+    if not settings.GROQ_API_KEY:
+        raise AIServiceError(
             "missing_key",
             "AI key is not connected",
-            "The content studio is ready, but the Gemini API key is missing or not loaded.",
-            "Add GEMINI_API_KEY to .env and restart the Django server.",
+            "The content studio is ready, but the Groq API key is missing or not loaded.",
+            "Add GROQ_API_KEY to .env and restart the Django server.",
         )
 
 
@@ -111,7 +111,7 @@ CRITICAL:
 """
 
     try:
-        first_pass = generate_text("gemini-2.5-flash", prompt)
+        first_pass = generate_text(prompt)
         if _count_generated_questions(first_pass) == question_count:
             return first_pass
 
@@ -126,13 +126,12 @@ Rewrite the quiz from scratch in the same format, and return:
 
 Topic: {topic}
 """
-        second_pass = generate_text("gemini-2.5-flash", correction_prompt)
+        second_pass = generate_text(correction_prompt)
         if _count_generated_questions(second_pass) == question_count:
             return second_pass
         return second_pass or first_pass
     except Exception as exc:
-        print(f"Error generating quiz: {exc}")
-        raise normalize_gemini_exception(exc) from exc
+        raise normalize_ai_exception(exc) from exc
 
 
 def generate_notes(topic):
@@ -155,10 +154,9 @@ Rules:
 """
 
     try:
-        return generate_text("gemini-2.5-flash", prompt)
+        return generate_text(prompt)
     except Exception as exc:
-        print(f"Error generating notes: {exc}")
-        raise normalize_gemini_exception(exc) from exc
+        raise normalize_ai_exception(exc) from exc
 
 
 def strip_quiz_answers(quiz_text):
@@ -197,7 +195,6 @@ CRITICAL: Provide ONLY the coding problem details. Do NOT output MCQs or notes.
 """
 
     try:
-        return generate_text("gemini-2.5-flash", prompt)
+        return generate_text(prompt)
     except Exception as exc:
-        print(f"Error generating coding assignment: {exc}")
-        raise normalize_gemini_exception(exc) from exc
+        raise normalize_ai_exception(exc) from exc
