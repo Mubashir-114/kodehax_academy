@@ -5,7 +5,7 @@ from datetime import timedelta
 from statistics import mean
 
 from django.contrib.auth import get_user_model
-from django.db.models import Avg, Count, Max, Q, Sum
+from django.db.models import Avg, Count, Max, Sum
 from django.utils import timezone
 
 from daily_challenges.models import DailyChallenge, DailyChallengeSet, StudentChallengeAttempt, StudentPoints

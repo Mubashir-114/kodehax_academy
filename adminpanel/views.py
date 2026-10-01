@@ -6,8 +6,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.utils import DatabaseError, OperationalError, ProgrammingError
-from django.db.models import Avg, Count, Q, Sum
-from django.db.models.functions import TruncDate
+from django.db.models import Avg, Count, Q
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
@@ -15,13 +14,9 @@ from django.utils import timezone
 
 from accounts.forms import TeacherInvitationAdminForm, resend_teacher_invitation
 from accounts.models import TeacherInvitation
-from daily_challenges.models import DailyChallenge, StudentChallengeAttempt, StudentPoints
 from teacher.models import (
     Assignment,
-    CodeSubmission,
     PerformanceRecord,
-    QuizAnswer,
-    Submission,
 )
 from teacher.services.performance import get_admin_analytics_page, get_admin_dashboard_analytics
 from kodehax_academy.mobile import render_for_device

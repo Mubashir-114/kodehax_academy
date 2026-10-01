@@ -5,7 +5,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import BadHeaderError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode

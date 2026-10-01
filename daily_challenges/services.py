@@ -4,7 +4,6 @@ import itertools
 import logging
 import math
 import random
-import re
 import subprocess
 import sys
 from datetime import datetime, time, timedelta

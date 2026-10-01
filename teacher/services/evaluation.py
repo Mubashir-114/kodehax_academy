@@ -5,7 +5,6 @@ import os
 import re
 from typing import Any
 
-from django.conf import settings
 from teacher.models import Assignment, CodeSubmission, QuizAnswer, QuizResult, Submission
 from chat.gemini_client import ai_error_payload, generate_text
 
