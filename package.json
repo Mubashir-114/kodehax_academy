@@ -3,7 +3,8 @@
   "private": true,
   "scripts": {
     "tailwind:build": "tailwindcss -i ./static/src/input.css -o ./static/css/tailwind.css --minify",
-    "tailwind:watch": "tailwindcss -i ./static/src/input.css -o ./static/css/tailwind.css --watch"
+    "tailwind:watch": "tailwindcss -i ./static/src/input.css -o ./static/css/tailwind.css --watch",
+    "tailwind": "tailwindcss -i ./static/src/input.css -o ./static/css/tailwind.css --minify"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.20",

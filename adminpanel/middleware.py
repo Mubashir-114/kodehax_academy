@@ -17,6 +17,8 @@ class MaintenanceModeMiddleware:
 
     def __call__(self, request):
         path = request.path
+        if path == "/health/":
+            return self.get_response(request)
         try:
             maintenance_path = reverse("maintenance_page")
         except NoReverseMatch:

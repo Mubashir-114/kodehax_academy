@@ -11,9 +11,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import ssl
 import importlib.util
 from pathlib import Path
-import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -34,7 +34,7 @@ def _load_env_file():
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, value = line.split("=", 1)
-            os.environ[key.strip()] = value.strip().strip('"').strip("'")
+            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
         break
 
 
@@ -67,8 +67,8 @@ DEBUG = _env_bool("DEBUG", False)
 if PRODUCTION and DEBUG:
     raise ImproperlyConfigured("DEBUG must be False in production.")
 
-ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
-if not ALLOWED_HOSTS and not DEBUG:
+ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", "" if PRODUCTION else "localhost,127.0.0.1")
+if not PRODUCTION and not ALLOWED_HOSTS and not DEBUG:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 if PRODUCTION and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production.")
@@ -135,29 +135,32 @@ WSGI_APPLICATION = 'kodehax_academy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Development and production use the same existing MySQL database configuration.
+# SQLite is explicitly overridden only in test_settings.py.
 if PRODUCTION:
-    db_url = os.environ.get('DB_URL')
-    if not db_url:
-        raise ImproperlyConfigured("DB_URL must be set in production.")
-    DATABASES = {
-        'default': dj_database_url.parse(db_url)
-    }
-else:
-    db_engine = os.getenv('DB_ENGINE', 'django.db.backends.mysql')
-    db_name = os.getenv('DB_NAME', 'kodehax_academy')
-    if db_engine == 'django.db.backends.sqlite3' and not os.path.isabs(db_name):
-        db_name = BASE_DIR / db_name
+    missing = [name for name in ("DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT")
+               if not os.getenv(name)]
+    if missing:
+        raise ImproperlyConfigured("Missing production database variables: " + ", ".join(missing))
 
-    DATABASES = {
-        'default': {
-            'ENGINE': db_engine,
-            'NAME': db_name,
-            'USER': os.getenv('DB_USER', 'root'),
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '3306'),
-        }
+_db_options = {"charset": "utf8mb4"}
+if _env_bool("DB_SSL_REQUIRED") or os.getenv("DB_SSL_CA"):
+    # Require encryption, a trusted certificate chain, and a matching hostname.
+    if os.getenv("DB_SSL_CA") and not Path(os.environ["DB_SSL_CA"]).is_file():
+        raise ImproperlyConfigured("DB_SSL_CA must point to a readable CA certificate file.")
+    _db_options["ssl"] = ssl.create_default_context(cafile=os.getenv("DB_SSL_CA") or None)
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DB_NAME", "kodehax_academy"),
+        "USER": os.getenv("DB_USER", "root"),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "3306"),
+        "OPTIONS": _db_options,
     }
+}
 
 
 # Password validation
@@ -237,6 +240,10 @@ if not PRODUCTION:
         "https://*.ngrok-free.dev",
         "https://*.ngrok-free.app",
     ])
+
+# Render terminates HTTPS and supplies this trusted proxy header.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_REDIRECT_EXEMPT = [r"^health/$"]
 
 SECURE_SSL_REDIRECT = _env_bool("SECURE_SSL_REDIRECT", PRODUCTION)
 SESSION_COOKIE_SECURE = _env_bool("SESSION_COOKIE_SECURE", PRODUCTION)

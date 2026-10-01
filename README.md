@@ -110,7 +110,7 @@ Before running the application, make sure you have:
 
 1. **Clone the project and enter the directory:**
    ```bash
-   git clone https://github.com/DhruvarajK/kodehax_academy.git
+   git clone https://github.com/Mubashir-114/kodehax_academy.git
    cd kodehax_academy
    ```
 
@@ -119,7 +119,7 @@ Before running the application, make sure you have:
    python -m venv venv
    # On Windows: venv\Scripts\activate | On Linux/Mac: source venv/bin/activate
    pip install -r requirements.txt
-   npm install
+   npm ci
    ```
 
 3. **Configure environment variables:**
@@ -137,11 +137,15 @@ Before running the application, make sure you have:
    EMAIL_USE_TLS=True
    DAILY_CHALLENGE_TIMEZONE=Asia/Kolkata
    DAILY_CHALLENGE_PUBLISH_HOUR=10
-   DB_URL=
+   DB_NAME=kodehax_academy
+   DB_USER=root
+   DB_PASSWORD=your-password
+   DB_HOST=localhost
+   DB_PORT=3306
    ```
 
    > [!TIP]
-   > No local MySQL? Run with `--settings=kodehax_academy.test_settings` to use SQLite instead.
+   > SQLite is reserved for tests with `--settings=kodehax_academy.test_settings`. Development and production use MySQL.
 
 4. **Migrate the database and create a superuser:**
    ```bash
@@ -162,10 +166,10 @@ Before running the application, make sure you have:
 
 - **Backend Framework:** Django
 - **AI Integration:** google-genai (Gemini)
-- **Database:** mysqlclient · dj-database-url (Postgres-ready)
+- **Database:** PyMySQL 1.1.1 with RSA authentication support
 - **Static Files:** whitenoise
 - **Media Storage:** Cloudinary · django-storages
-- **Deployment:** gunicorn · Docker
+- **Deployment:** Gunicorn and Render native Python
 
 ---
 
@@ -174,7 +178,7 @@ Before running the application, make sure you have:
 - Secrets (`SECRET_KEY`, `GEMINI_API_KEY`, DB and email credentials) are environment-managed via `.env` and never hardcoded.
 - Daily-challenge submissions run in a restricted sandbox — limited imports, blocked system calls, and wall-clock timeouts.
 - Account registration and recovery flows include OTP/email-related templates under `accounts/`.
-- `PRODUCTION=True` switches the database over to a parsed `DB_URL` instead of local hardcoded credentials.
+- `PRODUCTION=True` requires explicit MySQL credentials and production security settings.
 
 ---
 
@@ -193,3 +197,77 @@ Before running the application, make sure you have:
 This project is licensed under the [MIT License](LICENSE).
 
 <p align="center">Made with ❤️ for practical, AI-assisted technical education.</p>
+
+
+## Render native Python deployment
+
+Create a Web Service from `https://github.com/Mubashir-114/kodehax_academy`, using your release branch and repository root (leave Root Directory empty). Select **Python 3** and preferably a **paid Starter or higher** instance for SMTP OTP and pre-deploy migrations.
+
+| Setting | Value |
+| --- | --- |
+| Build command | `bash build.sh` |
+| Start command | `gunicorn kodehax_academy.wsgi --bind 0.0.0.0:$PORT` |
+| Health check | `/health/` |
+| Pre-deploy (paid service) | `python manage.py migrate --noinput` |
+| Python version | `PYTHON_VERSION=3.12.12` |
+| Node version | `NODE_VERSION=22.16.0` |
+
+Render's [native runtimes include Node and npm](https://render.com/docs/native-runtimes). `build.sh` installs Python dependencies, runs `npm ci --include=dev` and `npm run tailwind`, then `collectstatic`. No migrations run during build or startup. WhiteNoise serves collected static assets. Scripts use LF line endings.
+
+### Required production environment
+
+Set these privately in Render's Environment settings:
+
+```env
+PRODUCTION=True
+DEBUG=False
+SECRET_KEY=<long-random-private-secret>
+ALLOWED_HOSTS=<service>.onrender.com,your-domain.example
+CSRF_TRUSTED_ORIGINS=https://<service>.onrender.com,https://your-domain.example
+DB_NAME=<existing-database>
+DB_USER=<database-user>
+DB_PASSWORD=<database-password>
+DB_HOST=<reachable-mysql-provider-hostname>
+DB_PORT=3306
+PYTHON_VERSION=3.12.12
+NODE_VERSION=22.16.0
+```
+
+Render supplies `PORT`. Hosts are comma-separated bare hostnames; trusted origins include HTTPS schemes. Production rejects missing secrets/hosts/database values and DEBUG=True. Secure cookies, HTTPS redirect, and HSTS default on. Django recognizes Render's forwarded HTTPS header. `/health/` bypasses HTTPS redirect and maintenance database lookups; it reports liveness, not database readiness.
+
+Host MySQL **separately** and retain the existing schema, data, and migration history. Use MySQL 8.0.11+ for Django 5.2, with provider DNS/port, user permissions, and firewall rules allowing Render outbound connections. `localhost` identifies the web service itself, not the provider. Back up existing data before releases. Do not reset tables or generate replacement migrations.
+
+PyMySQL is used because Render's documented native tools do not guarantee MySQL development headers for mysqlclient. Project initialization calls `pymysql.install_as_MySQLdb()` before Django's backend loads. PyMySQL 1.1.1's compatibility interface satisfies Django **5.2.5** without version overrides; reverify before upgrading Django. The RSA extra supports modern MySQL authentication.
+
+### Verified MySQL TLS
+
+Set `DB_SSL_REQUIRED=True` when required by your provider. Encryption, certificate chain verification, and hostname verification are enforced using system trust roots. For a private provider CA, upload its PEM as a Render Secret File and set `DB_SSL_CA=/etc/secrets/<ca-file>.pem` (also enables verified TLS). Ensure it is available during build and runtime. Use the certificate's DNS hostname as DB_HOST. Do not disable verification to work around errors. Client-certificate authentication is not configured.
+
+### Migrations by plan
+
+On a paid service, set the separate pre-deploy command above. Render [supports pre-deploy on paid web services](https://render.com/docs/deploys). Review `python manage.py migrate --plan` and apply only the existing migrations once per release.
+
+Free services do not offer this pre-deploy step or an interactive service shell. Before routing users to each release, run `python manage.py migrate --noinput` from a trusted workstation or CI runner with the same release, production environment, and MySQL connectivity/TLS. Keep credentials private. Coordinate this manually; `/health/` passing does not prove migrations are applied. Never add migrations to build.sh or the Gunicorn start command.
+
+### Remaining deployment blockers
+
+- **Email OTP:** verification, non-admin login OTP, and recovery need working email delivery. Set `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, and verified `DEFAULT_FROM_EMAIL`. `EMAIL_TIMEOUT` defaults to 30 seconds. Missing credentials default to console delivery, which sends no user email. [Free Render services block outbound SMTP ports 25, 465, and 587](https://render.com/docs/free); choose paid hosting for the existing SMTP implementation. An HTTPS email API requires separate work. Real delivery is unverified.
+- **Uploaded media:** uploads use local `media/`, Render's filesystem is ephemeral, and Django's production URL configuration does not serve media with DEBUG=False. Installed Cloudinary/storage packages do not activate storage. Durable object storage with Django configuration, or a paid persistent disk plus production media serving, and transfer of existing uploads remain necessary. These are not implemented here.
+- **AI:** set `GEMINI_API_KEY` with usable quota. Optional `TIME_ZONE`, `DAILY_CHALLENGE_TIMEZONE`, `DAILY_CHALLENGE_PUBLISH_HOUR` default to Asia/Kolkata and hour 10. Existing upload-limit/security environment overrides remain supported. No external scheduler was added.
+
+### Verification commands
+
+```bash
+python -m pip check
+python manage.py check
+python manage.py check --deploy
+python manage.py test --settings=kodehax_academy.test_settings
+npm ci --include=dev
+npm run tailwind
+python manage.py collectstatic --noinput
+# Only with an authorized reachable MySQL connection:
+python manage.py check --database default
+python manage.py migrate --plan
+```
+
+SQLite test settings are preserved. Live MySQL checks, migration execution, and TLS negotiation require an actual reachable server.

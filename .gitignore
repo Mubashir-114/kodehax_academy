@@ -33,3 +33,12 @@ runserver.err.log
 .DS_Store
 Thumbs.db
 
+
+# Isolated deployment verification environment
+.venv-render-check/
+
+# Local migration recovery and checkout artifacts
+.migration-backup/
+.migration-before.patch
+.kilo/
+.publish-tools/
