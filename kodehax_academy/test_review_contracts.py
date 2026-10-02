@@ -2,11 +2,14 @@
 import json
 import tempfile
 from datetime import timedelta
+from importlib import import_module
 from unittest.mock import patch
 
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase, override_settings
+from django.db.migrations.operations.models import CreateModel
+from django.template.loader import get_template
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -15,11 +18,51 @@ from django.utils.http import urlsafe_base64_encode
 from accounts.tokens import email_verification_token
 from adminpanel.models import SiteSettings
 from student.models import ChatSession
-from teacher.models import Assignment, ClassRoom, CodeSubmission, QuizAnswer, QuizQuestion, Submission
+from teacher.models import (
+    Assignment,
+    ClassRoom,
+    CodeSubmission,
+    LectureNote,
+    QuizAnswer,
+    QuizQuestion,
+    Submission,
+)
 from teacher.services.evaluation import evaluate_quiz_for_student, grade_code_submission_ai
 from chat.ai_service import AIServiceError
 from teacher.services.performance import get_student_performance_summary
 from users.models import User
+
+
+@override_settings(ROOT_URLCONF="kodehax_academy.urls")
+class MigrationAndTemplateConsistencyTests(SimpleTestCase):
+    def test_lecture_note_index_names_match_deployed_migration_state(self):
+        migration = import_module("teacher.migrations.0012_lecturenote").Migration
+        create_model = next(
+            operation
+            for operation in migration.operations
+            if isinstance(operation, CreateModel) and operation.name == "LectureNote"
+        )
+        migration_indexes = {
+            (tuple(index.fields), index.name)
+            for index in create_model.options["indexes"]
+        }
+        model_indexes = {
+            (tuple(index.fields), index.name)
+            for index in LectureNote._meta.indexes
+        }
+
+        self.assertEqual(model_indexes, migration_indexes)
+
+    def test_legacy_registration_templates_compile_and_render(self):
+        templates = {
+            "user/register/std_register.html": "Student Register",
+            "user/register/teacher_register.html": "Teacher Register",
+        }
+
+        for template_name, heading in templates.items():
+            with self.subTest(template=template_name):
+                rendered = get_template(template_name).render({})
+                self.assertIn(heading, rendered)
 
 
 @override_settings(
