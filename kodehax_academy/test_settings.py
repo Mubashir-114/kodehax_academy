@@ -10,3 +10,4 @@ DATABASES = {
 
 ROOT_URLCONF = "kodehax_academy.test_urls"
 SILENCED_SYSTEM_CHECKS = ["fields.E210"]
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"

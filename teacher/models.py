@@ -122,8 +122,14 @@ class LectureNote(models.Model):
     class Meta:
         ordering = ("-created_at",)
         indexes = [
-            models.Index(fields=["classroom", "created_at"]),
-            models.Index(fields=["teacher", "created_at"]),
+            models.Index(
+                fields=["classroom", "created_at"],
+                name="teacher_lec_classro_ee7d18_idx",
+            ),
+            models.Index(
+                fields=["teacher", "created_at"],
+                name="teacher_lec_teacher_7b9e28_idx",
+            ),
         ]
 
     def __str__(self):

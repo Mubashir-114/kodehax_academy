@@ -19,7 +19,7 @@ from django.db.models import Count
 from datetime import timedelta
 import re
 from student.models import StudentProfile
-from chat.gemini_client import ai_error_payload, normalize_gemini_exception
+from chat.ai_service import ai_error_payload, normalize_ai_exception
 from .services.ai_tools import generate_quiz, generate_notes, generate_coding_assignment
 from .services.evaluation import (
     evaluate_quiz_for_assignment,
@@ -933,7 +933,7 @@ def ai_tools(request):
                 elif tool_used == "coding" and topic:
                     result = generate_coding_assignment(topic)
             except Exception as exc:  # noqa: BLE001
-                error = normalize_gemini_exception(exc)
+                error = normalize_ai_exception(exc)
                 ai_error = ai_error_payload(error)
                 messages.error(request, error.title)
 

@@ -1,3 +1,5 @@
+> Historical project summary: provider descriptions and code examples below predate the 2026-10-01 Groq migration. For current AI configuration, implementation, and verified results, use [GROQ_MIGRATION.md](GROQ_MIGRATION.md), [PUBLISH_REVIEW.md](PUBLISH_REVIEW.md), and [README.md](README.md). Removed Gemini paths below are historical references.
+
 # Kodehax Academy - Final Semester Project Summary
 
 ## 1. Project Title & One-Line Description
@@ -50,8 +52,7 @@ Kodehax Academy unifies these concerns into a single codebase with:
 | **CORS** | django-cors-headers | 4.7.0 |
 | **Timezone** | pytz | 2025.2 |
 | **Markdown** | Markdown & Bleach | 3.8.2, 6.2.0 |
-| **Containerization** | Docker | Latest |
-| **Deployment** | Render (via Dockerfile) | n/a |
+| **Deployment** | Render native Python | n/a |
 
 ---
 
@@ -472,7 +473,7 @@ StudentSkill (1) ──→ (1) StudentAssessment
 - Python 3.10+
 - MySQL 8.0+ (production) or SQLite (development)
 - Git
-- Docker (optional, for containerized deployment)
+- Node.js/npm for the native build
 
 ### Local Development Setup
 
@@ -506,20 +507,19 @@ DEBUG=True
 SECRET_KEY=django-insecure-dev-key
 ALLOWED_HOSTS=localhost,127.0.0.1
 
-# Database (SQLite for dev)
-DB_ENGINE=django.db.backends.sqlite3
-DB_NAME=db.sqlite3
-
-# Or MySQL:
-# DB_ENGINE=django.db.backends.mysql
-# DB_NAME=kodehax_academy
-# DB_USER=root
-# DB_PASSWORD=yourpassword
-# DB_HOST=127.0.0.1
-# DB_PORT=3306
+# MySQL for development and production; SQLite is only for tests.
+PRODUCTION=False
+DB_NAME=kodehax_academy
+DB_USER=root
+DB_PASSWORD=yourpassword
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_SSL_REQUIRED=False
+DB_SSL_CA=
 
 # Email (SMTP for OTP)
-EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend  # Logs to console for dev
+# Logs to console for development only:
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 # Production: django.core.mail.backends.smtp.EmailBackend
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
@@ -573,44 +573,9 @@ Visit `http://127.0.0.1:8000/` in your browser.
 
 ---
 
-### Production Deployment (Render or Heroku)
+### Production Deployment (Render native Python)
 
-#### 1. Push Code to Git
-
-```bash
-git add .
-git commit -m "Deploy to production"
-git push origin main
-```
-
-#### 2. Configure Environment on Render
-
-Set the following in Render dashboard environment variables:
-
-```
-PRODUCTION=True
-DEBUG=False
-SECRET_KEY=generate-a-secure-key
-ALLOWED_HOSTS=your-domain.com,www.your-domain.com
-
-DB_URL=mysql://user:password@host:port/dbname
-GEMINI_API_KEY=your-key
-CLOUDINARY_URL=cloudinary://...
-
-EMAIL_HOST=smtp.gmail.com
-EMAIL_HOST_USER=...
-EMAIL_HOST_PASSWORD=...
-```
-
-#### 3. Deploy
-
-Render automatically detects the Dockerfile and runs:
-
-```bash
-python manage.py collectstatic --noinput
-python manage.py migrate
-gunicorn kodehax_academy.wsgi:application --bind 0.0.0.0:$PORT
-```
+See [README](README.md#render-native-python-deployment) and `.env.example` for current settings. Build: `bash build.sh`. Start: `gunicorn kodehax_academy.wsgi --bind 0.0.0.0:$PORT`. Keep the existing separately hosted MySQL database and use DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT. Paid plans apply existing migrations in pre-deploy; free plans need an external trusted runner. Email OTP and media blockers remain documented in README.
 
 ---
 
@@ -937,24 +902,9 @@ def normalize_gemini_exception(exc: Exception) -> GeminiServiceError:
 
 ---
 
-### Challenge 6: **MySQL Connection Issues in Docker/Render**
+### Challenge 6: MySQL connections on Render
 
-**Symptoms**: Deployment to Render would fail with MySQL connection errors.
-
-**Solutions Found**:
-- Used environment variable `DB_URL` in production (format: `mysql://user:pass@host/db`)
-- Parsed with `dj-database-url` library
-- Fallback to SQLite for development
-- Added health check endpoint to verify connectivity
-- Used `psycopg2-binary` for PostgreSQL (backup option)
-
-**Code Example**: Database config in settings.py:
-```python
-if PRODUCTION:
-    DATABASES = {'default': dj_database_url.parse(os.environ.get('DB_URL'))}
-else:
-    DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}}
-```
+Use PyMySQL for both development and production. Configure explicit DB_* variables and verified TLS with DB_SSL_REQUIRED / DB_SSL_CA. SQLite is limited to test settings. Health checks report liveness, not database readiness.
 
 ---
 
@@ -1184,7 +1134,7 @@ Based on code inspection and incomplete features found:
 
 ### 15. **Refactor Daily Challenge Test Case Validation**
 - **Current**: Hard-coded Python sandbox in services.py
-- **Improvement**: Support multiple languages (JavaScript, Java, C++) by using docker containers or cloud-based judge systems
+- **Improvement**: Support multiple languages (JavaScript, Java, C++) by using isolated execution services or cloud-based judge systems
 - **Complexity**: High
 
 ---
@@ -1222,7 +1172,7 @@ Based on code inspection and incomplete features found:
 
 The project demonstrates strong software engineering fundamentals: modular design, clear separation of concerns, integration with external services (Gemini), and thoughtful UX for distinct user personas. The main opportunities for future work are test automation, native mobile app development, advanced analytics, and support for collaborative/competitive features.
 
-**Tech Stack Summary**: Django 5.2.5, Python 3.10+, MySQL, Tailwind CSS, Gemini AI, Docker, Gunicorn deployment.
+**Tech Stack Summary**: Django 5.2.5, Python 3.10+, MySQL, Tailwind CSS, Gemini AI, Render native Python, Gunicorn deployment.
 
 ---
 

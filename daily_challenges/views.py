@@ -1,3 +1,4 @@
+from code_execution.service import ExecutionUnavailable
 from datetime import timedelta
 import json
 
@@ -235,6 +236,7 @@ def submit_solution(request, challenge_id):
         messages.error(request, "This level is locked. Solve the required earlier questions first.")
         return redirect("daily_challenges_today")
 
+    response_status = 200
     preview_payload = None
     submission_payload = None
     editor_code = _build_workspace_editor_code(challenge)
@@ -258,13 +260,21 @@ def submit_solution(request, challenge_id):
             return redirect("daily_challenge_workspace", challenge_id=challenge.id)
 
         if action == "run":
-            preview_payload = preview_solution(challenge, code)
+            try:
+                preview_payload = preview_solution(challenge, code)
+            except ExecutionUnavailable as exc:
+                response_status = 503
+                preview_payload = {"allowed": False, "error": str(exc), "results": [], "summary": {}}
             if not preview_payload["allowed"]:
                 messages.error(request, preview_payload["error"])
             else:
                 messages.success(request, "Test run completed.")
         elif action == "submit":
-            submission_payload = submit_solution_for_challenge(challenge, code)
+            try:
+                submission_payload = submit_solution_for_challenge(challenge, code)
+            except ExecutionUnavailable as exc:
+                response_status = 503
+                submission_payload = {"ok": False, "error": str(exc)}
             if not submission_payload["ok"]:
                 messages.error(request, submission_payload["error"])
             else:
@@ -323,6 +333,7 @@ def submit_solution(request, challenge_id):
             ).first(),
             "remaining_challenges": _remaining_workspace_challenges(challenge.challenge_set, challenge),
         },
+        status=response_status,
     )
 
 

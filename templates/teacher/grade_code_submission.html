@@ -1,4 +1,5 @@
 {% extends "teacher/base.html" %}
+{% load static %}
 
 {% block title %}Grade Code Submission{% endblock %}
 {% block page_title %}Grade Code Submission{% endblock %}
@@ -82,6 +83,7 @@
 {% block extra_scripts %}
 <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="{% static 'js/safe_markdown.js' %}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -119,8 +121,7 @@
 
       try {
         if (hasMarked) {
-          const parsed = marked.parse(markdown);
-          output.innerHTML = hasSanitizer ? DOMPurify.sanitize(parsed) : parsed;
+          window.KodehaxMarkdown.render(output, markdown);
         } else {
           output.textContent = markdown;
         }

@@ -1,2 +1,4 @@
 # Keep generated Tailwind output untouched to avoid LF/CRLF conversion warnings.
 static/css/tailwind.css -text
+
+*.sh text eol=lf

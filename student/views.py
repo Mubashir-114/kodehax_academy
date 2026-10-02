@@ -1,7 +1,6 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.conf import settings
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
@@ -13,13 +12,14 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.urls import reverse
 from chat.views import RESPONSE_STYLE_INSTRUCTION, format_ai_reply
-from chat.gemini_client import ai_error_payload, generate_text, normalize_gemini_exception
+from chat.schemas import CHAT_SCHEMA
+from chat.ai_service import ai_error_payload, generate_text, normalize_ai_exception
 from daily_challenges.models import DailyChallengeSession, StudentPoints
 from daily_challenges.services import get_today_challenge_set, refresh_challenge_set
 from skill_assessment.models import StudentSkill
 from .models import ChatMessage, ChatSession, ImageQuery
 from .context_processors import ACTIVE_CLASSROOM_SESSION_KEY, resolve_active_student_classroom
-from .services.gemini_vision import ImageQueryError, upload_image_to_gemini
+from .services.vision import ImageQueryError, upload_image_to_ai
 from .services.chat_memory import (
     append_message,
     build_context_payload,
@@ -50,7 +50,6 @@ from .upload_validation import validate_assignment_upload, validate_profile_imag
 from teacher.services.course_readme import render_course_readme_html
 from kodehax_academy.mobile import render_for_device
 
-MODEL = "gemini-flash-latest"
 
 CODE_FENCE_PATTERN = re.compile(r"```[\w+-]*\n[\s\S]*?\n```")
 JSON_BLOCK_PATTERN = re.compile(r"```(?:json)?\s*(\{[\s\S]*\})\s*```", re.IGNORECASE)
@@ -434,7 +433,7 @@ def _message_payload(message):
     }
 
 
-def _build_gemini_prompt(mode, history, user_message, student_context, memory_context=None):
+def _build_ai_prompt(mode, history, user_message, student_context, memory_context=None):
     transcript_lines = []
     for item in history:
         if not isinstance(item, dict):
@@ -517,11 +516,10 @@ def _build_gemini_prompt(mode, history, user_message, student_context, memory_co
 
 def _run_text_chat(user, user_message, mode, history, memory_context=None):
     student_context = _student_context_payload(user, user_message, mode)
-    prompt = _build_gemini_prompt(mode, history, user_message, student_context, memory_context=memory_context)
+    prompt = _build_ai_prompt(mode, history, user_message, student_context, memory_context=memory_context)
     raw_response = generate_text(
-        "gemini-2.5-flash",
         prompt,
-        config={"response_mime_type": "application/json"},
+        schema=CHAT_SCHEMA,
     )
     parsed = _safe_json_load(raw_response)
     if not parsed:
@@ -542,7 +540,7 @@ def _run_text_chat(user, user_message, mode, history, memory_context=None):
     structured = _normalize_structured_response(parsed, mode)
     reply = format_ai_reply(_structured_to_markdown(structured))
     if not reply or not structured["content"]:
-        raise ValueError("Gemini returned an empty response.")
+        raise ValueError("Groq returned an empty response.")
     return {
         "reply": reply,
         "has_code": bool(CODE_FENCE_PATTERN.search(reply)),
@@ -571,7 +569,7 @@ def llama_chat(request):
     try:
         return JsonResponse(_run_text_chat(request.user, user_message, mode, history))
     except Exception as e:
-        error = normalize_gemini_exception(e)
+        error = normalize_ai_exception(e)
         return JsonResponse({"error": error.message, "ai_error": ai_error_payload(error)}, status=error.status_code)
 
 def chat_page(request):
@@ -593,7 +591,7 @@ def image_query_api(request):
         )
 
     try:
-        ai_payload = upload_image_to_gemini(uploaded_image)
+        ai_payload = upload_image_to_ai(uploaded_image)
     except ImageQueryError as exc:
         return JsonResponse({"error": exc.message, "suggestion": exc.suggestion}, status=400)
     except Exception as exc:  # noqa: BLE001
@@ -745,7 +743,7 @@ def chat_session_message_api(request, session_id):
             memory_context=memory_context,
         )
     except Exception as exc:
-        error = normalize_gemini_exception(exc)
+        error = normalize_ai_exception(exc)
         return JsonResponse({"error": error.message, "ai_error": ai_error_payload(error)}, status=error.status_code)
 
     assistant_message = append_message(session, ChatMessage.ROLE_ASSISTANT, ai_payload["reply"])
@@ -1133,12 +1131,12 @@ def student_performance_dashboard(request):
     return render_for_device(request, "student/performance.html", {
         "summary": summary,
         "records": analytics["records"],
-        "score_progression_labels": json.dumps(charts["score_progression_labels"]),
-        "score_progression_values": json.dumps(charts["score_progression_values"]),
-        "assignment_score_labels": json.dumps(charts["assignment_score_labels"]),
-        "assignment_score_values": json.dumps(charts["assignment_score_values"]),
-        "submission_trend_labels": json.dumps(charts["submission_trend_labels"]),
-        "submission_trend_values": json.dumps(charts["submission_trend_values"]),
+        "score_progression_labels": charts["score_progression_labels"],
+        "score_progression_values": charts["score_progression_values"],
+        "assignment_score_labels": charts["assignment_score_labels"],
+        "assignment_score_values": charts["assignment_score_values"],
+        "submission_trend_labels": charts["submission_trend_labels"],
+        "submission_trend_values": charts["submission_trend_values"],
         "notifications": notifications[:20],
     })
 

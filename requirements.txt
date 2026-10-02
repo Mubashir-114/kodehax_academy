@@ -9,9 +9,8 @@ django-storages==1.14.6
 django_compressor==4.6.0
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
-google-genai==1.49.0
-mysqlclient==2.2.7
-PyMySQL==1.1.1
+groq==1.7.0
+PyMySQL[rsa]==1.1.1
 python-dotenv==1.0.1
 pytz==2025.2
 pillow==12.1.0
@@ -22,7 +21,5 @@ requests-oauthlib==2.0.0
 requests-toolbelt==1.0.0
 whitenoise==6.10.0
 gunicorn==23.0.0
-dj-database-url==2.1.0
-psycopg2-binary==2.9.9
 Markdown==3.8.2
 bleach==6.2.0

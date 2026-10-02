@@ -1,0 +1,21 @@
+{% extends "user/base.html" %}
+
+{% block title %}Resend Verification{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl reveal">
+    <div class="glass-card p-8 text-center md:p-10">
+        <p class="text-xs uppercase tracking-[0.18em] text-indigo-300">Email verification</p>
+        <h1 class="mt-3 text-3xl font-black text-white">Need a fresh link?</h1>
+        <p class="mt-4 text-slate-300">Send a new verification link to {{ verification_email }}.</p>
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary px-6 py-3">Resend verification email</button>
+        </form>
+        {% if resend_seconds_remaining %}
+            <p class="mt-4 text-sm text-slate-400">Another request is available in about {{ resend_seconds_remaining }} seconds.</p>
+        {% endif %}
+        <a href="{% url 'student_login' %}" class="mt-6 inline-block text-sm text-indigo-300">Back to login</a>
+    </div>
+</div>
+{% endblock %}

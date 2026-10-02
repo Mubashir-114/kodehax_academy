@@ -24,7 +24,10 @@
 {% include "mobile/components/auth_drawer.html" %}
 <section class="done-panel p-6 text-center reveal-1">
     <h1 class="text-2xl font-semibold">Verify Your Email</h1>
-    <p class="mt-3 text-sm text-slate-300">A verification link has been sent. Open it, then continue to login.</p>
+    <p class="mt-3 text-sm text-slate-300">If an account can be registered with those details, check the inbox for a verification link.</p>
+    {% if can_resend_verification %}
+    <a href="{% url 'resend_verification' %}" class="mt-5 inline-flex rounded-xl border border-slate-600 px-4 py-3 text-sm">Resend verification</a>
+    {% endif %}
     <a href="{% url 'student_login' %}" class="done-btn mt-5 inline-flex px-4 py-3 text-sm">Go to Login</a>
 </section>
 <div class="mt-4 px-1 text-sm">

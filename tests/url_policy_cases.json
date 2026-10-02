@@ -1,0 +1,4 @@
+{
+  "safe": ["https://example.com/course?q=1&lang=en", "http://example.com/", "mailto:student@example.com", "/courses/1/", "../notes.md", "#overview", "?page=2", "//example.com/image.png", "https://example.com/lesson%20one"],
+  "unsafe": ["javascript:synthetic()", "JaVaScRiPt:synthetic()", "java script:synthetic()", "java\tscript:synthetic()", "java\nscript:synthetic()", "javascript%3Asynthetic()", "%6Aavascript%253Asynthetic()", "vbscript:synthetic()", "data:text/html,synthetic", "file:///synthetic", "blob:synthetic", "ftp://example.com/", "https:example.com", "https://[broken", "https://example.com:bad/", "https://synthetic:placeholder@example.com/", "\\\\example.com", "///example.com", "java\u200bscript:synthetic()", "ｊａｖａｓｃｒｉｐｔ：synthetic()"]
+}

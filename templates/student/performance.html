@@ -168,14 +168,20 @@
 {% endblock %}
 
 {% block extra_scripts %}
+{{ score_progression_labels|json_script:"score-progression-labels" }}
+{{ score_progression_values|json_script:"score-progression-values" }}
+{{ assignment_score_labels|json_script:"assignment-score-labels" }}
+{{ assignment_score_values|json_script:"assignment-score-values" }}
+{{ submission_trend_labels|json_script:"submission-trend-labels" }}
+{{ submission_trend_values|json_script:"submission-trend-values" }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const scoreProgressionLabels = {{ score_progression_labels|safe }};
-  const scoreProgressionValues = {{ score_progression_values|safe }};
-  const assignmentScoreLabels = {{ assignment_score_labels|safe }};
-  const assignmentScoreValues = {{ assignment_score_values|safe }};
-  const submissionTrendLabels = {{ submission_trend_labels|safe }};
-  const submissionTrendValues = {{ submission_trend_values|safe }};
+  const scoreProgressionLabels = JSON.parse(document.getElementById("score-progression-labels").textContent);
+  const scoreProgressionValues = JSON.parse(document.getElementById("score-progression-values").textContent);
+  const assignmentScoreLabels = JSON.parse(document.getElementById("assignment-score-labels").textContent);
+  const assignmentScoreValues = JSON.parse(document.getElementById("assignment-score-values").textContent);
+  const submissionTrendLabels = JSON.parse(document.getElementById("submission-trend-labels").textContent);
+  const submissionTrendValues = JSON.parse(document.getElementById("submission-trend-values").textContent);
 
   const commonGrid = { color: "rgba(148, 163, 184, 0.2)" };
   const commonTick = { color: "#cbd5e1" };

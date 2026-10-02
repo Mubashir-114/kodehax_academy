@@ -1,12 +1,9 @@
+from code_execution.service import execute
 import ast
-import json
 import itertools
 import logging
 import math
 import random
-import re
-import subprocess
-import sys
 from datetime import datetime, time, timedelta
 from decimal import Decimal
 from string import Formatter
@@ -103,137 +100,7 @@ DIFFICULTY_DISTRIBUTION_BY_SKILL = {
     },
 }
 
-RUNNER_SCRIPT = r"""
-import ast
-import builtins
-import contextlib
-import io
-import json
-import sys
-import time
 
-payload = json.loads(sys.stdin.read())
-code = payload["code"]
-function_name = payload["function_name"]
-test_cases = payload["test_cases"]
-
-blocked_calls = {"eval", "exec", "open", "__import__", "compile", "input", "globals", "locals", "vars"}
-blocked_modules = {"os", "sys", "subprocess", "socket", "pathlib", "shutil"}
-allowed_modules = {"math", "collections", "itertools", "functools", "heapq", "bisect", "string"}
-
-def serialize_error(exc, category):
-    return {
-        "category": category,
-        "type": exc.__class__.__name__,
-        "message": str(exc),
-        "line": getattr(exc, "lineno", None),
-    }
-
-captured_stdout = io.StringIO()
-
-def safe_print(*args, **kwargs):
-    kwargs.setdefault("file", captured_stdout)
-    return builtins.print(*args, **kwargs)
-
-def safe_import(name, globals=None, locals=None, fromlist=(), level=0):
-    root_name = name.split(".")[0]
-    if root_name in blocked_modules or root_name not in allowed_modules:
-        raise ImportError(f"Import of '{root_name}' is not allowed in daily challenges.")
-    return builtins.__import__(name, globals, locals, fromlist, level)
-
-allowed_builtins = {
-    "abs": abs,
-    "all": all,
-    "any": any,
-    "bool": bool,
-    "dict": dict,
-    "enumerate": enumerate,
-    "float": float,
-    "int": int,
-    "len": len,
-    "list": list,
-    "max": max,
-    "min": min,
-    "print": safe_print,
-    "range": range,
-    "reversed": reversed,
-    "set": set,
-    "sorted": sorted,
-    "str": str,
-    "sum": sum,
-    "tuple": tuple,
-    "zip": zip,
-    "__import__": safe_import,
-}
-
-namespace = {"__builtins__": allowed_builtins}
-try:
-    tree = ast.parse(code, mode="exec")
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.Import, ast.ImportFrom)):
-            names = []
-            if isinstance(node, ast.Import):
-                names = [alias.name.split(".")[0] for alias in node.names]
-            else:
-                if node.module:
-                    names = [node.module.split(".")[0]]
-            if any(name in blocked_modules or name not in allowed_modules for name in names):
-                raise ValueError("Restricted import detected.")
-        if isinstance(node, ast.Call):
-            func = node.func
-            if isinstance(func, ast.Name) and func.id in blocked_calls:
-                raise ValueError("Restricted call detected.")
-        if isinstance(node, ast.Attribute) and node.attr.startswith("__"):
-            raise ValueError("Dunder attribute access is not allowed.")
-
-    with contextlib.redirect_stdout(captured_stdout):
-        exec(compile(tree, "<daily-challenge>", "exec"), namespace, namespace)
-except Exception as exc:
-    category = "compilation" if isinstance(exc, (SyntaxError, IndentationError, ValueError)) else "runtime"
-    sys.stdout.write(json.dumps({"results": [], "fatal_error": serialize_error(exc, category), "execution_ms": 0}))
-    sys.exit(0)
-
-target = namespace.get(function_name)
-if not callable(target):
-    sys.stdout.write(json.dumps({"results": [], "fatal_error": {"category": "compilation", "type": "ValueError", "message": f"Function '{function_name}' was not defined.", "line": None}, "execution_ms": 0}))
-    sys.exit(0)
-
-results = []
-total_start = time.perf_counter()
-for case in test_cases:
-    args = case.get("input", [])
-    expected = case.get("expected")
-    case_start = time.perf_counter()
-    try:
-        actual = target(*args)
-        results.append(
-            {
-                "passed": actual == expected,
-                "actual": actual,
-                "expected": expected,
-                "input": args,
-                "error_type": "",
-                "error_category": "",
-                "error": "",
-                "execution_ms": round((time.perf_counter() - case_start) * 1000, 2),
-            }
-        )
-    except Exception as exc:
-        results.append(
-            {
-                "passed": False,
-                "actual": None,
-                "expected": expected,
-                "input": args,
-                "error_type": exc.__class__.__name__,
-                "error_category": "runtime",
-                "error": str(exc),
-                "execution_ms": round((time.perf_counter() - case_start) * 1000, 2),
-            }
-        )
-
-sys.stdout.write(json.dumps({"results": results, "fatal_error": None, "execution_ms": round((time.perf_counter() - total_start) * 1000, 2)}))
-"""
 
 DEFAULT_QUESTION_TEMPLATES = [
     {
@@ -1128,37 +995,8 @@ def regenerate_daily_challenges(student=None, challenge_date=None):
 
 
 def _run_code(problem, code):
-    normalized_test_cases = _normalize_test_cases(problem.test_cases)
-    try:
-        completed = subprocess.run(
-            [sys.executable, "-I", "-c", RUNNER_SCRIPT],
-            input=json.dumps(
-                {
-                    "code": code,
-                    "function_name": problem.function_name,
-                    "test_cases": normalized_test_cases,
-                }
-            ),
-            capture_output=True,
-            text=True,
-            timeout=3,
-            check=False,
-        )
-    except subprocess.TimeoutExpired:
-        return [], {"category": "timeout", "type": "TimeoutExpired", "message": "Execution timed out.", "line": None}, 3000
-
-    if completed.returncode != 0:
-        stderr = (completed.stderr or completed.stdout or "Execution failed.").strip()
-        lowered = stderr.lower()
-        error_category = "compilation" if any(token in lowered for token in ("syntaxerror", "indentationerror", "valueerror", "restricted")) else "runtime"
-        return [], {"category": error_category, "type": "ExecutionError", "message": stderr, "line": None}, 0
-
-    try:
-        payload = json.loads(completed.stdout or "{}")
-    except json.JSONDecodeError:
-        return [], {"category": "runtime", "type": "JSONDecodeError", "message": "Execution returned an invalid response.", "line": None}, 0
-
-    return payload.get("results", []), payload.get("fatal_error"), payload.get("execution_ms", 0)
+    payload = execute(code, problem.function_name, _normalize_test_cases(problem.test_cases), kind="daily")
+    return payload["results"], payload["fatal_error"], payload["execution_ms"]
 
 
 def _format_execution_error(error_payload):
@@ -1474,10 +1312,10 @@ def submit_solution_for_challenge(challenge, code):
     if challenge.attempts >= attempt_limit:
         return {"ok": False, "error": "Attempt limit reached."}
 
+    results, error_payload, execution_ms = _run_code(challenge, code)
+
     challenge.attempts += 1
     challenge.latest_code = code
-
-    results, error_payload, execution_ms = _run_code(challenge, code)
     summary = _summarize_results(results, error_payload)
     solved, penalty, final_score = _calculate_final_score(challenge, summary)
 

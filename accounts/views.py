@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import BadHeaderError
 from django.db.models import Q
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
@@ -26,9 +27,12 @@ from .forms import (
 )
 from .models import TeacherInvitation
 from .services import (
+    EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
+    EMAIL_VERIFICATION_SESSION_KEY,
     LOGIN_OTP_MAX_ATTEMPTS,
     LOGIN_OTP_RESEND_COOLDOWN_SECONDS,
     LOGIN_OTP_SESSION_KEY,
+    build_email_verification_state,
     build_login_otp_state,
     generate_login_otp,
     hash_login_otp,
@@ -74,6 +78,37 @@ def _store_login_otp_state(request, state):
     request.session.modified = True
 
 
+def _store_email_verification_state(request, user, *, cooldown=True):
+    request.session[EMAIL_VERIFICATION_SESSION_KEY] = build_email_verification_state(
+        user=user, cooldown=cooldown
+    )
+    request.session.modified = True
+
+
+def _pending_email_verification_user(request):
+    state = request.session.get(EMAIL_VERIFICATION_SESSION_KEY)
+    if not state:
+        return None, None
+    user_id = state.get("user_id")
+    if not user_id:
+        return None, state
+    user = User.objects.filter(pk=user_id, is_active=False, is_email_verified=False).first()
+    if not user:
+        state.pop("user_id", None)
+        request.session[EMAIL_VERIFICATION_SESSION_KEY] = state
+        request.session.modified = True
+    return user, state
+
+
+def _store_decoy_email_verification_state(request, email):
+    request.session[EMAIL_VERIFICATION_SESSION_KEY] = {
+        "email_hint": mask_email(email),
+        "resend_available_at": now_timestamp()
+        + EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
+    }
+    request.session.modified = True
+
+
 def _send_login_otp(request, user, role, backend):
     otp = generate_login_otp()
     state = build_login_otp_state(user=user, role=role, backend=backend, otp=otp)
@@ -105,18 +140,104 @@ def _prepare_login_otp_context(request, form):
 
 
 def register(request):
+    if request.method == "POST":
+        email = request.POST.get("email", "").lower().strip()
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password1", "")
+        existing_user = User.objects.filter(email__iexact=email).first() if email else None
+        username_exists = bool(
+            username and User.objects.filter(username__iexact=username).exists()
+        )
+        if existing_user or username_exists:
+            if (
+                existing_user
+                and not existing_user.is_active
+                and not existing_user.is_email_verified
+                and existing_user.check_password(password)
+            ):
+                _store_email_verification_state(request, existing_user, cooldown=False)
+            else:
+                _store_decoy_email_verification_state(request, email)
+            return redirect("registration_success")
+
     form = StudentRegistrationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         user = form.save()
-        send_verification_email(request, user)
+        _store_email_verification_state(request, user)
+        try:
+            send_verification_email(request, user)
+        except Exception:
+            _store_email_verification_state(request, user, cooldown=False)
+            messages.error(
+                request,
+                "Your account was saved, but the verification email could not be sent. Please try again.",
+            )
         return redirect("registration_success")
-    return _render(request, "accounts/register.html", {"form": form, "page_title": "Student registration"})
+    return _render(
+        request,
+        "accounts/register.html",
+        {"form": form, "page_title": "Student registration"},
+    )
 
 
 def registration_success(request):
-    return _render(request, "accounts/registration_success.html")
+    _user, state = _pending_email_verification_user(request)
+    return _render(
+        request,
+        "accounts/registration_success.html",
+        {"can_resend_verification": bool(state)},
+    )
 
 
+def resend_verification(request):
+    if request.method not in ("GET", "POST"):
+        return HttpResponseNotAllowed(["GET", "POST"])
+
+    user, state = _pending_email_verification_user(request)
+    if not state:
+        messages.info(request, "Start registration or sign in to request a verification email.")
+        return redirect("student_login")
+
+    current_time = now_timestamp()
+    resend_available_at = state.get("resend_available_at", 0)
+    if request.method == "POST":
+        if current_time < resend_available_at:
+            wait_seconds = resend_available_at - current_time
+            messages.error(
+                request,
+                f"Please wait {wait_seconds} seconds before requesting another verification email.",
+            )
+        elif user:
+            try:
+                send_verification_email(request, user)
+            except Exception:
+                messages.error(request, "We couldn't send the verification email. Please try again.")
+            else:
+                _store_email_verification_state(request, user)
+                state = request.session[EMAIL_VERIFICATION_SESSION_KEY]
+                resend_available_at = state["resend_available_at"]
+                messages.success(request, "A new verification link has been sent.")
+        else:
+            state["resend_available_at"] = (
+                current_time + EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS
+            )
+            request.session[EMAIL_VERIFICATION_SESSION_KEY] = state
+            request.session.modified = True
+            resend_available_at = state["resend_available_at"]
+            messages.success(
+                request,
+                "If the account still needs verification, a new link has been sent.",
+            )
+
+    return _render(
+        request,
+        "accounts/resend_verification.html",
+        {
+            "verification_email": state.get("email_hint", "your email address"),
+            "resend_seconds_remaining": max(resend_available_at - now_timestamp(), 0),
+            "resend_cooldown_seconds": EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
+        },
+    )
 
 def verify_email(request, uid, token):
     user_id = _decode_uid(uid)
@@ -170,8 +291,9 @@ def _login_user(request, role, template_name):
             return redirect("teacher_login")
 
         if not user.is_email_verified and not user.is_superuser and user.role != "admin":
-            messages.error(request, "Please verify your email before logging in.")
-            return redirect(request.resolver_match.view_name)
+            _store_email_verification_state(request, user, cooldown=False)
+            messages.info(request, "Please verify your email before logging in.")
+            return redirect("resend_verification")
 
         if not user.is_active and not user.is_superuser and user.role != "admin":
             messages.error(request, "Your account is inactive. Please contact support.")

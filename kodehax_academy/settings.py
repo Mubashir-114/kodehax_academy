@@ -11,9 +11,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 import os
+import ssl
 import importlib.util
 from pathlib import Path
-import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -34,7 +34,7 @@ def _load_env_file():
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, value = line.split("=", 1)
-            os.environ[key.strip()] = value.strip().strip('"').strip("'")
+            os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
         break
 
 
@@ -67,8 +67,8 @@ DEBUG = _env_bool("DEBUG", False)
 if PRODUCTION and DEBUG:
     raise ImproperlyConfigured("DEBUG must be False in production.")
 
-ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
-if not ALLOWED_HOSTS and not DEBUG:
+ALLOWED_HOSTS = _env_list("ALLOWED_HOSTS", "" if PRODUCTION else "localhost,127.0.0.1")
+if not PRODUCTION and not ALLOWED_HOSTS and not DEBUG:
     ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 if PRODUCTION and not ALLOWED_HOSTS:
     raise ImproperlyConfigured("ALLOWED_HOSTS must be set in production.")
@@ -135,29 +135,32 @@ WSGI_APPLICATION = 'kodehax_academy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Development and production use the same existing MySQL database configuration.
+# SQLite is explicitly overridden only in test_settings.py.
 if PRODUCTION:
-    db_url = os.environ.get('DB_URL')
-    if not db_url:
-        raise ImproperlyConfigured("DB_URL must be set in production.")
-    DATABASES = {
-        'default': dj_database_url.parse(db_url)
-    }
-else:
-    db_engine = os.getenv('DB_ENGINE', 'django.db.backends.mysql')
-    db_name = os.getenv('DB_NAME', 'kodehax_academy')
-    if db_engine == 'django.db.backends.sqlite3' and not os.path.isabs(db_name):
-        db_name = BASE_DIR / db_name
+    missing = [name for name in ("DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT")
+               if not os.getenv(name)]
+    if missing:
+        raise ImproperlyConfigured("Missing production database variables: " + ", ".join(missing))
 
-    DATABASES = {
-        'default': {
-            'ENGINE': db_engine,
-            'NAME': db_name,
-            'USER': os.getenv('DB_USER', 'root'),
-            'PASSWORD': os.getenv('DB_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '3306'),
-        }
+_db_options = {"charset": "utf8mb4"}
+if _env_bool("DB_SSL_REQUIRED") or os.getenv("DB_SSL_CA"):
+    # Require encryption, a trusted certificate chain, and a matching hostname.
+    if os.getenv("DB_SSL_CA") and not Path(os.environ["DB_SSL_CA"]).is_file():
+        raise ImproperlyConfigured("DB_SSL_CA must point to a readable CA certificate file.")
+    _db_options["ssl"] = ssl.create_default_context(cafile=os.getenv("DB_SSL_CA") or None)
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": os.getenv("DB_NAME", "kodehax_academy"),
+        "USER": os.getenv("DB_USER", "root"),
+        "PASSWORD": os.getenv("DB_PASSWORD", ""),
+        "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "3306"),
+        "OPTIONS": _db_options,
     }
+}
 
 
 # Password validation
@@ -199,7 +202,9 @@ USE_TZ = True
 DAILY_CHALLENGE_TIMEZONE = os.getenv("DAILY_CHALLENGE_TIMEZONE", "Asia/Kolkata")
 DAILY_CHALLENGE_PUBLISH_HOUR = int(os.getenv("DAILY_CHALLENGE_PUBLISH_HOUR", "10"))
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_TEXT_MODEL = os.getenv("GROQ_TEXT_MODEL", "openai/gpt-oss-20b")
+GROQ_VISION_MODEL = os.getenv("GROQ_VISION_MODEL", "qwen/qwen3.8-27b")
 
 STATICFILES_DIRS = [
     BASE_DIR / "static"
@@ -215,7 +220,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(10 * 1024 * 1024)))
 FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(5 * 1024 * 1024)))
 
-# SMTP is enabled when EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are provided.
+# Brevo's HTTPS API is preferred when its credentials are configured. SMTP and
+# console remain available for local development and tests.
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
+BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "")
+BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "")
+BREVO_API_TIMEOUT = float(os.getenv("BREVO_API_TIMEOUT", "10"))
+BREVO_API_CONFIGURED = bool(BREVO_API_KEY and BREVO_SENDER_EMAIL and BREVO_SENDER_NAME)
+
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
@@ -225,11 +237,18 @@ EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
-    "django.core.mail.backends.smtp.EmailBackend"
-    if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
-    else "django.core.mail.backends.console.EmailBackend",
+    (
+        "accounts.email_backends.BrevoEmailBackend"
+        if BREVO_API_CONFIGURED
+        else "django.core.mail.backends.smtp.EmailBackend"
+        if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
+        else "django.core.mail.backends.console.EmailBackend"
+    ),
 )
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@kodehaxacademy.local")
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    BREVO_SENDER_EMAIL or EMAIL_HOST_USER or "noreply@kodehaxacademy.local",
+)
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
 CSRF_TRUSTED_ORIGINS = _env_list("CSRF_TRUSTED_ORIGINS")
 if not PRODUCTION:
@@ -238,6 +257,10 @@ if not PRODUCTION:
         "https://*.ngrok-free.app",
     ])
 
+# Render terminates HTTPS and supplies this trusted proxy header.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_REDIRECT_EXEMPT = [r"^health/$"]
+
 SECURE_SSL_REDIRECT = _env_bool("SECURE_SSL_REDIRECT", PRODUCTION)
 SESSION_COOKIE_SECURE = _env_bool("SESSION_COOKIE_SECURE", PRODUCTION)
 CSRF_COOKIE_SECURE = _env_bool("CSRF_COOKIE_SECURE", PRODUCTION)
@@ -245,3 +268,11 @@ SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "31536000" if PRODUCT
 SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", PRODUCTION)
 SECURE_HSTS_PRELOAD = _env_bool("SECURE_HSTS_PRELOAD", PRODUCTION)
 SECURE_REFERRER_POLICY = os.getenv("SECURE_REFERRER_POLICY", "same-origin")
+
+# Production coding jobs require a separately isolated HTTPS execution service.
+# The local backend is a development mitigation, never a public sandbox.
+CODE_EXECUTION_BACKEND = os.getenv("CODE_EXECUTION_BACKEND", "remote" if PRODUCTION else "development")
+CODE_EXECUTION_URL = os.getenv("CODE_EXECUTION_URL", "")
+CODE_EXECUTION_TOKEN = os.getenv("CODE_EXECUTION_TOKEN", "")
+
+from code_execution import checks as execution_checks  # Register deployment readiness checks.
