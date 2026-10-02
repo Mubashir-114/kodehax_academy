@@ -5,4 +5,5 @@ node --version
 npm --version
 npm ci --include=dev
 npm run tailwind
-python manage.py collectstatic --noinput
+# Render secret files are runtime-only; collectstatic does not access the database.
+DB_SSL_CA="" python manage.py collectstatic --noinput
