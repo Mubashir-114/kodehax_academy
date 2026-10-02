@@ -8,10 +8,14 @@ from django.utils.crypto import salted_hmac
 
 
 LOGIN_OTP_SESSION_KEY = "login_otp_state"
+EMAIL_VERIFICATION_SESSION_KEY = "email_verification_state"
 LOGIN_OTP_LENGTH = 6
 LOGIN_OTP_TTL_SECONDS = getattr(settings, "LOGIN_OTP_TTL_SECONDS", 300)
 LOGIN_OTP_RESEND_COOLDOWN_SECONDS = getattr(settings, "LOGIN_OTP_RESEND_COOLDOWN_SECONDS", 30)
 LOGIN_OTP_MAX_ATTEMPTS = getattr(settings, "LOGIN_OTP_MAX_ATTEMPTS", 5)
+EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS = getattr(
+    settings, "EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS", 30
+)
 
 
 def now_timestamp():
@@ -37,6 +41,16 @@ def build_login_otp_state(*, user, role, backend, otp):
         "expires_at": current_time + LOGIN_OTP_TTL_SECONDS,
         "resend_available_at": current_time + LOGIN_OTP_RESEND_COOLDOWN_SECONDS,
         "attempts": 0,
+    }
+
+
+def build_email_verification_state(*, user, cooldown=True):
+    current_time = now_timestamp()
+    return {
+        "user_id": user.pk,
+        "email_hint": mask_email(user.email),
+        "resend_available_at": current_time
+        + (EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS if cooldown else 0),
     }
 
 

@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 
+from accounts.email_backends import BrevoEmailError
 from accounts.forms import TeacherInvitationAdminForm, resend_teacher_invitation
 from accounts.models import TeacherInvitation
 from teacher.models import (
@@ -246,10 +247,10 @@ def invite_teacher(request):
     if form.is_valid():
         try:
             invitation = form.save(request=request)
-        except (SMTPException, TimeoutError, OSError, socket.timeout) as exc:
+        except (BrevoEmailError, SMTPException, TimeoutError, OSError, socket.timeout) as exc:
             messages.error(
                 request,
-                "Invitation email could not be sent. Check SMTP settings, network access, and the sender credentials.",
+                "Invitation email could not be sent. Check email settings, network access, and the sender credentials.",
             )
             messages.error(request, f"Mail error: {exc}")
         else:
@@ -270,10 +271,10 @@ def resend_teacher_invite(request, invitation_id):
     invitation = get_object_or_404(TeacherInvitation, id=invitation_id)
     try:
         resend_teacher_invitation(request, invitation)
-    except (SMTPException, TimeoutError, OSError, socket.timeout) as exc:
+    except (BrevoEmailError, SMTPException, TimeoutError, OSError, socket.timeout) as exc:
         messages.error(
             request,
-            "Invitation email could not be re-sent. Check SMTP settings, network access, and the sender credentials.",
+            "Invitation email could not be re-sent. Check email settings, network access, and the sender credentials.",
         )
         messages.error(request, f"Mail error: {exc}")
     else:
@@ -552,5 +553,3 @@ def toggle_maintenance_mode(request):
             "message": "Maintenance mode updated successfully.",
         }
     )
-
-

@@ -132,11 +132,10 @@ Before running the application, make sure you have:
    GROQ_API_KEY=replace-me
    GROQ_TEXT_MODEL=openai/gpt-oss-20b
    GROQ_VISION_MODEL=qwen/qwen3.8-27b
-   EMAIL_HOST=smtp.gmail.com
-   EMAIL_PORT=587
-   EMAIL_HOST_USER=
-   EMAIL_HOST_PASSWORD=
-   EMAIL_USE_TLS=True
+   BREVO_API_KEY=replace-me
+   BREVO_SENDER_EMAIL=verified-sender@example.com
+   BREVO_SENDER_NAME=Kodehax Academy
+   BREVO_API_TIMEOUT=10
    DAILY_CHALLENGE_TIMEZONE=Asia/Kolkata
    DAILY_CHALLENGE_PUBLISH_HOUR=10
    DB_NAME=kodehax_academy
@@ -203,7 +202,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Render native Python deployment
 
-Create a Web Service from `https://github.com/Mubashir-114/kodehax_academy`, using your release branch and repository root (leave Root Directory empty). Select **Python 3** and preferably a **paid Starter or higher** instance for SMTP OTP and pre-deploy migrations.
+Create a Web Service from `https://github.com/Mubashir-114/kodehax_academy`, using your release branch and repository root (leave Root Directory empty). Select **Python 3**. A paid instance is only required here if you want Render's pre-deploy migrations; email uses Brevo's HTTPS API and does not require SMTP access.
 
 | Setting | Value |
 | --- | --- |
@@ -231,6 +230,10 @@ DB_USER=<database-user>
 DB_PASSWORD=<database-password>
 DB_HOST=<reachable-mysql-provider-hostname>
 DB_PORT=3306
+BREVO_API_KEY=<private-brevo-api-key>
+BREVO_SENDER_EMAIL=<brevo-verified-sender-address>
+BREVO_SENDER_NAME=Kodehax Academy
+BREVO_API_TIMEOUT=10
 PYTHON_VERSION=3.12.12
 NODE_VERSION=22.16.0
 ```
@@ -253,7 +256,7 @@ Free services do not offer this pre-deploy step or an interactive service shell.
 
 ### Remaining deployment blockers
 
-- **Email OTP:** verification, non-admin login OTP, and recovery need working email delivery. Set `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`, `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `EMAIL_USE_SSL`, and verified `DEFAULT_FROM_EMAIL`. `EMAIL_TIMEOUT` defaults to 30 seconds. Missing credentials default to console delivery, which sends no user email. [Free Render services block outbound SMTP ports 25, 465, and 587](https://render.com/docs/free); choose paid hosting for the existing SMTP implementation. An HTTPS email API requires separate work. Real delivery is unverified.
+- **Email:** verification links, login OTPs, password resets, and teacher invitations use `POST https://api.brevo.com/v3/smtp/email` when `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, and `BREVO_SENDER_NAME` are set. `BREVO_API_TIMEOUT` defaults to 10 seconds. Keep the API key private and configure the sender as a verified Brevo sender. If the Brevo variables are absent, configured SMTP credentials remain the fallback; otherwise development defaults to console delivery. `EMAIL_BACKEND` can still explicitly override this selection for local development or tests. Real provider delivery remains an environment-level verification step.
 - **Uploaded media:** uploads use local `media/`, Render's filesystem is ephemeral, and Django's production URL configuration does not serve media with DEBUG=False. Installed Cloudinary/storage packages do not activate storage. Durable object storage with Django configuration, or a paid persistent disk plus production media serving, and transfer of existing uploads remain necessary. These are not implemented here.
 - **AI:** set `GROQ_API_KEY`, `GROQ_TEXT_MODEL=openai/gpt-oss-20b`, and `GROQ_VISION_MODEL=qwen/qwen3.8-27b` server-side with usable quota. Qwen is a preview model; no model substitution is automatic. See [Groq migration and validation](GROQ_MIGRATION.md). Optional `TIME_ZONE`, `DAILY_CHALLENGE_TIMEZONE`, `DAILY_CHALLENGE_PUBLISH_HOUR` default to Asia/Kolkata and hour 10. Existing upload-limit/security environment overrides remain supported. No external scheduler was added.
 

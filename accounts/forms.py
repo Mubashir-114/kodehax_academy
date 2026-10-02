@@ -303,19 +303,13 @@ def send_verification_email(request, user):
         },
     )
 
-    def _send():
-        try:
-            send_mail(
-                subject="Verify your Kodehax Academy email",
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
-        except Exception:
-            logger.exception("Failed to send verification email to %s", user.email)
-
-    threading.Thread(target=_send, daemon=True).start()
+    return send_mail(
+        subject="Verify your Kodehax Academy email",
+        message=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[user.email],
+        fail_silently=False,
+    )
 
 
 def send_password_reset_email(request, user):
@@ -341,6 +335,6 @@ def send_password_reset_email(request, user):
                 fail_silently=False,
             )
         except Exception:
-            logger.exception("Failed to send password reset email to %s", user.email)
+            logger.exception("Failed to send password reset email")
 
     threading.Thread(target=_send, daemon=True).start()

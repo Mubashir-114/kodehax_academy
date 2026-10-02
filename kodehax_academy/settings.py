@@ -220,7 +220,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(10 * 1024 * 1024)))
 FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(5 * 1024 * 1024)))
 
-# SMTP is enabled when EMAIL_HOST_USER and EMAIL_HOST_PASSWORD are provided.
+# Brevo's HTTPS API is preferred when its credentials are configured. SMTP and
+# console remain available for local development and tests.
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
+BREVO_SENDER_EMAIL = os.getenv("BREVO_SENDER_EMAIL", "")
+BREVO_SENDER_NAME = os.getenv("BREVO_SENDER_NAME", "")
+BREVO_API_TIMEOUT = float(os.getenv("BREVO_API_TIMEOUT", "10"))
+BREVO_API_CONFIGURED = bool(BREVO_API_KEY and BREVO_SENDER_EMAIL and BREVO_SENDER_NAME)
+
 EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
@@ -230,11 +237,18 @@ EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
-    "django.core.mail.backends.smtp.EmailBackend"
-    if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
-    else "django.core.mail.backends.console.EmailBackend",
+    (
+        "accounts.email_backends.BrevoEmailBackend"
+        if BREVO_API_CONFIGURED
+        else "django.core.mail.backends.smtp.EmailBackend"
+        if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
+        else "django.core.mail.backends.console.EmailBackend"
+    ),
 )
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER or "noreply@kodehaxacademy.local")
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    BREVO_SENDER_EMAIL or EMAIL_HOST_USER or "noreply@kodehaxacademy.local",
+)
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
 CSRF_TRUSTED_ORIGINS = _env_list("CSRF_TRUSTED_ORIGINS")
 if not PRODUCTION:
