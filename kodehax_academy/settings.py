@@ -216,6 +216,80 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# ---------------------------------------------------------------------------
+# Media storage
+#
+# Development (PRODUCTION=False) keeps serving uploads from the local
+# filesystem through MEDIA_ROOT/MEDIA_URL. Production MUST use durable,
+# private, S3-compatible object storage and never silently falls back to
+# Render's ephemeral filesystem: build_storages() fails closed when the
+# required variables are missing.
+# ---------------------------------------------------------------------------
+MEDIA_STORAGE_REQUIRED_VARS = (
+    "MEDIA_STORAGE_BUCKET_NAME",
+    "MEDIA_STORAGE_ACCESS_KEY_ID",
+    "MEDIA_STORAGE_SECRET_ACCESS_KEY",
+)
+
+# WhiteNoise serves collected static assets; keep the existing staticfiles
+# backend unchanged while configuring the default (media) backend.
+_STATICFILES_STORAGE = {
+    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+}
+
+
+def build_storages(production):
+    """Return the Django ``STORAGES`` mapping for the given mode.
+
+    Production selects an S3-compatible, provider-neutral object-storage
+    backend whose objects stay private and are exposed only through
+    short-lived signed URLs. Any missing required variable raises
+    ``ImproperlyConfigured`` so a misconfigured deployment cannot appear
+    healthy while writing uploads to ephemeral local storage.
+    """
+    if not production:
+        return {
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": dict(_STATICFILES_STORAGE),
+        }
+
+    missing = [name for name in MEDIA_STORAGE_REQUIRED_VARS if not os.getenv(name)]
+    if missing:
+        raise ImproperlyConfigured(
+            "Missing production media storage variables: " + ", ".join(missing)
+        )
+
+    options = {
+        "bucket_name": os.environ["MEDIA_STORAGE_BUCKET_NAME"],
+        "access_key": os.environ["MEDIA_STORAGE_ACCESS_KEY_ID"],
+        "secret_key": os.environ["MEDIA_STORAGE_SECRET_ACCESS_KEY"],
+        # Objects stay private; url() returns short-lived signed links.
+        "querystring_auth": True,
+        "default_acl": None,
+        "file_overwrite": False,
+        "querystring_expire": int(os.getenv("MEDIA_STORAGE_QUERYSTRING_EXPIRE", "3600")),
+    }
+    if os.getenv("MEDIA_STORAGE_ENDPOINT_URL"):
+        options["endpoint_url"] = os.environ["MEDIA_STORAGE_ENDPOINT_URL"]
+    if os.getenv("MEDIA_STORAGE_REGION_NAME"):
+        options["region_name"] = os.environ["MEDIA_STORAGE_REGION_NAME"]
+    if os.getenv("MEDIA_STORAGE_ADDRESSING_STYLE"):
+        options["addressing_style"] = os.environ["MEDIA_STORAGE_ADDRESSING_STYLE"]
+
+    return {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": options,
+        },
+        "staticfiles": dict(_STATICFILES_STORAGE),
+    }
+
+
+STORAGES = build_storages(PRODUCTION)
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(10 * 1024 * 1024)))
 FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(5 * 1024 * 1024)))

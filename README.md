@@ -169,7 +169,7 @@ Before running the application, make sure you have:
 - **AI Integration:** groq 1.7.0
 - **Database:** PyMySQL 1.1.1 with RSA authentication support
 - **Static Files:** whitenoise
-- **Media Storage:** Cloudinary · django-storages
+- **Media Storage:** S3-compatible object storage (django-storages)
 - **Deployment:** Gunicorn and Render native Python
 
 ---
@@ -230,6 +230,12 @@ DB_USER=<database-user>
 DB_PASSWORD=<database-password>
 DB_HOST=<reachable-mysql-provider-hostname>
 DB_PORT=3306
+MEDIA_STORAGE_BUCKET_NAME=<private-bucket-name>
+MEDIA_STORAGE_ACCESS_KEY_ID=<private-access-key-id>
+MEDIA_STORAGE_SECRET_ACCESS_KEY=<private-secret-access-key>
+MEDIA_STORAGE_ENDPOINT_URL=https://<provider-s3-endpoint>
+MEDIA_STORAGE_REGION_NAME=<provider-region>
+MEDIA_STORAGE_QUERYSTRING_EXPIRE=3600
 BREVO_API_KEY=<private-brevo-api-key>
 BREVO_SENDER_EMAIL=<brevo-verified-sender-address>
 BREVO_SENDER_NAME=Kodehax Academy
@@ -238,7 +244,7 @@ PYTHON_VERSION=3.12.12
 NODE_VERSION=22.16.0
 ```
 
-Render supplies `PORT`. Hosts are comma-separated bare hostnames; trusted origins include HTTPS schemes. Production rejects missing secrets/hosts/database values and DEBUG=True. Secure cookies, HTTPS redirect, and HSTS default on. Django recognizes Render's forwarded HTTPS header. `/health/` bypasses HTTPS redirect and maintenance database lookups; it reports liveness, not database readiness.
+Render supplies `PORT`. Hosts are comma-separated bare hostnames; trusted origins include HTTPS schemes. Production rejects missing secrets/hosts/database/media-storage values and DEBUG=True. Secure cookies, HTTPS redirect, and HSTS default on. Django recognizes Render's forwarded HTTPS header. `/health/` bypasses HTTPS redirect and maintenance database lookups; it reports liveness, not database readiness.
 
 Host MySQL **separately** and retain the existing schema, data, and migration history. Use MySQL 8.0.11+ for Django 5.2, with provider DNS/port, user permissions, and firewall rules allowing Render outbound connections. `localhost` identifies the web service itself, not the provider. Back up existing data before releases. Do not reset tables or generate replacement migrations.
 
@@ -257,7 +263,7 @@ Free services do not offer this pre-deploy step or an interactive service shell.
 ### Remaining deployment blockers
 
 - **Email:** verification links, login OTPs, password resets, and teacher invitations use `POST https://api.brevo.com/v3/smtp/email` when `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, and `BREVO_SENDER_NAME` are set. `BREVO_API_TIMEOUT` defaults to 10 seconds. Keep the API key private and configure the sender as a verified Brevo sender. If the Brevo variables are absent, configured SMTP credentials remain the fallback; otherwise development defaults to console delivery. `EMAIL_BACKEND` can still explicitly override this selection for local development or tests. Real provider delivery remains an environment-level verification step.
-- **Uploaded media:** uploads use local `media/`, Render's filesystem is ephemeral, and Django's production URL configuration does not serve media with DEBUG=False. Installed Cloudinary/storage packages do not activate storage. Durable object storage with Django configuration, or a paid persistent disk plus production media serving, and transfer of existing uploads remain necessary. These are not implemented here.
+- **Uploaded media:** production (`PRODUCTION=True`) stores user uploads in durable, private, S3-compatible object storage via `django-storages`, configured through Django's `STORAGES` setting. It refuses to start unless `MEDIA_STORAGE_BUCKET_NAME`, `MEDIA_STORAGE_ACCESS_KEY_ID`, and `MEDIA_STORAGE_SECRET_ACCESS_KEY` are set, so a deployment can never silently fall back to Render's ephemeral filesystem. Objects stay private (`default_acl=None`, `querystring_auth=True`), and every `FileField`/`ImageField` `url` returns a short-lived signed link; profile images and assignment submissions are served the same way. `MEDIA_STORAGE_ENDPOINT_URL` and `MEDIA_STORAGE_REGION_NAME` target any S3-compatible provider, and `MEDIA_STORAGE_QUERYSTRING_EXPIRE` (seconds, default 3600) sets link lifetime. Development (`PRODUCTION=False`) continues to use the local `media/` folder through `MEDIA_ROOT`/`MEDIA_URL`, and `media/` stays Git-ignored. Existing local `media/` files are **not** migrated automatically: copy them into the bucket under the same keys (or re-upload) before switching, and independently verify object upload and signed access with real provider credentials after deployment. Real provider behavior is not exercised by the repository's automated tests.
 - **AI:** set `GROQ_API_KEY`, `GROQ_TEXT_MODEL=openai/gpt-oss-20b`, and `GROQ_VISION_MODEL=qwen/qwen3.8-27b` server-side with usable quota. Qwen is a preview model; no model substitution is automatic. See [Groq migration and validation](GROQ_MIGRATION.md). Optional `TIME_ZONE`, `DAILY_CHALLENGE_TIMEZONE`, `DAILY_CHALLENGE_PUBLISH_HOUR` default to Asia/Kolkata and hour 10. Existing upload-limit/security environment overrides remain supported. No external scheduler was added.
 
 - **Code execution:** provision and independently verify the isolated HTTPS executor described in [CODE_EXECUTION.md](CODE_EXECUTION.md), then privately configure `CODE_EXECUTION_BACKEND=remote`, `CODE_EXECUTION_URL` and `CODE_EXECUTION_TOKEN`. Until configured, coding requests visibly return 503 without grading, score deductions or consumed attempts. No local fallback occurs in production. The native Render/MySQL deployment stays unchanged.

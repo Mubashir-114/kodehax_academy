@@ -42,17 +42,28 @@ def grade_code_submission_manual(code_submission: CodeSubmission, score: Any, fe
     return code_submission
 
 
-def _read_text_file(file_path: str, char_limit: int = 6000) -> str:
-    if not file_path or not os.path.exists(file_path):
+_TEXT_EXTENSIONS = {".txt", ".md", ".py", ".csv", ".json", ".html", ".js", ".java", ".c", ".cpp"}
+
+
+def _read_text_file(uploaded_file, char_limit: int = 6000) -> str:
+    """Extract text through Django's storage API without a local path.
+
+    ``FieldFile.path`` only exists for filesystem-backed storage, so remote
+    (e.g. S3) submissions are read via ``FieldFile.open``. The extension
+    whitelist, UTF-8 ``errors="ignore"`` decoding, and bounded read are kept
+    the same as before.
+    """
+    if not uploaded_file:
         return ""
-    _, ext = os.path.splitext(file_path.lower())
-    if ext not in {".txt", ".md", ".py", ".csv", ".json", ".html", ".js", ".java", ".c", ".cpp"}:
+    _, ext = os.path.splitext((getattr(uploaded_file, "name", "") or "").lower())
+    if ext not in _TEXT_EXTENSIONS:
         return ""
     try:
-        with open(file_path, "r", encoding="utf-8", errors="ignore") as handle:
-            return handle.read(char_limit)
-    except OSError:
+        with uploaded_file.open("rb") as handle:
+            raw = handle.read(char_limit)
+    except (OSError, ValueError):
         return ""
+    return raw.decode("utf-8", errors="ignore")[:char_limit]
 
 
 def _ai_grade(prompt: str, max_score: float) -> tuple[float, str]:
@@ -125,7 +136,7 @@ def _check_python_syntax(code: str) -> tuple[bool, str]:
 
 
 def grade_file_submission_ai(submission: Submission) -> Submission:
-    file_text = _read_text_file(submission.file.path)
+    file_text = _read_text_file(submission.file)
     prompt = (
         "You are grading a student file submission.\n"
         f"Assignment description:\n{submission.assignment.description}\n\n"

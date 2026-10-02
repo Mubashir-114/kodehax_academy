@@ -1,5 +1,6 @@
 Django==5.2.5
 django-appconf==1.2.0
+boto3==1.43.107
 django-cloudinary-storage==0.3.0
 django-cors-headers==4.7.0
 django-crontab==0.7.1
