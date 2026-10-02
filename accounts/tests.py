@@ -1,4 +1,5 @@
 import re
+from unittest.mock import patch
 
 from django.core import mail
 from django.test import TestCase
@@ -136,6 +137,19 @@ class LoginOTPFlowTests(TestCase):
         self.assertRedirects(final_response, reverse("student_login"))
         self.assertIsNone(self._pending_state())
         self.assertNotIn("_auth_user_id", self.client.session)
+
+    @patch("accounts.views.send_login_otp_email", side_effect=RuntimeError("backend down"))
+    def test_otp_send_failure_is_visible_and_never_claims_success(self, _send):
+        response = self.client.post(
+            reverse("student_login"),
+            {"username": "student1@example.com", "password": "pass12345"},
+            follow=True,
+        )
+
+        self.assertContains(response, "send your verification code right now")
+        self.assertNotContains(response, "Verification code sent")
+        self.assertNotIn("_auth_user_id", self.client.session)
+        self.assertIsNone(self._pending_state())
 
     def test_admin_teacher_login_bypasses_otp_and_remains_unchanged(self):
         response = self.client.post(

@@ -309,15 +309,37 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
-EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND",
-    (
-        "accounts.email_backends.BrevoEmailBackend"
-        if BREVO_API_CONFIGURED
-        else "django.core.mail.backends.smtp.EmailBackend"
-        if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
-        else "django.core.mail.backends.console.EmailBackend"
-    ),
+
+
+def choose_email_backend(*, production, override="", brevo_configured=False, smtp_configured=False):
+    """Select the Django email backend.
+
+    Brevo is preferred, then configured SMTP, then console for local
+    development. Production must never silently fall back to console
+    delivery: an OTP written only to the server logs would look successfully
+    sent to the user while never reaching their inbox. Production therefore
+    fails closed unless Brevo/SMTP is configured or EMAIL_BACKEND is set.
+    """
+    if override:
+        return override
+    if brevo_configured:
+        return "accounts.email_backends.BrevoEmailBackend"
+    if smtp_configured:
+        return "django.core.mail.backends.smtp.EmailBackend"
+    if production:
+        raise ImproperlyConfigured(
+            "Production email is not configured: set BREVO_API_KEY, "
+            "BREVO_SENDER_EMAIL and BREVO_SENDER_NAME (or complete SMTP "
+            "credentials), or set EMAIL_BACKEND explicitly."
+        )
+    return "django.core.mail.backends.console.EmailBackend"
+
+
+EMAIL_BACKEND = choose_email_backend(
+    production=PRODUCTION,
+    override=os.getenv("EMAIL_BACKEND", ""),
+    brevo_configured=BREVO_API_CONFIGURED,
+    smtp_configured=bool(EMAIL_HOST_USER and EMAIL_HOST_PASSWORD),
 )
 DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",
