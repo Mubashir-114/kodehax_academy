@@ -87,6 +87,31 @@ class StorageSelectionTests(SimpleTestCase):
         self.assertNotIn("endpoint_url", options)
         self.assertNotIn("region_name", options)
 
+    def test_signed_url_expiry_is_positive_and_bounded(self):
+        for invalid_expiry in ("0", "-1", "86401", "not-an-integer"):
+            with self.subTest(expiry=invalid_expiry):
+                env = {
+                    **DUMMY_PRODUCTION_ENV,
+                    "MEDIA_STORAGE_QUERYSTRING_EXPIRE": invalid_expiry,
+                }
+                with patch.dict(os.environ, env, clear=False):
+                    with self.assertRaises(ImproperlyConfigured) as ctx:
+                        build_storages(production=True)
+                self.assertIn(
+                    "MEDIA_STORAGE_QUERYSTRING_EXPIRE", str(ctx.exception)
+                )
+
+    def test_signed_url_expiry_accepts_documented_bounds(self):
+        for valid_expiry in ("1", "3600", "86400"):
+            with self.subTest(expiry=valid_expiry):
+                env = {
+                    **DUMMY_PRODUCTION_ENV,
+                    "MEDIA_STORAGE_QUERYSTRING_EXPIRE": valid_expiry,
+                }
+                with patch.dict(os.environ, env, clear=False):
+                    options = build_storages(production=True)["default"]["OPTIONS"]
+                self.assertEqual(options["querystring_expire"], int(valid_expiry))
+
     def test_production_fails_closed_when_each_variable_is_missing(self):
         for missing_name in MEDIA_STORAGE_REQUIRED_VARS:
             with self.subTest(missing=missing_name):

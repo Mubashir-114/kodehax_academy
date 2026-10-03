@@ -231,6 +231,7 @@ MEDIA_STORAGE_REQUIRED_VARS = (
     "MEDIA_STORAGE_ACCESS_KEY_ID",
     "MEDIA_STORAGE_SECRET_ACCESS_KEY",
 )
+MEDIA_STORAGE_QUERYSTRING_EXPIRE_MAX = 24 * 60 * 60
 
 # WhiteNoise serves collected static assets; keep the existing staticfiles
 # backend unchanged while configuring the default (media) backend.
@@ -262,6 +263,19 @@ def build_storages(production):
             "Missing production media storage variables: " + ", ".join(missing)
         )
 
+    try:
+        querystring_expire = int(
+            os.getenv("MEDIA_STORAGE_QUERYSTRING_EXPIRE", "3600")
+        )
+    except ValueError as exc:
+        raise ImproperlyConfigured(
+            "MEDIA_STORAGE_QUERYSTRING_EXPIRE must be an integer between 1 and 86400."
+        ) from exc
+    if not 1 <= querystring_expire <= MEDIA_STORAGE_QUERYSTRING_EXPIRE_MAX:
+        raise ImproperlyConfigured(
+            "MEDIA_STORAGE_QUERYSTRING_EXPIRE must be between 1 and 86400 seconds."
+        )
+
     options = {
         "bucket_name": os.environ["MEDIA_STORAGE_BUCKET_NAME"],
         "access_key": os.environ["MEDIA_STORAGE_ACCESS_KEY_ID"],
@@ -270,7 +284,7 @@ def build_storages(production):
         "querystring_auth": True,
         "default_acl": None,
         "file_overwrite": False,
-        "querystring_expire": int(os.getenv("MEDIA_STORAGE_QUERYSTRING_EXPIRE", "3600")),
+        "querystring_expire": querystring_expire,
     }
     if os.getenv("MEDIA_STORAGE_ENDPOINT_URL"):
         options["endpoint_url"] = os.environ["MEDIA_STORAGE_ENDPOINT_URL"]
