@@ -57,7 +57,7 @@ def _render(request, template_name, context=None, status=200):
 
 
 def _login_redirect_for_role(role):
-    return "teacher_login" if role == "teacher" else "student_login"
+    return "teacher_login" if role in ("teacher", "admin") else "student_login"
 
 
 def _dashboard_redirect_for_role(role):
@@ -241,27 +241,26 @@ def resend_verification(request):
 
 def verify_email(request, uid, token):
     user_id = _decode_uid(uid)
-    user = User.objects.filter(pk=user_id).first() if user_id else None
-    verified = False
+    try:
+        user = User.objects.filter(pk=user_id).first() if user_id else None
+    except (TypeError, ValueError, OverflowError):
+        user = None
 
     if user and email_verification_token.check_token(user, token):
         if not user.is_email_verified or not user.is_active:
             user.is_active = True
             user.is_email_verified = True
             user.save(update_fields=["is_active", "is_email_verified"])
-        verified = True
-        messages.success(request, "Email verified. You can log in now.")
-    elif user and user.is_email_verified:
-        verified = True
-        messages.info(request, "Email already verified. You can log in now.")
-
-    if verified:
-        return redirect("student_login")
+        messages.success(
+            request,
+            "Email verified successfully. Please log in to continue.",
+        )
+        return redirect(_login_redirect_for_role(user.role))
 
     return _render(
         request,
         "accounts/verify_email.html",
-        {"verified": verified, "login_url": reverse("student_login")},
+        {"verified": False, "login_url": reverse("student_login")},
         status=400,
     )
 

@@ -216,6 +216,94 @@ STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# ---------------------------------------------------------------------------
+# Media storage
+#
+# Development (PRODUCTION=False) keeps serving uploads from the local
+# filesystem through MEDIA_ROOT/MEDIA_URL. Production MUST use durable,
+# private, S3-compatible object storage and never silently falls back to
+# Render's ephemeral filesystem: build_storages() fails closed when the
+# required variables are missing.
+# ---------------------------------------------------------------------------
+MEDIA_STORAGE_REQUIRED_VARS = (
+    "MEDIA_STORAGE_BUCKET_NAME",
+    "MEDIA_STORAGE_ACCESS_KEY_ID",
+    "MEDIA_STORAGE_SECRET_ACCESS_KEY",
+)
+MEDIA_STORAGE_QUERYSTRING_EXPIRE_MAX = 24 * 60 * 60
+
+# WhiteNoise serves collected static assets; keep the existing staticfiles
+# backend unchanged while configuring the default (media) backend.
+_STATICFILES_STORAGE = {
+    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+}
+
+
+def build_storages(production):
+    """Return the Django ``STORAGES`` mapping for the given mode.
+
+    Production selects an S3-compatible, provider-neutral object-storage
+    backend whose objects stay private and are exposed only through
+    short-lived signed URLs. Any missing required variable raises
+    ``ImproperlyConfigured`` so a misconfigured deployment cannot appear
+    healthy while writing uploads to ephemeral local storage.
+    """
+    if not production:
+        return {
+            "default": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "staticfiles": dict(_STATICFILES_STORAGE),
+        }
+
+    missing = [name for name in MEDIA_STORAGE_REQUIRED_VARS if not os.getenv(name)]
+    if missing:
+        raise ImproperlyConfigured(
+            "Missing production media storage variables: " + ", ".join(missing)
+        )
+
+    try:
+        querystring_expire = int(
+            os.getenv("MEDIA_STORAGE_QUERYSTRING_EXPIRE", "3600")
+        )
+    except ValueError as exc:
+        raise ImproperlyConfigured(
+            "MEDIA_STORAGE_QUERYSTRING_EXPIRE must be an integer between 1 and 86400."
+        ) from exc
+    if not 1 <= querystring_expire <= MEDIA_STORAGE_QUERYSTRING_EXPIRE_MAX:
+        raise ImproperlyConfigured(
+            "MEDIA_STORAGE_QUERYSTRING_EXPIRE must be between 1 and 86400 seconds."
+        )
+
+    options = {
+        "bucket_name": os.environ["MEDIA_STORAGE_BUCKET_NAME"],
+        "access_key": os.environ["MEDIA_STORAGE_ACCESS_KEY_ID"],
+        "secret_key": os.environ["MEDIA_STORAGE_SECRET_ACCESS_KEY"],
+        # Objects stay private; url() returns short-lived signed links.
+        "querystring_auth": True,
+        "default_acl": None,
+        "file_overwrite": False,
+        "querystring_expire": querystring_expire,
+    }
+    if os.getenv("MEDIA_STORAGE_ENDPOINT_URL"):
+        options["endpoint_url"] = os.environ["MEDIA_STORAGE_ENDPOINT_URL"]
+    if os.getenv("MEDIA_STORAGE_REGION_NAME"):
+        options["region_name"] = os.environ["MEDIA_STORAGE_REGION_NAME"]
+    if os.getenv("MEDIA_STORAGE_ADDRESSING_STYLE"):
+        options["addressing_style"] = os.environ["MEDIA_STORAGE_ADDRESSING_STYLE"]
+
+    return {
+        "default": {
+            "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": options,
+        },
+        "staticfiles": dict(_STATICFILES_STORAGE),
+    }
+
+
+STORAGES = build_storages(PRODUCTION)
+
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("DATA_UPLOAD_MAX_MEMORY_SIZE", str(10 * 1024 * 1024)))
 FILE_UPLOAD_MAX_MEMORY_SIZE = int(os.getenv("FILE_UPLOAD_MAX_MEMORY_SIZE", str(5 * 1024 * 1024)))
@@ -235,15 +323,37 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() == "true"
 EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() == "true"
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
-EMAIL_BACKEND = os.getenv(
-    "EMAIL_BACKEND",
-    (
-        "accounts.email_backends.BrevoEmailBackend"
-        if BREVO_API_CONFIGURED
-        else "django.core.mail.backends.smtp.EmailBackend"
-        if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD
-        else "django.core.mail.backends.console.EmailBackend"
-    ),
+
+
+def choose_email_backend(*, production, override="", brevo_configured=False, smtp_configured=False):
+    """Select the Django email backend.
+
+    Brevo is preferred, then configured SMTP, then console for local
+    development. Production must never silently fall back to console
+    delivery: an OTP written only to the server logs would look successfully
+    sent to the user while never reaching their inbox. Production therefore
+    fails closed unless Brevo/SMTP is configured or EMAIL_BACKEND is set.
+    """
+    if override:
+        return override
+    if brevo_configured:
+        return "accounts.email_backends.BrevoEmailBackend"
+    if smtp_configured:
+        return "django.core.mail.backends.smtp.EmailBackend"
+    if production:
+        raise ImproperlyConfigured(
+            "Production email is not configured: set BREVO_API_KEY, "
+            "BREVO_SENDER_EMAIL and BREVO_SENDER_NAME (or complete SMTP "
+            "credentials), or set EMAIL_BACKEND explicitly."
+        )
+    return "django.core.mail.backends.console.EmailBackend"
+
+
+EMAIL_BACKEND = choose_email_backend(
+    production=PRODUCTION,
+    override=os.getenv("EMAIL_BACKEND", ""),
+    brevo_configured=BREVO_API_CONFIGURED,
+    smtp_configured=bool(EMAIL_HOST_USER and EMAIL_HOST_PASSWORD),
 )
 DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",

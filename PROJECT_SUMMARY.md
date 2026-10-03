@@ -42,7 +42,7 @@ Kodehax Academy unifies these concerns into a single codebase with:
 | **API** | Django REST Framework | 3.16.1 |
 | **Authentication** | SimpleJWT | 5.5.1 |
 | **AI Service** | Google Gemini (via google-genai) | 1.49.0 |
-| **File Storage** | Cloudinary (with django-cloudinary-storage) | 0.3.0 |
+| **File Storage** | S3-compatible object storage (django-storages) | 1.14.6 |
 | **Server (Production)** | Gunicorn | 23.0.0 |
 | **Static Files** | WhiteNoise | 6.10.0 |
 | **Task Scheduler** | Django Crontab | 0.7.1 |
@@ -531,8 +531,12 @@ DEFAULT_FROM_EMAIL=noreply@kodehaxacademy.com
 # Google Gemini API
 GEMINI_API_KEY=your-gemini-api-key
 
-# Cloudinary (optional, for media storage)
-CLOUDINARY_URL=cloudinary://key:secret@cloud-name
+# Production durable media storage (S3-compatible object storage)
+MEDIA_STORAGE_BUCKET_NAME=
+MEDIA_STORAGE_ACCESS_KEY_ID=
+MEDIA_STORAGE_SECRET_ACCESS_KEY=
+MEDIA_STORAGE_ENDPOINT_URL=
+MEDIA_STORAGE_REGION_NAME=
 
 # Time Zone
 TIME_ZONE=Asia/Kolkata

@@ -2,11 +2,13 @@ from unittest.mock import patch
 
 import requests
 from django.core import mail
+from django.core.exceptions import ImproperlyConfigured
 from django.core.mail import EmailMessage
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from accounts.email_backends import BREVO_EMAIL_URL, BrevoEmailError
+from kodehax_academy.settings import choose_email_backend
 from accounts.services import EMAIL_VERIFICATION_SESSION_KEY, now_timestamp
 from users.models import User
 
@@ -219,3 +221,45 @@ class VerificationRecoveryTests(TestCase):
         self.assertNotIn("user_id", state)
         self.assertEqual(state["email_hint"], "ex******@example.com")
         send_email.assert_not_called()
+
+
+class EmailBackendSelectionTests(TestCase):
+    def test_brevo_selected_when_configured(self):
+        self.assertEqual(
+            choose_email_backend(production=True, brevo_configured=True),
+            "accounts.email_backends.BrevoEmailBackend",
+        )
+
+    def test_smtp_fallback_selected_when_configured(self):
+        self.assertEqual(
+            choose_email_backend(production=True, smtp_configured=True),
+            "django.core.mail.backends.smtp.EmailBackend",
+        )
+
+    def test_development_defaults_to_console(self):
+        self.assertEqual(
+            choose_email_backend(production=False),
+            "django.core.mail.backends.console.EmailBackend",
+        )
+
+    def test_production_never_selects_console_implicitly(self):
+        with self.assertRaises(ImproperlyConfigured):
+            choose_email_backend(
+                production=True, brevo_configured=False, smtp_configured=False
+            )
+
+    def test_production_error_names_variables_without_values(self):
+        with self.assertRaises(ImproperlyConfigured) as ctx:
+            choose_email_backend(production=True)
+        message = str(ctx.exception)
+        for name in ("BREVO_API_KEY", "BREVO_SENDER_EMAIL", "BREVO_SENDER_NAME"):
+            self.assertIn(name, message)
+
+    def test_explicit_override_wins_even_in_production(self):
+        self.assertEqual(
+            choose_email_backend(
+                production=True,
+                override="django.core.mail.backends.console.EmailBackend",
+            ),
+            "django.core.mail.backends.console.EmailBackend",
+        )
