@@ -4,971 +4,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Kodehax Academy{% endblock %}</title>
+    <meta name="description" content="Kodehax Academy offers live, mentor-led technology programs built around practical projects and career readiness.">
+    <title>{% block title %}Kodehax Academy | Learn live. Build for real.{% endblock %}</title>
     <link rel="icon" type="image/png" href="{% static 'image/image.png' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
-    <style>
-        :root{--bg1:#020617;--bg2:#0b1224;--bg3:#0f172a;--surface:rgba(255,255,255,.025);--surface-2:rgba(255,255,255,.04);--border:rgba(255,255,255,.09);--border-strong:rgba(255,255,255,.15);--text:#e5eefb;--muted:#8ea0b9;--title:#f8fbff}
-        html{scroll-behavior:smooth;background-color:var(--bg1);overscroll-behavior-y:none}
-        body{margin:0;min-height:100vh;color:var(--text);color-scheme:dark;font-family:"Manrope",sans-serif;background-color:var(--bg1);background-image:radial-gradient(circle at 18% 22%,rgba(59,130,246,.22),transparent 18%),radial-gradient(circle at 78% 14%,rgba(99,102,241,.18),transparent 16%),radial-gradient(circle at 55% 88%,rgba(59,130,246,.08),transparent 22%),linear-gradient(145deg,var(--bg1),var(--bg2) 52%,var(--bg3) 100%);background-size:160% 160%;background-repeat:no-repeat;animation:gradientDrift 18s ease-in-out infinite alternate;overflow-x:hidden}
-        h1,h2,h3,h4,.font-display{font-family:"Space Grotesk",sans-serif}
-        body:before{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(148,163,184,.09) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,.09) 1px,transparent 1px);background-size:44px 44px;opacity:.28;pointer-events:none;mask-image:radial-gradient(circle at center,black 46%,transparent 88%);-webkit-mask-image:radial-gradient(circle at center,black 46%,transparent 88%);z-index:0}
-        body:after{content:"";position:fixed;inset:-10% -15%;background:radial-gradient(circle at 22% 28%,rgba(59,130,246,.07),transparent 18%),radial-gradient(circle at 74% 18%,rgba(99,102,241,.06),transparent 16%);filter:blur(26px);animation:floatLights 20s ease-in-out infinite alternate;pointer-events:none;z-index:0}
-        .page-shell{position:relative;z-index:1}.glass{background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border-strong);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 28px 70px rgba(2,6,23,.62),inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(255,255,255,.015)}
-        .premium{position:relative;overflow:hidden;border-radius:1.25rem;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}.premium:after{content:"";position:absolute;inset:auto -18% -42% auto;width:12rem;height:12rem;border-radius:999px;background:radial-gradient(circle,rgba(99,102,241,.14),transparent 70%);opacity:0;transition:opacity .28s ease;pointer-events:none}.premium:hover{transform:translateY(-10px) scale(1.02);border-color:rgba(255,255,255,.22);box-shadow:0 38px 82px rgba(2,6,23,.66),0 0 0 1px rgba(255,255,255,.045) inset,0 0 30px rgba(59,130,246,.12)}.premium:hover:after{opacity:1}
-        .nav-link{position:relative;color:#cbd5e1;transition:.18s}.nav-link:after{content:"";position:absolute;left:.1rem;right:.1rem;bottom:-.35rem;height:2px;border-radius:999px;background:linear-gradient(90deg,rgba(59,130,246,.9),rgba(168,85,247,.8));transform:scaleX(0);transition:transform .22s ease}.nav-link:hover{color:#fff;transform:translateY(-1px)}.nav-link:hover:after{transform:scaleX(1)}
-        .btn-primary{color:#fff;font-weight:800;border-radius:1rem;background:linear-gradient(135deg,#2563eb,#4f46e5 48%,#7c3aed);box-shadow:0 24px 46px rgba(79,70,229,.42),0 0 0 1px rgba(255,255,255,.06) inset,0 0 34px rgba(59,130,246,.16);transition:transform .22s ease,box-shadow .22s ease,filter .22s ease;position:relative}.btn-primary:before{content:"";position:absolute;inset:-22% -14%;border-radius:inherit;background:radial-gradient(circle,rgba(99,102,241,.24),transparent 60%);z-index:-1;pointer-events:none}.btn-primary:hover{transform:translateY(-3px) scale(1.035);filter:brightness(1.08);box-shadow:0 30px 54px rgba(79,70,229,.5),0 0 44px rgba(99,102,241,.2)}
-        .btn-secondary{color:#f8fafc;font-weight:600;border-radius:1rem;border:1px solid rgba(255,255,255,.20);background:rgba(15,23,42,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.07);transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease}.btn-secondary:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.30);background:rgba(15,23,42,.44);box-shadow:0 18px 32px rgba(2,6,23,.38),0 0 0 1px rgba(255,255,255,.035) inset}
-        .badge{border-radius:999px;border:1px solid rgba(129,140,248,.24);background:rgba(2,6,23,.56);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}.hero-radial{position:absolute;left:8%;top:6%;width:42rem;height:42rem;border-radius:999px;background:radial-gradient(circle,rgba(59,130,246,.16),rgba(99,102,241,.08) 28%,transparent 62%);pointer-events:none;filter:blur(14px)}
-        .hero-orb{position:absolute;border-radius:999px;filter:blur(18px);opacity:.7;pointer-events:none}.hero-orb.one{top:-3rem;right:14%;width:10rem;height:10rem;background:rgba(59,130,246,.26)}.hero-orb.two{right:-2rem;bottom:10%;width:12rem;height:12rem;background:rgba(168,85,247,.18)}
-        .chat-shell{position:relative;border-radius:1.65rem;overflow:hidden;box-shadow:0 40px 94px rgba(2,6,23,.72),0 0 48px rgba(99,102,241,.14)}.chat-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 82% 18%,rgba(99,102,241,.20),transparent 22%),linear-gradient(180deg,rgba(2,6,23,.94),rgba(15,23,42,.82));pointer-events:none}.chat-shell:after{content:"";position:absolute;inset:auto -6% -12% auto;width:16rem;height:16rem;border-radius:999px;background:radial-gradient(circle,rgba(59,130,246,.16),transparent 68%);pointer-events:none}.chat-shell>*{position:relative;z-index:1}
-        .bubble{border-radius:1.2rem;border:1px solid rgba(255,255,255,.10);backdrop-filter:blur(8px);animation:messageSlideIn .62s ease both}.bubble.user{background:rgba(2,6,23,.92);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}.bubble.ai{background:linear-gradient(135deg,rgba(37,99,235,.22),rgba(79,70,229,.18));box-shadow:0 18px 42px rgba(59,130,246,.18),0 0 28px rgba(99,102,241,.12),inset 0 1px 0 rgba(255,255,255,.07)}.bubble.ai [data-ai-response]{animation:responseGlow 2.6s ease-in-out infinite}
-        .typing-dot{width:.45rem;height:.45rem;border-radius:999px;background:rgba(191,219,254,.9);animation:typingPulse 1s infinite ease-in-out}.typing-dot:nth-child(2){animation-delay:.15s}.typing-dot:nth-child(3){animation-delay:.3s}
-        .icon-wrap{width:3rem;height:3rem;border-radius:1rem;border:1px solid rgba(129,140,248,.18);background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-        .progress-track{height:.55rem;border-radius:999px;background:rgba(148,163,184,.12);overflow:hidden}.progress-bar{height:100%;border-radius:inherit;background:linear-gradient(90deg,#3b82f6,#6366f1,#8b5cf6);box-shadow:0 0 18px rgba(99,102,241,.24)}
-        .reveal{opacity:0;transform:translateY(36px);transition:opacity .7s ease,transform .7s ease}.reveal.visible{opacity:1;transform:translateY(0)}.s1{transition-delay:.09s}.s2{transition-delay:.18s}.s3{transition-delay:.27s}.s4{transition-delay:.36s}
-        .cta{position:relative;overflow:hidden;border-radius:1.5rem;background:radial-gradient(circle at top left,rgba(59,130,246,.28),transparent 30%),radial-gradient(circle at top right,rgba(168,85,247,.24),transparent 26%),linear-gradient(135deg,rgba(30,41,59,.88),rgba(15,23,42,.94))}.cta:after{content:"";position:absolute;inset:auto -10% -55% auto;width:18rem;height:18rem;border-radius:999px;background:radial-gradient(circle,rgba(99,102,241,.24),transparent 70%);pointer-events:none}
-        .layout-main{padding-top:1.25rem}
-        .layout-stack{display:flex;flex-direction:column;gap:4.5rem}
-        .hero-section{margin-top:0;padding:3.5rem}
-        .hero-grid{align-items:stretch;gap:2.5rem}
-        .hero-copy{max-width:none;width:100%;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
-        .hero-copy .hero-lead{max-width:42rem}
-        .hero-chat{margin-top:0;min-width:0}
-        .chat-shell.ai-chat-shell{min-height:100%;padding:2rem;display:flex;flex-direction:column}
-        .feature-cards{margin-top:2.5rem;gap:2.5rem;align-items:stretch}
-        .feature-cards .feature-card{height:100%;padding:2.5rem}
-        .text-\[11px\]{font-size:11px;line-height:1rem}
-        .text-\[1\.15rem\]{font-size:1.15rem}
-        .leading-\[0\.96\]{line-height:.96}
-        .tracking-\[-0\.04em\]{letter-spacing:-.04em}
-        .tracking-\[0\.16em\]{letter-spacing:.16em}
-        .tracking-\[0\.18em\]{letter-spacing:.18em}
-        .tracking-\[0\.2em\]{letter-spacing:.2em}
-        .tracking-\[0\.22em\]{letter-spacing:.22em}
-        .tracking-\[0\.24em\]{letter-spacing:.24em}
-        .tracking-\[0\.28em\]{letter-spacing:.28em}
-        .rounded-\[1\.25rem\]{border-radius:1.25rem}
-        .rounded-\[1\.35rem\]{border-radius:1.35rem}
-        .rounded-\[1\.4rem\]{border-radius:1.4rem}
-        .rounded-\[1\.6rem\]{border-radius:1.6rem}
-        .rounded-\[1\.75rem\]{border-radius:1.75rem}
-        .max-w-\[72\%\]{max-width:72%}
-        .max-w-\[90\%\]{max-width:90%}
-        .w-\[74\%\]{width:74%}
-        .w-\[82\%\]{width:82%}
-        .w-\[91\%\]{width:91%}
-        .shadow-\[0_0_16px_rgba\(56\,189\,248\,0\.9\)\]{box-shadow:0 0 16px rgba(56,189,248,.9)}
-        .shadow-\[0_12px_30px_rgba\(15\,23\,42\,0\.28\)\]{box-shadow:0 12px 30px rgba(15,23,42,.28)}
-        .spotlight-line{min-height:2rem}
-        .hero-title{max-width:44rem;font-size:clamp(4rem,6vw,5.7rem);line-height:.92;letter-spacing:-.05em;text-wrap:balance}
-        .hero-body{max-width:41rem;font-size:1.08rem;line-height:1.95;color:#d7e3f7}
-        .hero-actions{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}
-        .hero-spotlight{width:100%;max-width:46rem;padding:1.15rem 1.45rem;border-radius:1.4rem}
-        .hero-support-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;width:100%;max-width:46rem}
-        .hero-mini-card{min-height:11.75rem;height:100%;padding:1.35rem 1.3rem;border-radius:1.35rem;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.022));border:1px solid rgba(255,255,255,.09);box-shadow:inset 0 1px 0 rgba(255,255,255,.04);display:flex;flex-direction:column;justify-content:flex-start}
-        .hero-mini-card p:first-child{margin:0}
-        .hero-mini-card p:last-child{margin-top:1rem;font-size:.98rem;line-height:1.9;color:#dbe6f7}
-        .hero-card-label{font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;color:#6f7f9a}
-        .hero-meta-card{min-height:10.5rem;padding:1.4rem 1.5rem;border-radius:1.4rem;display:flex;flex-direction:column;justify-content:space-between}
-        .hero-meta-card p:first-child{margin:0}
-        .hero-meta-card p:last-child{margin-top:1rem;font-size:1.2rem;line-height:1.45;max-width:16rem}
-        .hero-chat-grid{gap:1rem;padding-top:0;align-items:stretch}
-        .hero-window{display:flex;flex-direction:column;gap:1.2rem;flex:1}
-        .hero-bubble-user{margin-left:auto;max-width:82%;padding:1.55rem 1.75rem}
-        .hero-bubble-ai{max-width:100%;padding:1.85rem 1.95rem;min-height:15rem;display:flex;flex-direction:column;justify-content:flex-start}
-        .hero-window-head{padding-bottom:1.25rem}
-        .hero-window-copy{display:flex;flex-direction:column;gap:1.35rem;flex:1}
-        .hero-panel-glow{position:absolute;inset:auto -10% -16% auto;width:18rem;height:18rem;border-radius:999px;background:radial-gradient(circle,rgba(99,102,241,.22),transparent 70%);pointer-events:none;opacity:.85}
-        .hero-meta-shell{margin-top:auto;padding-top:.25rem}
-        .hero-bottom-strip{margin-top:1rem;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.85rem}
-        .hero-strip-card{border:1px solid rgba(255,255,255,.08);border-radius:1rem;background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.018));padding:1rem 1.05rem}
-        .hero-strip-card .value{margin-top:.45rem;font-size:1rem;line-height:1.45;color:#f4f7ff;font-weight:700}
-        .hero-strip-card .note{margin-top:.3rem;font-size:.82rem;line-height:1.45;color:#aebdd7}
-        .pill-tabs{display:flex;flex-wrap:wrap;gap:.75rem}
-        .pill-tab{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#dcefe5;padding:.8rem 1rem;border-radius:999px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;transition:.2s}
-        .pill-tab:hover,.pill-tab.active{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));border-color:rgba(129,140,248,.38);color:#fff}
-        .tab-panel{display:none}
-        .tab-panel.active{display:block}
-        .course-chip{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:999px;padding:.4rem .7rem;font-size:.78rem;color:#d6e8de}
-        .course-panel{padding:2rem;border-radius:1.55rem;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.028));border:1px solid rgba(255,255,255,.09);box-shadow:0 20px 48px rgba(2,6,23,.22),inset 0 1px 0 rgba(255,255,255,.04)}
-        .course-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(18rem,.8fr);gap:2rem;align-items:stretch}
-        .course-copy{display:flex;flex-direction:column;justify-content:flex-start;gap:1.25rem;min-width:0}
-        .course-title{font-size:2rem;line-height:1.15;font-weight:800;color:#fff;text-wrap:balance}
-        .course-subtitle{margin-top:.55rem;font-size:.88rem;letter-spacing:.18em;text-transform:uppercase;color:#6f7f9a}
-        .course-description{margin-top:0;font-size:1.06rem;line-height:2.05;color:#d9e5f7;max-width:40rem}
-        .course-chip-row{margin-top:.15rem;display:flex;flex-wrap:wrap;gap:.75rem}
-        .course-aside{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:.9rem}
-        .course-detail-card{border:1px solid rgba(255,255,255,.09);border-radius:1.2rem;background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.02));padding:1.15rem 1.2rem;display:flex;flex-direction:column;justify-content:space-between}
-        .course-detail-card .eyebrow{font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:#7084a8}
-        .course-detail-card .value{margin-top:.55rem;font-size:1.02rem;line-height:1.6;color:#f5f8ff;font-weight:700}
-        .course-detail-card .note{margin-top:.4rem;font-size:.9rem;line-height:1.55;color:#c7d3e9}
-        .accordion-trigger{width:100%;text-align:left}
-        .accordion-trigger svg{transition:transform .2s ease}
-        .accordion-item.open .accordion-trigger svg{transform:rotate(45deg)}
-        .accordion-panel{display:none}
-        .accordion-item.open .accordion-panel{display:block}
-        .info-card{background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.09)}
-        .mobile-stack{display:flex;flex-direction:column;gap:1rem}
-        .mobile-topbar,.mobile-nav,.mobile-card,.mobile-feature,.mobile-chat-bubble,.mobile-cta-shell,.mobile-stat-card,.mobile-live-panel,.mobile-spotlight-panel,.mobile-stage,.mobile-stage-panel,.mobile-float-card{position:relative;overflow:hidden}
-        .mobile-fallback{display:none}
-        .mobile-shell{position:relative;max-width:30rem;margin:0 auto;padding:1rem 1rem 3rem}
-        .mobile-shell:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 12% 0%,rgba(59,130,246,.13),transparent 26%),radial-gradient(circle at 88% 8%,rgba(168,85,247,.12),transparent 24%),radial-gradient(circle at 50% 58%,rgba(59,130,246,.06),transparent 30%);pointer-events:none}
-        .mobile-shell:after{content:"";position:absolute;left:8%;right:8%;top:7rem;height:18rem;border-radius:999px;background:radial-gradient(circle,rgba(79,70,229,.16),transparent 70%);filter:blur(18px);pointer-events:none;opacity:.78}
-        .mobile-section{position:relative;z-index:1;margin-top:3.2rem}
-        .mobile-topbar{position:sticky;top:1rem;z-index:35;display:flex;flex-direction:column;gap:.9rem;padding:1rem 1.05rem;border-radius:1.55rem}
-        .mobile-topbar-row{display:flex;align-items:center;justify-content:space-between;gap:.85rem}
-        .mobile-logo{display:flex;align-items:center;gap:.85rem;min-width:0}
-        .mobile-logo img{width:2.8rem;height:2.8rem;border-radius:1rem;object-fit:cover;box-shadow:0 16px 30px rgba(15,23,42,.34)}
-        .mobile-logo-mark{font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:#7f8faf}
-        .mobile-logo-name{font-size:1rem;font-weight:800;color:#fff;line-height:1.1}
-        .mobile-debug-banner{display:flex;align-items:center;justify-content:center;min-height:2.6rem;border-radius:999px;padding:0 1rem;background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;font-size:.78rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 16px 28px rgba(239,68,68,.24)}
-        .mobile-nav{display:flex;flex-direction:column;gap:.85rem}
-        .mobile-nav-row{display:flex;align-items:center;gap:.7rem;overflow-x:auto;padding-bottom:.15rem;scrollbar-width:none;-ms-overflow-style:none}
-        .mobile-nav-row::-webkit-scrollbar{display:none}
-        .mobile-nav-link,.mobile-auth-link{display:inline-flex;align-items:center;justify-content:center;min-height:2.9rem;border-radius:999px;padding:0 1rem;color:#d7e3f8;font-size:.85rem;font-weight:700;letter-spacing:.01em;text-decoration:none;white-space:nowrap;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease}
-        .mobile-nav-link.active,.mobile-nav-link:hover,.mobile-auth-link:hover{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));border-color:rgba(129,140,248,.28);color:#fff}
-        .mobile-auth-row{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
-        .mobile-auth-link.register{padding:0 1.35rem;background:linear-gradient(135deg,#2563eb,#4f46e5 48%,#7c3aed);border-color:transparent;box-shadow:0 18px 34px rgba(79,70,229,.28)}
-        .mobile-auth-link.register:hover{filter:brightness(1.06)}
-        .mobile-nav-link:active,.mobile-auth-link:active,.mobile-hero-btn:active,.mobile-cta-btn:active{transform:scale(.97)}
-        .mobile-hero{text-align:center;padding-top:.75rem}
-        .mobile-badge{display:inline-flex;align-items:center;justify-content:center;padding:.5rem .95rem;border-radius:999px;border:1px solid rgba(129,140,248,.22);background:rgba(2,6,23,.48);font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#c6d6f0}
-        .mobile-title{margin:1.2rem 0 0;font-size:clamp(2.65rem,10vw,4.1rem);line-height:.95;letter-spacing:-.05em;color:#fff;text-wrap:balance}
-        .mobile-subtext{margin:1rem auto 0;max-width:21rem;font-size:1.02rem;line-height:1.8;color:#c9d7ed}
-        .mobile-hero-btn,.mobile-cta-btn{display:inline-flex;align-items:center;justify-content:center;width:100%;min-height:3.8rem;padding:0 1.35rem;border-radius:1.35rem;font-size:1rem;font-weight:800}
-        .mobile-hero-btn{margin-top:1.5rem}
-        .mobile-stage{margin-top:1.5rem;padding:1.15rem;border-radius:1.9rem;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));box-shadow:0 34px 80px rgba(2,6,23,.58),0 0 0 1px rgba(255,255,255,.02) inset}
-        .mobile-stage:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 15%,rgba(59,130,246,.18),transparent 26%),radial-gradient(circle at 82% 18%,rgba(168,85,247,.18),transparent 24%);pointer-events:none}
-        .mobile-stage-device{position:relative;z-index:1;border-radius:1.75rem;padding:1rem;background:linear-gradient(180deg,rgba(2,6,23,.96),rgba(15,23,42,.92));border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 22px 46px rgba(2,6,23,.46)}
-        .mobile-stage-notch{width:7rem;height:.45rem;border-radius:999px;background:rgba(148,163,184,.22);margin:0 auto .85rem}
-        .mobile-stage-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;text-align:left}
-        .mobile-stage-kicker{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:#8fa4c8}
-        .mobile-stage-title{margin-top:.3rem;font-size:1rem;font-weight:800;color:#fff}
-        .mobile-stage-signal{display:inline-flex;align-items:center;gap:.38rem;padding:.38rem .6rem;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);font-size:.72rem;color:#d9e6f8}
-        .mobile-stage-signal span{width:.42rem;height:.42rem;border-radius:999px;background:#38bdf8;box-shadow:0 0 12px rgba(56,189,248,.85)}
-        .mobile-stage-grid{margin-top:1rem;display:grid;gap:.85rem}
-        .mobile-stage-panel{padding:1rem;border-radius:1.35rem;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.028));border:1px solid rgba(255,255,255,.08);text-align:left}
-        .mobile-stage-panel .eyebrow{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:#94a8c7}
-        .mobile-stage-panel strong{display:block;margin-top:.45rem;font-size:1rem;color:#fff}
-        .mobile-stage-panel p{margin:.45rem 0 0;font-size:.88rem;line-height:1.6;color:#c9d7eb}
-        .mobile-stage-metric{display:flex;justify-content:space-between;gap:1rem;align-items:flex-end}
-        .mobile-stage-metric .value{font-size:2rem;font-weight:800;line-height:1;color:#fff}
-        .mobile-stage-metric .note{font-size:.8rem;color:#b8c8e0}
-        .mobile-float-card{position:absolute;z-index:2;padding:.8rem .9rem;border-radius:1.15rem;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 18px 38px rgba(2,6,23,.44);text-align:left}
-        .mobile-float-card.top{top:-.8rem;right:-.15rem;transform:rotate(7deg)}
-        .mobile-float-card.bottom{left:-.2rem;bottom:1.15rem;transform:rotate(-6deg)}
-        .mobile-float-label{font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:#a8b7d2}
-        .mobile-float-value{margin-top:.35rem;font-size:.95rem;font-weight:800;color:#fff}
-        .mobile-float-note{margin-top:.18rem;font-size:.74rem;color:#d3def2}
-        .mobile-marquee{margin-top:1.15rem;border-radius:1.2rem;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);padding:.8rem 0}
-        .mobile-marquee-track{display:flex;gap:1.5rem;min-width:max-content;padding-left:1rem;animation:marqueeDrift 18s linear infinite}
-        .mobile-marquee-item{display:inline-flex;align-items:center;gap:.55rem;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d4e0f5}
-        .mobile-marquee-item:before{content:"";display:inline-block;width:.42rem;height:.42rem;border-radius:999px;background:linear-gradient(135deg,#38bdf8,#818cf8);box-shadow:0 0 14px rgba(99,102,241,.45)}
-        .mobile-stats-grid{margin-top:1.2rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.9rem}
-        .mobile-stat-card{padding:1rem 1rem 1.05rem;border-radius:1.35rem;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.026));border:1px solid rgba(255,255,255,.1);text-align:left}
-        .mobile-stat-label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#96a9c8}
-        .mobile-stat-value{margin-top:.55rem;font-size:1.55rem;font-weight:800;color:#fff}
-        .mobile-stat-note{margin-top:.3rem;font-size:.84rem;line-height:1.55;color:#c2d0e7}
-        .mobile-spotlight-panel{margin-top:1rem;padding:1rem 1.05rem 1.05rem;border-radius:1.4rem;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.025));text-align:left}
-        .mobile-spotlight-label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#8ea0be}
-        .mobile-spotlight-line{margin-top:.65rem;min-height:3rem;font-size:.96rem;line-height:1.7;color:#eef4ff}
-        .mobile-card{padding:1.35rem;border-radius:1.6rem}
-        .mobile-chat-card{padding:1.35rem 1.2rem 1.3rem}
-        .mobile-chat-head{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem}
-        .mobile-chat-title{font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8ba0c2}
-        .mobile-chat-status{display:inline-flex;align-items:center;gap:.4rem;font-size:.8rem;color:#c8d6ee}
-        .mobile-chat-status span{display:inline-block;width:.5rem;height:.5rem;border-radius:999px;background:#38bdf8;box-shadow:0 0 14px rgba(56,189,248,.9)}
-        .mobile-chat-pills{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}
-        .mobile-chat-pill{display:inline-flex;align-items:center;justify-content:center;padding:.55rem .85rem;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d4e0f4;transition:transform .18s ease,background .18s ease,border-color .18s ease,color .18s ease}
-        .mobile-chat-pill.active{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));border-color:rgba(129,140,248,.35);color:#fff}
-        .mobile-chat-flow{display:flex;flex-direction:column;gap:1rem}
-        .mobile-chat-bubble{max-width:88%;padding:1rem 1rem 1.05rem;border-radius:1.35rem;border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-        .mobile-chat-bubble.user{align-self:flex-end;background:rgba(255,255,255,.045)}
-        .mobile-chat-bubble.ai{align-self:flex-start;background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.22));box-shadow:0 18px 44px rgba(59,130,246,.18),0 0 34px rgba(99,102,241,.12)}
-        .mobile-chat-label{display:block;margin-bottom:.45rem;font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9db1cf}
-        .mobile-chat-text{font-size:.98rem;line-height:1.7;color:#f8fbff}
-        .mobile-live-panel{margin-top:1rem;padding:1rem 1.05rem;border-radius:1.35rem;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03)}
-        .mobile-live-row{display:flex;align-items:center;justify-content:space-between;gap:.8rem}
-        .mobile-live-row strong{font-size:.95rem;color:#fff}
-        .mobile-live-row span{font-size:.8rem;color:#b9c8df}
-        .mobile-progress{margin-top:.75rem;height:.45rem;border-radius:999px;background:rgba(148,163,184,.14);overflow:hidden}
-        .mobile-progress-bar{height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#38bdf8,#6366f1,#8b5cf6);box-shadow:0 0 18px rgba(99,102,241,.26);transition:width 1s ease}
-        .mobile-features{display:flex;flex-direction:column;gap:1rem}
-        .mobile-feature{display:flex;gap:1rem;align-items:flex-start;padding:1.35rem 1.25rem;border-radius:1.55rem}
-        .mobile-feature-icon{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:3rem;height:3rem;border-radius:1rem;border:1px solid rgba(129,140,248,.18);background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.18));color:#eef4ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-        .mobile-feature h3{margin:0;font-size:1.08rem;font-weight:800;color:#fff}
-        .mobile-feature p{margin:.45rem 0 0;font-size:.95rem;line-height:1.75;color:#c7d4e8}
-        .mobile-switcher{display:flex;gap:.55rem;overflow:auto;padding-bottom:.15rem;-ms-overflow-style:none;scrollbar-width:none}
-        .mobile-switcher::-webkit-scrollbar{display:none}
-        .mobile-switch-btn{display:inline-flex;align-items:center;justify-content:center;padding:.6rem .95rem;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);font-size:.74rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#d1ddf2;white-space:nowrap;transition:transform .18s ease,background .18s ease,border-color .18s ease}
-        .mobile-switch-btn.active{background:linear-gradient(135deg,rgba(37,99,235,.24),rgba(79,70,229,.2));border-color:rgba(129,140,248,.34);color:#fff}
-        .mobile-switch-panel{display:none}
-        .mobile-switch-panel.active{display:flex;flex-direction:column;gap:.85rem}
-        .mobile-surface-block{margin-top:1rem;padding:1.15rem;border-radius:1.45rem;border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.022))}
-        .mobile-surface-block h3{margin:0;font-size:1.2rem;font-weight:800;color:#fff}
-        .mobile-surface-block p{margin:.55rem 0 0;font-size:.95rem;line-height:1.7;color:#c9d7eb}
-        .mobile-surface-metrics{margin-top:.9rem;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
-        .mobile-surface-metric{padding:.85rem;border-radius:1.1rem;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
-        .mobile-surface-metric .label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:#8ea1c0}
-        .mobile-surface-metric .value{margin-top:.45rem;font-size:1rem;font-weight:700;color:#fff}
-        .mobile-profile-shell{padding:1.15rem;border-radius:1.65rem;border:1px solid rgba(255,255,255,.1);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.024));box-shadow:0 28px 60px rgba(2,6,23,.38),inset 0 1px 0 rgba(255,255,255,.04)}
-        .mobile-profile-hero{padding:1.2rem 1.1rem 1.15rem;border-radius:1.45rem;background:radial-gradient(circle at top right,rgba(59,130,246,.18),transparent 32%),linear-gradient(135deg,rgba(17,24,39,.9),rgba(30,41,59,.96));border:1px solid rgba(255,255,255,.08)}
-        .mobile-profile-kicker{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:#95a8c7}
-        .mobile-profile-title{margin:.55rem 0 0;font-size:1.55rem;line-height:1.2;font-weight:800;color:#fff}
-        .mobile-profile-copy{margin:.8rem 0 0;font-size:.94rem;line-height:1.75;color:#d5e2f5}
-        .mobile-profile-badges{margin-top:1rem;display:flex;flex-wrap:wrap;gap:.6rem}
-        .mobile-profile-badge{display:inline-flex;align-items:center;justify-content:center;padding:.48rem .72rem;border-radius:999px;border:1px solid rgba(129,140,248,.2);background:rgba(255,255,255,.05);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#e3ecfb}
-        .mobile-profile-grid{display:grid;gap:.85rem}
-        .mobile-profile-card{padding:1rem;border-radius:1.25rem;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.08)}
-        .mobile-profile-card .label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:#8ea1c0}
-        .mobile-profile-card .value{margin-top:.55rem;font-size:.95rem;line-height:1.7;color:#f6f9ff}
-        .mobile-profile-list{display:grid;gap:.75rem}
-        .mobile-profile-list-item{padding:.95rem 1rem;border-radius:1.2rem;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
-        .mobile-profile-list-item strong{display:block;font-size:.94rem;color:#fff}
-        .mobile-profile-list-item span{display:block;margin-top:.35rem;font-size:.88rem;line-height:1.65;color:#cad7ea}
-        .mobile-profile-courses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
-        .mobile-profile-course{padding:.95rem;border-radius:1.15rem;background:linear-gradient(180deg,rgba(59,130,246,.1),rgba(255,255,255,.025));border:1px solid rgba(129,140,248,.16)}
-        .mobile-profile-course strong{display:block;font-size:.92rem;color:#fff}
-        .mobile-profile-course span{display:block;margin-top:.35rem;font-size:.82rem;line-height:1.55;color:#c8d5e9}
-        .mobile-profile-contact{display:grid;gap:.75rem}
-        .mobile-profile-contact-item{padding:.95rem 1rem;border-radius:1.2rem;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
-        .mobile-profile-contact-item .label{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:#8ea1c0}
-        .mobile-profile-contact-item .value{margin-top:.4rem;font-size:.9rem;line-height:1.65;color:#f5f8ff}
-        .mobile-cta-shell{padding:1.5rem 1.25rem;border-radius:1.7rem;background:radial-gradient(circle at top left,rgba(59,130,246,.3),transparent 32%),radial-gradient(circle at top right,rgba(168,85,247,.24),transparent 28%),linear-gradient(135deg,rgba(30,41,59,.9),rgba(15,23,42,.96))}
-        .mobile-cta-shell p{margin:0;font-size:.76rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#cad6ee}
-        .mobile-cta-shell h3{margin:.85rem 0 0;font-size:1.7rem;line-height:1.2;font-weight:800;color:#fff;text-wrap:balance}
-        .mobile-cta-shell .mobile-cta-copy{margin:.8rem 0 1.2rem;font-size:.96rem;line-height:1.75;color:#d7e2f5}
-        .mobile-cta-orbs{position:absolute;inset:0;pointer-events:none}
-        .mobile-cta-orbs:before,.mobile-cta-orbs:after{content:"";position:absolute;border-radius:999px;filter:blur(6px)}
-        .mobile-cta-orbs:before{width:7rem;height:7rem;top:-1rem;right:-1rem;background:radial-gradient(circle,rgba(99,102,241,.28),transparent 70%)}
-        .mobile-cta-orbs:after{width:8rem;height:8rem;left:-1rem;bottom:-2rem;background:radial-gradient(circle,rgba(59,130,246,.24),transparent 72%)}
-        @media (min-width:1024px){.lg\:px-16{padding-left:4rem;padding-right:4rem}.lg\:py-24{padding-top:6rem;padding-bottom:6rem}}
-        @media (min-width:1280px){.xl\:mt-24{margin-top:6rem}.xl\:text-\[5\.5rem\]{font-size:5.5rem;line-height:1}.xl\:grid-cols-\[1\.06fr_0\.94fr\]{grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr)}.xl\:grid-cols-\[1\.08fr_0\.92fr\]{grid-template-columns:1.08fr .92fr}}
-        .grid-cols-\[1\.15fr_0\.85fr\]{grid-template-columns:1.15fr .85fr}
-        .desktop-only{display:block}.mobile-fallback{display:none}
-        @media (max-width:1279px){.hero-section{padding:2.5rem}.hero-grid{grid-template-columns:1fr}.hero-copy .hero-lead,.hero-spotlight,.hero-support-grid{max-width:none}.hero-support-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-chat{margin-top:0}.hero-window{gap:1.25rem}}
-        @media (max-width:900px){.hero-support-grid{grid-template-columns:1fr}.hero-mini-card,.hero-meta-card{min-height:auto}.hero-chat-grid,.hero-bottom-strip{grid-template-columns:1fr}.course-layout{grid-template-columns:1fr}.course-aside{grid-template-rows:none;grid-template-columns:1fr}}
-        @media (max-width:1023px){body{background-size:auto;animation:none}.desktop-only{display:none}.mobile-fallback{display:block}}
-        @media (max-width:480px){.mobile-shell{padding-left:.95rem;padding-right:.95rem}.mobile-title{font-size:2.8rem}.mobile-section{margin-top:2.8rem}.mobile-card,.mobile-feature,.mobile-cta-shell,.mobile-stat-card,.mobile-surface-block,.mobile-stage,.mobile-profile-shell,.mobile-topbar{border-radius:1.45rem}.mobile-stats-grid,.mobile-surface-metrics,.mobile-profile-courses{grid-template-columns:1fr}.mobile-float-card.top{right:.1rem}.mobile-float-card.bottom{left:.1rem;bottom:.85rem}.mobile-stage-device{padding:.9rem}.mobile-topbar-row{align-items:flex-start;flex-direction:column}.mobile-auth-row{width:100%;display:grid;grid-template-columns:1fr 1fr}.mobile-nav-link,.mobile-auth-link{min-height:2.8rem}}
-        @keyframes gradientDrift{from{background-position:0 50%}to{background-position:100% 50%}}@keyframes floatLights{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(2%,-1.5%,0) scale(1.04)}}@keyframes messageSlideIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}@keyframes typingPulse{0%,80%,100%{transform:scale(.7);opacity:.45}40%{transform:scale(1);opacity:1}}@keyframes responseGlow{0%,100%{text-shadow:0 0 0 rgba(125,211,252,0);filter:brightness(1)}50%{text-shadow:0 0 16px rgba(125,211,252,.16),0 0 30px rgba(99,102,241,.12);filter:brightness(1.04)}}@keyframes marqueeDrift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-    </style>
+    <link rel="stylesheet" href="{% static 'css/landing.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen">
-    <div class="page-shell">
-        {% if messages %}
-        <div class="fixed left-0 right-0 top-4 z-50 flex justify-center px-4">
-            <div class="w-full max-w-3xl space-y-3">
-                {% for message in messages %}
-                <div class="glass rounded-2xl px-5 py-3 text-sm {% if message.tags == 'success' %}border-emerald-500/40 text-emerald-100{% elif message.tags == 'error' %}border-rose-500/40 text-rose-100{% else %}border-sky-500/40 text-sky-100{% endif %}">
-                    <div class="flex items-center justify-between gap-3"><span>{{ message }}</span><button onclick="this.parentElement.parentElement.style.display='none'" class="text-slate-300 transition hover:text-white">x</button></div>
-                </div>
-                {% endfor %}
-            </div>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    {% if messages %}
+    <div class="flash-stack" aria-live="polite">
+        {% for message in messages %}
+        <div class="flash-message flash-message--{{ message.tags|default:'info' }}">
+            <span>{{ message }}</span>
+            <button type="button" aria-label="Dismiss message" data-dismiss-message>&times;</button>
         </div>
-        {% endif %}
-        {% block content %}
-        <div class="desktop-only">
-            <div class="hero-radial"></div>
-            <nav class="sticky top-4 z-40 mb-8 px-6 pt-6">
-                <div class="glass mx-auto flex max-w-7xl items-center justify-between rounded-[1.25rem] px-6 py-4 lg:px-7">
-                    <a href="/" class="flex items-center gap-3">
-                        <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo" class="h-11 w-11 rounded-2xl object-cover shadow-[0_12px_30px_rgba(15,23,42,0.28)]">
-                        <div><p class="text-[11px] uppercase tracking-[0.28em] text-slate-400">Kodehax</p><h1 class="text-base font-black text-white">Academy</h1></div>
-                    </a>
-                    <div class="flex items-center gap-8 text-sm">
-                        <a href="/" class="nav-link">Home</a>
-                        <a href="{% url 'student_login' %}" class="nav-link">Student</a>
-                        <a href="{% url 'teacher_login' %}" class="nav-link">Teacher</a>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <a href="{% url 'teacher_login' %}" class="btn-secondary inline-flex h-11 items-center justify-center px-5">Login</a>
-                        <a href="{% url 'student_register' %}" class="btn-primary inline-flex h-11 items-center justify-center px-5">Join Now</a>
-                    </div>
-                </div>
-            </nav>
-
-            <main class="layout-main px-8 pb-24 lg:px-10">
-                <div class="layout-stack mx-auto max-w-7xl">
-                    <section class="hero-section relative overflow-hidden rounded-[1.75rem] border border-white/10">
-                        <div class="absolute inset-0 rounded-[1.75rem] glass"></div>
-                        <div class="hero-orb one"></div><div class="hero-orb two"></div>
-                        <div class="hero-grid relative grid xl:grid-cols-[1.06fr_0.94fr]">
-                            <div class="hero-copy reveal visible">
-                                <div class="badge inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-300"><span class="inline-block h-2 w-2 rounded-full bg-sky-400 shadow-[0_0_16px_rgba(56,189,248,0.9)]"></span>DPIIT Recognized EdTech</div>
-                                <h2 class="hero-title mt-7 text-white">Ethical tech education with real career momentum.</h2>
-                                <p class="hero-body hero-lead mt-7">This version lifts the strongest information from the public Kodehax site into a richer landing page: live classes, practical programs, mentorship, internships, placement support, and transparent pricing.</p>
-                                <div class="hero-actions mt-10">
-                                    <a href="{% url 'student_register' %}" class="btn-primary inline-flex h-14 items-center justify-center px-7 text-base">Join Kodehax</a>
-                                    <a href="{% url 'teacher_login' %}" class="btn-secondary inline-flex h-14 items-center justify-center px-7 text-base">Talk to a Mentor</a>
-                                </div>
-                                <div class="hero-spotlight mt-8 glass">
-                                    <p class="hero-card-label">Public-site highlights</p>
-                                    <div class="spotlight-line mt-3 text-lg font-semibold text-white" data-spotlight></div>
-                                </div>
-                                <div class="hero-support-grid mt-5">
-                                    <div class="hero-mini-card glass"><p class="hero-card-label">Trust First</p><p>Clear emphasis on ethical training and "no scams, no false promises".</p></div>
-                                    <div class="hero-mini-card glass"><p class="hero-card-label">Live Delivery</p><p>100% live classes with mentor-led sessions and practical assignments.</p></div>
-                                    <div class="hero-mini-card glass"><p class="hero-card-label">Career Support</p><p>Internships, certification help, placement assistance, and networking support.</p></div>
-                                </div>
-                            </div>
-
-                            <div class="hero-chat reveal visible s1">
-                                <div class="ai-chat-shell chat-shell glass premium">
-                                    <div class="hero-window-head flex items-center justify-between border-b border-white/10">
-                                        <div class="flex items-center gap-3"><div class="flex gap-2"><span class="h-2.5 w-2.5 rounded-full bg-rose-400/80"></span><span class="h-2.5 w-2.5 rounded-full bg-amber-300/80"></span><span class="h-2.5 w-2.5 rounded-full bg-emerald-400/80"></span></div><p class="text-sm font-semibold text-white">Kodehax Experience</p></div>
-                                        <span class="rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em] text-sky-200">Live Preview</span>
-                                    </div>
-                                    <div class="hero-window mt-7">
-                                        <div class="bubble user hero-bubble-user"><p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Student</p><p class="mt-3 text-sm leading-7 text-slate-100">What makes Kodehax Academy stand out?</p></div>
-                                        <div class="bubble ai hero-bubble-ai">
-                                            <p class="text-[11px] uppercase tracking-[0.16em] text-blue-200/80">Kodehax AI</p>
-                                            <div class="hero-window-copy mt-5">
-                                                <div class="flex items-center gap-2" data-typing><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>
-                                                <div class="hidden text-sm leading-8 text-slate-100" data-ai-response>Kodehax focuses on transparent pricing, live mentor-led classes, practical programs, internships, certification support, and placement-oriented learning rather than inflated promises.</div>
-                                            </div>
-                                        </div>
-                                        <div class="hero-meta-shell">
-                                            <div class="hero-chat-grid grid grid-cols-2 items-stretch">
-                                                <div class="hero-meta-card glass"><p class="hero-card-label">Recognition</p><p class="font-semibold text-white">Startup India / DPIIT</p></div>
-                                                <div class="hero-meta-card glass"><p class="hero-card-label">Location</p><p class="font-semibold text-white">Koramangala, Bengaluru</p></div>
-                                            </div>
-                                            <div class="hero-bottom-strip">
-                                                <div class="hero-strip-card">
-                                                    <p class="hero-card-label">Format</p>
-                                                    <p class="value">100% Live</p>
-                                                    <p class="note">Mentor-led learning sessions</p>
-                                                </div>
-                                                <div class="hero-strip-card">
-                                                    <p class="hero-card-label">Support</p>
-                                                    <p class="value">1-on-1 Guidance</p>
-                                                    <p class="note">Direct mentorship and direction</p>
-                                                </div>
-                                                <div class="hero-strip-card">
-                                                    <p class="hero-card-label">Outcome</p>
-                                                    <p class="value">Career Focused</p>
-                                                    <p class="note">Projects, internships, placement help</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="hero-panel-glow"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="feature-cards mt-16 grid grid-cols-4 gap-8">
-                        <article class="feature-card glass premium reveal rounded-3xl p-8 s1"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18"/><path d="M6 8h12"/><path d="M8 21h8"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">100% Live Classes</h3><p class="mt-4 text-sm leading-8 text-slate-300">The site's strongest promise now gets top-level visibility in the first content band.</p></article>
-                        <article class="feature-card glass premium reveal rounded-3xl p-8 s2"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19h14"/><path d="M7 16V8"/><path d="M12 16V5"/><path d="M17 16v-4"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">Practical Learning</h3><p class="mt-4 text-sm leading-8 text-slate-300">Projects, assignments, and internships are framed as the bridge between learning and work.</p></article>
-                        <article class="feature-card glass premium reveal rounded-3xl p-8 s3"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 8h8"/><path d="M8 12h5"/><path d="M8 16h7"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">Career-Ready Tracks</h3><p class="mt-4 text-sm leading-8 text-slate-300">Web, Data, Cyber Security, AI/ML, and Python are surfaced as clear flagship pathways.</p></article>
-                        <article class="feature-card glass premium reveal rounded-3xl p-8 s4"><div class="icon-wrap flex items-center justify-center"><svg class="h-5 w-5 text-blue-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17c2.5-5 5.5-7.5 9-7.5S19.5 12 20 17"/><path d="M8 7a4 4 0 1 0 8 0"/></svg></div><h3 class="mt-8 text-xl font-bold text-white">Mentor Support</h3><p class="mt-4 text-sm leading-8 text-slate-300">The messaging now makes mentorship, placement help, and networking easier to notice.</p></article>
-                    </section>
-
-                    <section class="grid grid-cols-3 gap-8">
-                        <article class="glass premium reveal rounded-[1.25rem] p-8 s1"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Promise</p><h3 class="mt-4 text-xl font-bold text-white">No scams. No false promises.</h3><p class="mt-4 text-sm leading-9 text-slate-300">That public-facing promise is now visually promoted instead of getting buried in generic product copy.</p></article>
-                        <article class="glass premium reveal rounded-[1.25rem] p-8 s2"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Mission</p><h3 class="mt-4 text-xl font-bold text-white">Break overpriced low-value learning</h3><p class="mt-4 text-sm leading-9 text-slate-300">The value section now reflects the academy's real market positioning and affordability story.</p></article>
-                        <article class="glass premium reveal rounded-[1.25rem] p-8 s3"><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Support</p><h3 class="mt-4 text-xl font-bold text-white">Mentorship to placement assistance</h3><p class="mt-4 text-sm leading-9 text-slate-300">Students can quickly understand that Kodehax is selling outcomes, not just access to lessons.</p></article>
-                    </section>
-
-                    <section class="grid gap-8 xl:grid-cols-[1.08fr_0.92fr]">
-                        <div class="glass reveal rounded-[1.6rem] p-9 s1">
-                            <div class="flex items-start justify-between gap-8">
-                                <div><p class="text-xs uppercase tracking-[0.18em] text-slate-500">Programs</p><h3 class="mt-3 text-3xl font-black text-white">Flagship courses presented as an interactive explorer</h3><p class="mt-4 max-w-xl text-sm leading-8 text-slate-300">This keeps the original product-style structure, but turns it into a tabbed section based on the strongest public Kodehax course offerings.</p></div>
-                                <div class="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-right"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">View</p><p class="mt-2 text-lg font-bold text-white">Course Explorer</p></div>
-                            </div>
-                            <div class="mt-10 space-y-6">
-                                <div class="pill-tabs" data-tabs>
-                                    <button class="pill-tab active" type="button" data-tab-trigger="web">Web Dev</button>
-                                    <button class="pill-tab" type="button" data-tab-trigger="data">Data Science</button>
-                                    <button class="pill-tab" type="button" data-tab-trigger="cyber">Cyber Security</button>
-                                    <button class="pill-tab" type="button" data-tab-trigger="aiml">AI / ML</button>
-                                    <button class="pill-tab" type="button" data-tab-trigger="python">Python</button>
-                                </div>
-                                <div class="tab-panel active course-panel" data-tab-panel="web">
-                                    <div class="course-layout">
-                                        <div class="course-copy">
-                                            <div><p class="course-title">Advanced Diploma in Full Stack Web Development</p><p class="course-subtitle">Industry 4.0 edition</p></div>
-                                            <p class="course-description">Includes Python, Django, Flask, MEARN, Angular, MySQL, and AI integration through project-focused learning.</p>
-                                            <div class="course-chip-row"><span class="course-chip">Python</span><span class="course-chip">Django</span><span class="course-chip">Flask</span><span class="course-chip">MEARN</span><span class="course-chip">Angular</span></div>
-                                        </div>
-                                        <div class="course-aside">
-                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Frontend + backend product building</p><p class="note">Built for learners who want broad real-world development coverage.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Project-first workflow</p><p class="note">Pairs frameworks with implementation-ready practice instead of theory-only modules.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Portfolio-ready full stack foundation</p><p class="note">Strong fit for web app development and software delivery roles.</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-panel course-panel" data-tab-panel="data">
-                                    <div class="course-layout">
-                                        <div class="course-copy">
-                                            <div><p class="course-title">Advanced Diploma in Data Science</p><p class="course-subtitle">ML to MLOps</p></div>
-                                            <p class="course-description">Build skills in ML, deep learning, NLP, generative AI, big data, cloud, and deployment-ready workflows.</p>
-                                            <div class="course-chip-row"><span class="course-chip">ML</span><span class="course-chip">Deep Learning</span><span class="course-chip">NLP</span><span class="course-chip">Generative AI</span><span class="course-chip">MLOps</span></div>
-                                        </div>
-                                        <div class="course-aside">
-                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Analytics, modeling, and AI systems</p><p class="note">A broader path that extends from classic data work into deployment.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">From experimentation to production</p><p class="note">Helps learners connect model-building with operational thinking.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Modern data portfolio direction</p><p class="note">Useful for data science, analytics, and applied AI career tracks.</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-panel course-panel" data-tab-panel="cyber">
-                                    <div class="course-layout">
-                                        <div class="course-copy">
-                                            <div><p class="course-title">Advanced Diploma in Cyber Security</p><p class="course-subtitle">8-month program</p></div>
-                                            <p class="course-description">Includes offensive security, defensive security, DFIR, cloud security, application security, and GRC concepts.</p>
-                                            <div class="course-chip-row"><span class="course-chip">Ethical Hacking</span><span class="course-chip">DFIR</span><span class="course-chip">Cloud Security</span><span class="course-chip">GRC</span></div>
-                                        </div>
-                                        <div class="course-aside">
-                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Offensive + defensive security coverage</p><p class="note">Balances attack awareness with protection, investigation, and governance.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Hands-on security exposure</p><p class="note">Brings multiple cyber domains together inside one guided path.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Foundation for cyber specialization</p><p class="note">Supports learners moving toward security operations and risk-oriented roles.</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-panel course-panel" data-tab-panel="aiml">
-                                    <div class="course-layout">
-                                        <div class="course-copy">
-                                            <div><p class="course-title">Advanced Diploma in AI &amp; Machine Learning</p><p class="course-subtitle">Modern AI path</p></div>
-                                            <p class="course-description">Adds deep learning, generative AI, NLP, cloud AI, and deployment skills for future-facing AI roles.</p>
-                                            <div class="course-chip-row"><span class="course-chip">Generative AI</span><span class="course-chip">NLP</span><span class="course-chip">Cloud AI</span><span class="course-chip">Deployment</span></div>
-                                        </div>
-                                        <div class="course-aside">
-                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Applied AI beyond basics</p><p class="note">Expands from model fundamentals into current AI tooling and deployment context.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Modern stack orientation</p><p class="note">Keeps the curriculum aligned with how current AI systems are actually used.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Future-facing AI readiness</p><p class="note">A stronger fit for learners aiming at applied ML and AI product workflows.</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-panel course-panel" data-tab-panel="python">
-                                    <div class="course-layout">
-                                        <div class="course-copy">
-                                            <div><p class="course-title">Master in Python</p><p class="course-subtitle">3-month intensive</p></div>
-                                            <p class="course-description">Covers core Python, OOP, modules, APIs, web scraping, databases, and automation with mini-projects.</p>
-                                            <div class="course-chip-row"><span class="course-chip">Core Python</span><span class="course-chip">OOP</span><span class="course-chip">APIs</span><span class="course-chip">Automation</span></div>
-                                        </div>
-                                        <div class="course-aside">
-                                            <div class="course-detail-card"><p class="eyebrow">Track Focus</p><p class="value">Strong Python fundamentals</p><p class="note">Centers on practical fluency across language basics and applied scripting.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Learning Style</p><p class="value">Fast, compact, and hands-on</p><p class="note">A concise path for learners who want focused skill-building without extra complexity.</p></div>
-                                            <div class="course-detail-card"><p class="eyebrow">Outcome</p><p class="value">Utility-driven coding confidence</p><p class="note">Helps prepare for automation, scripting, and Python-based entry paths.</p></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="space-y-6">
-                            <div class="glass premium reveal rounded-[1.6rem] p-8 s2">
-                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Core Signals</p>
-                                <div class="mt-8 grid grid-cols-2 gap-5">
-                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Live Classes</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="100">0</p><p class="mt-3 text-sm leading-8 text-slate-300">mentor-led delivery</p></div>
-                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Support Areas</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="6">0</p><p class="mt-3 text-sm leading-8 text-slate-300">career-focused services</p></div>
-                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Internship Tracks</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="3">0</p><p class="mt-3 text-sm leading-8 text-slate-300">web, data, cyber</p></div>
-                                    <div class="rounded-2xl border border-white/10 bg-white/5 p-7"><p class="text-xs uppercase tracking-[0.16em] text-slate-500">Campus Base</p><p class="mt-3 text-4xl font-black text-white" data-counter data-target="1">0</p><p class="mt-3 text-sm leading-8 text-slate-300">Koramangala, Bengaluru</p></div>
-                                </div>
-                            </div>
-                            <div class="glass premium reveal rounded-[1.6rem] p-8 s3">
-                                <p class="text-xs uppercase tracking-[0.18em] text-slate-500">Services</p>
-                                <h3 class="mt-4 text-2xl font-black text-white">Expandable support stack</h3>
-                                <div class="mt-6 space-y-4" data-accordion>
-                                    <div class="accordion-item info-card rounded-2xl open">
-                                        <button class="accordion-trigger flex items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white" type="button"><span>Career guidance and interview prep</span><svg class="h-4 w-4 text-sky-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
-                                        <div class="accordion-panel px-5 pb-5 text-sm leading-8 text-slate-300">Resume guidance, interview readiness, and placement assistance are now highlighted in a clearer way.</div>
-                                    </div>
-                                    <div class="accordion-item info-card rounded-2xl">
-                                        <button class="accordion-trigger flex items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white" type="button"><span>Internships and live projects</span><svg class="h-4 w-4 text-sky-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
-                                        <div class="accordion-panel px-5 pb-5 text-sm leading-8 text-slate-300">Internship pathways in web development, data science, analytics, and cyber security are more visible.</div>
-                                    </div>
-                                    <div class="accordion-item info-card rounded-2xl">
-                                        <button class="accordion-trigger flex items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white" type="button"><span>1-on-1 mentorship and certifications</span><svg class="h-4 w-4 text-sky-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg></button>
-                                        <div class="accordion-panel px-5 pb-5 text-sm leading-8 text-slate-300">The page now better communicates personal guidance and help toward globally recognized certifications.</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section class="cta reveal rounded-[1.75rem] border border-white/10 px-12 py-14 s2">
-                        <div class="relative z-10 flex items-center justify-between gap-10">
-                            <div><p class="text-xs uppercase tracking-[0.2em] text-slate-400">Get Started</p><h3 class="mt-4 text-4xl font-black text-white">Explore live classes, mentorship, and career-ready programs</h3><p class="mt-4 max-w-xl text-base leading-9 text-slate-300">The closing CTA now matches the public Kodehax message instead of ending with a generic AI LMS statement.</p></div>
-                            <a href="{% url 'student_register' %}" class="btn-primary inline-flex h-14 shrink-0 items-center justify-center px-8 text-base">Apply With Kodehax</a>
-                        </div>
-                    </section>
-                </div>
-            </main>
-            <footer class="px-6 pb-8 pt-2">
-                <div class="glass mx-auto flex max-w-7xl items-center justify-between rounded-[1.35rem] px-6 py-4">
-                    <p class="text-sm text-slate-400">&copy; 2026 Kodehax Academy</p>
-                    <div class="flex items-center gap-6 text-sm text-slate-400"><a href="{% url 'student_login' %}" class="transition hover:text-white">Student Portal</a><a href="{% url 'teacher_login' %}" class="transition hover:text-white">Teacher Portal</a></div>
-                </div>
-            </footer>
-        </div>
-
-        <div class="mobile-fallback">
-            <div class="mobile-shell">
-                <header class="mobile-section mt-0">
-                    <div class="glass mobile-topbar reveal visible">
-                        <div class="mobile-topbar-row">
-                            <a href="/" class="mobile-logo">
-                                <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo">
-                                <div>
-                                    <p class="mobile-logo-mark">Kodehax</p>
-                                    <h2 class="mobile-logo-name">Academy</h2>
-                                </div>
-                            </a>
-                            <div class="mobile-auth-row">
-                                <a href="{% url 'student_login' %}" class="mobile-auth-link">Login</a>
-                                <a href="{% url 'student_register' %}" class="mobile-auth-link register">Join Now</a>
-                            </div>
-                        </div>
-                        <div class="mobile-debug-banner">New Mobile Nav</div>
-                        <nav class="mobile-nav" aria-label="Mobile navigation">
-                            <div class="mobile-nav-row">
-                            <a href="#mobile-home" class="mobile-nav-link active">Home</a>
-                            <a href="#mobile-profile" class="mobile-nav-link">About</a>
-                            <a href="#mobile-ai" class="mobile-nav-link">Services</a>
-                            <a href="#mobile-courses" class="mobile-nav-link">Courses</a>
-                            <a href="#mobile-profile" class="mobile-nav-link">Contact</a>
-                            </div>
-                        </nav>
-                    </div>
-                </header>
-
-                <section class="mobile-section mobile-hero reveal visible" id="mobile-home">
-                    <span class="mobile-badge">AI-Powered LMS</span>
-                    <h1 class="mobile-title font-display">Learn Smarter with AI</h1>
-                    <p class="mobile-subtext">Touch-friendly lessons, instant guidance, and premium learning flows built for modern students.</p>
-                    <a href="{% url 'student_register' %}" class="btn-primary mobile-hero-btn">Start Learning</a>
-                    <div class="mobile-stage">
-                        <div class="mobile-float-card top">
-                            <div class="mobile-float-label">Live Session</div>
-                            <div class="mobile-float-value">AI Tutor Online</div>
-                            <div class="mobile-float-note">Explaining in real time</div>
-                        </div>
-                        <div class="mobile-float-card bottom">
-                            <div class="mobile-float-label">Momentum</div>
-                            <div class="mobile-float-value">+18% Focus</div>
-                            <div class="mobile-float-note">vs last week</div>
-                        </div>
-                        <div class="mobile-stage-device">
-                            <div class="mobile-stage-notch"></div>
-                            <div class="mobile-stage-head">
-                                <div>
-                                    <div class="mobile-stage-kicker">Mobile Learning Surface</div>
-                                    <div class="mobile-stage-title">AI lesson flow</div>
-                                </div>
-                                <div class="mobile-stage-signal"><span></span>Live</div>
-                            </div>
-                            <div class="mobile-stage-grid">
-                                <div class="mobile-stage-panel">
-                                    <div class="eyebrow">Current Topic</div>
-                                    <strong>Python loops and iteration</strong>
-                                    <p>Explanation, examples, and next practice are stacked into one calm screen.</p>
-                                </div>
-                                <div class="mobile-stage-panel">
-                                    <div class="mobile-stage-metric">
-                                        <div>
-                                            <div class="eyebrow">Confidence</div>
-                                            <div class="value">94%</div>
-                                        </div>
-                                        <div class="note">adaptive review ready</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mobile-marquee glass">
-                        <div class="mobile-marquee-track">
-                            <span class="mobile-marquee-item">Live AI guidance</span>
-                            <span class="mobile-marquee-item">Mentor-backed paths</span>
-                            <span class="mobile-marquee-item">Mobile-first lessons</span>
-                            <span class="mobile-marquee-item">Smart progress</span>
-                            <span class="mobile-marquee-item">Live AI guidance</span>
-                            <span class="mobile-marquee-item">Mentor-backed paths</span>
-                            <span class="mobile-marquee-item">Mobile-first lessons</span>
-                            <span class="mobile-marquee-item">Smart progress</span>
-                        </div>
-                    </div>
-                    <div class="mobile-stats-grid">
-                        <div class="glass mobile-stat-card reveal s1">
-                            <div class="mobile-stat-label">Completion</div>
-                            <div class="mobile-stat-value" data-counter data-target="92" data-suffix="%">0</div>
-                            <div class="mobile-stat-note">lesson continuation rate</div>
-                        </div>
-                        <div class="glass mobile-stat-card reveal s2">
-                            <div class="mobile-stat-label">AI Support</div>
-                            <div class="mobile-stat-value" data-counter data-target="24" data-suffix="h">0</div>
-                            <div class="mobile-stat-note">hour guidance rhythm</div>
-                        </div>
-                    </div>
-                    <div class="glass mobile-spotlight-panel">
-                        <div class="mobile-spotlight-label">Live Spotlight</div>
-                        <div class="mobile-spotlight-line" data-mobile-spotlight>Adaptive study flows keep lessons, AI help, and action steps connected on one mobile screen.</div>
-                    </div>
-                </section>
-
-                <section class="mobile-section reveal" id="mobile-ai">
-                    <div class="glass mobile-card mobile-chat-card">
-                        <div class="mobile-chat-head">
-                            <p class="mobile-chat-title">AI Chat Preview</p>
-                            <div class="mobile-chat-status"><span></span>Live help</div>
-                        </div>
-                        <div class="mobile-chat-pills" data-mobile-switcher>
-                            <button type="button" class="mobile-chat-pill active" data-mobile-switch-trigger="python">Python</button>
-                            <button type="button" class="mobile-chat-pill" data-mobile-switch-trigger="sql">SQL</button>
-                            <button type="button" class="mobile-chat-pill" data-mobile-switch-trigger="api">API</button>
-                        </div>
-                        <div class="mobile-chat-flow">
-                            <div class="mobile-switch-panel active" data-mobile-switch-panel="python">
-                                <div class="mobile-chat-bubble user">
-                                    <span class="mobile-chat-label">User</span>
-                                    <div class="mobile-chat-text">Explain Python loops</div>
-                                </div>
-                                <div class="mobile-chat-bubble ai">
-                                    <span class="mobile-chat-label">AI Tutor</span>
-                                    <div class="flex items-center gap-2" data-typing>
-                                        <span class="typing-dot"></span>
-                                        <span class="typing-dot"></span>
-                                        <span class="typing-dot"></span>
-                                    </div>
-                                    <div class="mobile-chat-text hidden" data-ai-response>Python loops repeat a block of code for each item or until a condition changes, so you can automate patterns instead of writing the same line again.</div>
-                                </div>
-                            </div>
-                            <div class="mobile-switch-panel" data-mobile-switch-panel="sql">
-                                <div class="mobile-chat-bubble user">
-                                    <span class="mobile-chat-label">User</span>
-                                    <div class="mobile-chat-text">When do I use a LEFT JOIN?</div>
-                                </div>
-                                <div class="mobile-chat-bubble ai">
-                                    <span class="mobile-chat-label">AI Tutor</span>
-                                    <div class="mobile-chat-text">Use a LEFT JOIN when you want every row from the left table, even if the right table has missing matches.</div>
-                                </div>
-                            </div>
-                            <div class="mobile-switch-panel" data-mobile-switch-panel="api">
-                                <div class="mobile-chat-bubble user">
-                                    <span class="mobile-chat-label">User</span>
-                                    <div class="mobile-chat-text">Why is my API returning 401?</div>
-                                </div>
-                                <div class="mobile-chat-bubble ai">
-                                    <span class="mobile-chat-label">AI Tutor</span>
-                                    <div class="mobile-chat-text">A 401 usually means your request is missing valid authentication, so check the token, header format, and expiry first.</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mobile-live-panel">
-                            <div class="mobile-live-row"><strong>AI session confidence</strong><span>Updated now</span></div>
-                            <div class="mobile-progress"><div class="mobile-progress-bar" data-progress-value="86"></div></div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="mobile-section reveal">
-                    <div class="mobile-features">
-                        <article class="glass mobile-feature">
-                            <div class="mobile-feature-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"></path>
-                                    <path d="M12 12l8-4.5"></path>
-                                    <path d="M12 12v9"></path>
-                                    <path d="M12 12L4 7.5"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3>Adaptive Courses</h3>
-                                <p>Lessons reshape around learner progress so each touchpoint stays clear, guided, and relevant.</p>
-                            </div>
-                        </article>
-                        <article class="glass mobile-feature">
-                            <div class="mobile-feature-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M5 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 4V6a2 2 0 0 1 2-2z"></path>
-                                    <path d="M9 9h6"></path>
-                                    <path d="M9 13h4"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3>AI Tutor Support</h3>
-                                <p>Get concise explanations, practice help, and fast feedback inside a calm chat-first experience.</p>
-                            </div>
-                        </article>
-                        <article class="glass mobile-feature">
-                            <div class="mobile-feature-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M4 15c2.5-3 5.5-4.5 8-4.5s5.5 1.5 8 4.5"></path>
-                                    <path d="M12 4v6"></path>
-                                    <circle cx="12" cy="16" r="4"></circle>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3>Progress Insights</h3>
-                                <p>Track momentum with simplified milestones designed for quick scans on smaller screens.</p>
-                            </div>
-                        </article>
-                    </div>
-                </section>
-
-                <section class="mobile-section reveal" id="mobile-profile">
-                    <div class="mobile-profile-shell">
-                        <div class="mobile-profile-hero">
-                            <div class="mobile-profile-kicker">Kodehax Academy</div>
-                            <h3 class="mobile-profile-title">A career-focused online tech academy built around practical learning.</h3>
-                            <p class="mobile-profile-copy">This section now reflects Kodehax Academy more directly: guided programs, live support, internships, certification help, and placement-oriented mentoring presented in a cleaner mobile profile layout.</p>
-                            <div class="mobile-profile-badges">
-                                <span class="mobile-profile-badge">Live Classes</span>
-                                <span class="mobile-profile-badge">Mentorship</span>
-                                <span class="mobile-profile-badge">Internships</span>
-                                <span class="mobile-profile-badge">Career Support</span>
-                            </div>
-                        </div>
-
-                        <div class="mobile-switcher" data-mobile-switcher>
-                            <button type="button" class="mobile-switch-btn active" data-mobile-switch-trigger="about">About</button>
-                            <button type="button" class="mobile-switch-btn" data-mobile-switch-trigger="services">Services</button>
-                            <button type="button" class="mobile-switch-btn" data-mobile-switch-trigger="courses">Courses</button>
-                        </div>
-
-                        <div class="mobile-switch-panel active" data-mobile-switch-panel="about">
-                            <div class="mobile-profile-grid">
-                                <div class="mobile-profile-card">
-                                    <div class="label">Overview</div>
-                                    <div class="value">Kodehax Academy presents itself as an online tech learning platform focused on helping students build real, employable skills through structured instruction and industry-relevant practice.</div>
-                                </div>
-                                <div class="mobile-profile-card">
-                                    <div class="label">What Stands Out</div>
-                                    <div class="value">The academy messaging emphasizes hands-on learning, mentor guidance, and outcome-driven support rather than only self-paced content access.</div>
-                                </div>
-                                <div class="mobile-profile-card">
-                                    <div class="label">Student Experience</div>
-                                    <div class="value">Learners move through guided lessons, get support when blocked, and stay connected to next steps like projects, certifications, and placement preparation.</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mobile-switch-panel" data-mobile-switch-panel="services">
-                            <div class="mobile-profile-list">
-                                <div class="mobile-profile-list-item">
-                                    <strong>Mentorship and live guidance</strong>
-                                    <span>Support is positioned around expert-led teaching, doubt resolution, and practical explanation rather than passive content consumption.</span>
-                                </div>
-                                <div class="mobile-profile-list-item">
-                                    <strong>Internships and live projects</strong>
-                                    <span>The academy highlights real-world practice so learners can connect concepts to portfolio-ready work and team workflows.</span>
-                                </div>
-                                <div class="mobile-profile-list-item">
-                                    <strong>Certification and placement assistance</strong>
-                                    <span>Career support is part of the offer, with messaging centered on helping students move from learning to opportunities.</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mobile-switch-panel" data-mobile-switch-panel="courses">
-                            <div class="mobile-profile-courses">
-                                <div class="mobile-profile-course">
-                                    <strong>Web Development</strong>
-                                    <span>Frontend, backend, and full-stack foundations for modern product building.</span>
-                                </div>
-                                <div class="mobile-profile-course">
-                                    <strong>Data Science</strong>
-                                    <span>Analytics-oriented learning paths that connect data handling with decision-making.</span>
-                                </div>
-                                <div class="mobile-profile-course">
-                                    <strong>Cyber Security</strong>
-                                    <span>Security-focused training for learners exploring defensive and systems thinking.</span>
-                                </div>
-                                <div class="mobile-profile-course">
-                                    <strong>AI and Programming</strong>
-                                    <span>Programming fundamentals and AI-oriented tracks for current technical workflows.</span>
-                                </div>
-                            </div>
-                            <div class="mobile-profile-contact">
-                                <div class="mobile-profile-contact-item">
-                                    <div class="label">Academy Focus</div>
-                                    <div class="value">Online learning, practical tech skills, guided delivery, and career acceleration.</div>
-                                </div>
-                                <div class="mobile-profile-contact-item">
-                                    <div class="label">Bengaluru Presence</div>
-                                    <div class="value">Kodehax Academy LLP is listed in Koramangala, Bengaluru, Karnataka.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="mobile-section reveal" id="mobile-courses">
-                    <div class="mobile-cta-shell">
-                        <div class="mobile-cta-orbs"></div>
-                        <p>Start Today</p>
-                        <h3>Build real skills with guided learning, live support, and career momentum.</h3>
-                        <div class="mobile-cta-copy">Explore Kodehax Academy programs across development, data, security, and AI, then move into mentorship, projects, and placement-oriented support.</div>
-                        <a href="{% url 'student_register' %}" class="btn-primary mobile-cta-btn">Explore Courses and Join</a>
-                    </div>
-                </section>
-            </div>
-
-        </div>
-        {% endblock %}
+        {% endfor %}
     </div>
+    {% endif %}
 
-    <script>
-        (() => {
-            const revealItems = document.querySelectorAll(".reveal");
-            if (revealItems.length) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        entry.target.classList.add("visible");
-                        observer.unobserve(entry.target);
-                    });
-                }, { threshold: 0.18 });
-                revealItems.forEach((item) => { if (!item.classList.contains("visible")) observer.observe(item); });
-            }
+    {% block content %}
+    <div class="landing-root">
+    <header class="site-header" data-site-header>
+        <div class="nav-shell">
+            <a class="brand" href="{% url 'home' %}" aria-label="Kodehax Academy home">
+                <img src="{% static 'image/image.png' %}" alt="" width="44" height="44">
+                <span class="brand-copy"><strong>Kodehax</strong><small>Academy</small></span>
+            </a>
+            <nav class="primary-nav" aria-label="Primary navigation">
+                <a href="#why">Why Kodehax</a>
+                <a href="#programs">Programs</a>
+                <a href="#experience">Experience</a>
+                <a href="#mentorship">Mentorship</a>
+                <a href="{% url 'teacher_login' %}">Teacher</a>
+            </nav>
+            <div class="nav-actions">
+                <a class="text-link" href="{% url 'student_login' %}">Log in</a>
+                <a class="button button--small button--primary" href="{% url 'student_register' %}">Join now <span aria-hidden="true">↗</span></a>
+            </div>
+        </div>
+    </header>
 
-            document.querySelectorAll("[data-typing]").forEach((typing, index) => {
-                const response = typing.parentElement ? typing.parentElement.querySelector("[data-ai-response]") : null;
-                if (!response) return;
-                window.setTimeout(() => {
-                    typing.classList.add("hidden");
-                    response.classList.remove("hidden");
-                    response.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 420, easing: "ease-out", fill: "forwards" });
-                }, 1800 + (index * 140));
-            });
+    <main id="main-content">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-light hero-light--one"></div>
+            <div class="hero-light hero-light--two"></div>
+            <div class="container hero-grid">
+                <div class="hero-copy" data-hero-item>
+                    <div class="eyebrow"><span class="eyebrow-dot"></span>DPIIT recognized · Startup India</div>
+                    <h1 id="hero-title">Learn live.<br><span>Build for real.</span></h1>
+                    <p class="hero-lead">Industry-led tech education for people who want to do the work—not just watch it. Learn with mentors, ship practical projects, and move toward a career with proof.</p>
+                    <div class="hero-actions">
+                        <a class="button button--primary" href="{% url 'student_register' %}">Start your journey <span aria-hidden="true">↗</span></a>
+                        <a class="button button--ghost" href="#programs">Explore programs <span aria-hidden="true">↓</span></a>
+                    </div>
+                    <div class="hero-trust">
+                        <div class="avatar-stack" aria-hidden="true"><span>KH</span><span>01</span><span>∞</span></div>
+                        <p><strong>Human guidance at every step.</strong><br>Live sessions, direct feedback, transparent learning.</p>
+                    </div>
+                </div>
 
-            const mobileSpotlight = document.querySelector("[data-mobile-spotlight]");
-            if (mobileSpotlight) {
-                const lines = [
-                    "Adaptive study flows keep lessons, AI help, and action steps connected on one mobile screen.",
-                    "Glass surfaces and glow states make the mobile UI feel premium without changing the core palette.",
-                    "Touch-first spacing and motion cues help learners move faster with less friction."
-                ];
-                let mobileLineIndex = 0;
-                window.setInterval(() => {
-                    mobileLineIndex = (mobileLineIndex + 1) % lines.length;
-                    mobileSpotlight.textContent = lines[mobileLineIndex];
-                    mobileSpotlight.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 320, easing: "ease-out" });
-                }, 2800);
-            }
+                <div class="experience-stage" data-hero-item aria-label="Preview of the Kodehax live learning experience">
+                    <div class="stage-aura"></div>
+                    <div class="product-window">
+                        <div class="window-bar">
+                            <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                            <div class="window-course"><span>Full Stack Development</span><small>Live classroom</small></div>
+                            <div class="live-status"><i></i> Live</div>
+                        </div>
+                        <div class="classroom-grid">
+                            <div class="mentor-feed">
+                                <div class="mentor-visual" aria-hidden="true"><span class="mentor-ring"></span><span class="mentor-head"></span><span class="mentor-body"></span></div>
+                                <div class="mentor-caption"><span>Arjun · Lead mentor</span><strong>Building the API layer</strong></div>
+                                <div class="audio-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                            </div>
+                            <div class="lesson-rail">
+                                <div class="lesson-label">Today’s session</div>
+                                <div class="lesson-title">Connect a Django API to the frontend.</div>
+                                <div class="lesson-progress"><span></span></div>
+                                <div class="lesson-meta"><span>42 min</span><span>7 learners</span></div>
+                            </div>
+                        </div>
+                        <div class="code-surface" aria-label="Code example">
+                            <div class="code-head"><span>views.py</span><span class="code-state">Saved</span></div>
+                            <pre><code><span class="c-purple">def</span> <span class="c-blue">project_list</span>(request):
+    projects = Project.objects.<span class="c-blue">all</span>()
+    <span class="c-purple">return</span> JsonResponse({
+        <span class="c-amber">"results"</span>: projects
+    })</code></pre>
+                            <div class="code-cursor" aria-hidden="true"></div>
+                        </div>
+                    </div>
+                    <div class="float-card float-card--progress"><span class="float-label">Track progress</span><div class="progress-ring"><strong>84</strong><small>%</small></div><span>Portfolio project</span></div>
+                    <div class="float-card float-card--feedback"><span class="feedback-icon">✓</span><div><strong>Mentor feedback</strong><span>Just now · Clear next step</span></div></div>
+                </div>
+            </div>
+            <div class="hero-index" aria-hidden="true">01</div>
+        </section>
 
-            document.querySelectorAll("[data-mobile-switcher]").forEach((switcher) => {
-                const triggers = switcher.querySelectorAll("[data-mobile-switch-trigger]");
-                if (!triggers.length) return;
-                const scope = switcher.closest(".mobile-section") || switcher.parentElement;
-                const panels = scope.querySelectorAll("[data-mobile-switch-panel]");
-                triggers.forEach((trigger) => {
-                    trigger.addEventListener("click", () => {
-                        const target = trigger.dataset.mobileSwitchTrigger;
-                        triggers.forEach((item) => item.classList.toggle("active", item === trigger));
-                        panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.mobileSwitchPanel === target));
-                    });
-                });
-            });
+        <section class="trust-band" aria-label="Kodehax learning commitments">
+            <div class="container trust-band-inner">
+                <p class="trust-intro">Built for <span>serious learning</span></p>
+                <div class="trust-items">
+                    <div><span class="trust-mark">01</span><strong>100% live</strong><small>No passive course library</small></div>
+                    <div><span class="trust-mark">02</span><strong>Mentor-led</strong><small>Guidance from real people</small></div>
+                    <div><span class="trust-mark">03</span><strong>Project-driven</strong><small>Practice that becomes proof</small></div>
+                    <div><span class="trust-mark">04</span><strong>Career-focused</strong><small>Skills aligned to outcomes</small></div>
+                </div>
+            </div>
+        </section>
 
-            document.querySelectorAll("[data-progress-value]").forEach((bar) => {
-                const target = Math.max(0, Math.min(100, Number(bar.dataset.progressValue || "0")));
-                const progressObserver = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        bar.style.width = target + "%";
-                        progressObserver.unobserve(entry.target);
-                    });
-                }, { threshold: 0.35 });
-                progressObserver.observe(bar);
-            });
+        <section class="section why-section" id="why" aria-labelledby="why-title">
+            <div class="section-glow section-glow--left"></div>
+            <div class="container why-layout">
+                <div class="section-intro reveal">
+                    <p class="section-index">02 · WHY KODEHAX</p>
+                    <h2 id="why-title">Education that<br>doesn’t hide behind <span>promises.</span></h2>
+                    <p>We replace vague outcomes with a visible learning process: show up live, practise deliberately, get direct feedback, and build work you can stand behind.</p>
+                    <a class="arrow-link" href="#experience">See how learning works <span aria-hidden="true">↘</span></a>
+                </div>
+                <div class="principles">
+                    <article class="principle reveal"><span class="principle-number">01</span><div><p class="principle-kicker">LEARN TOGETHER</p><h3>Live classes, not a content graveyard.</h3><p>Ask questions in the moment, work through concepts with an expert, and learn alongside a focused cohort.</p></div><span class="principle-glyph" aria-hidden="true">⌁</span></article>
+                    <article class="principle reveal"><span class="principle-number">02</span><div><p class="principle-kicker">MAKE THE WORK</p><h3>Practical from the first session.</h3><p>Assignments, guided builds, and live projects turn understanding into a portfolio—not another completion badge.</p></div><span class="principle-glyph" aria-hidden="true">⌘</span></article>
+                    <article class="principle reveal"><span class="principle-number">03</span><div><p class="principle-kicker">MOVE WITH DIRECTION</p><h3>A track shaped around careers.</h3><p>Structured pathways connect technical depth to interviews, certifications, internships, and the roles ahead.</p></div><span class="principle-glyph" aria-hidden="true">↗</span></article>
+                    <article class="principle reveal"><span class="principle-number">04</span><div><p class="principle-kicker">NEVER STAY BLOCKED</p><h3>Mentorship that stays close.</h3><p>Direct guidance and honest feedback help you understand what to improve and where to go next.</p></div><span class="principle-glyph" aria-hidden="true">◎</span></article>
+                </div>
+            </div>
+        </section>
 
-            document.querySelectorAll("[data-auth-form]").forEach((form) => {
-                form.querySelectorAll("input, select, textarea").forEach((input) => {
-                    input.classList.add("auth-input");
-                    const wrapper = input.parentElement;
-                    if (!wrapper || !wrapper.classList.contains("auth-input-shell")) return;
-                    if (input.type === "password" && !wrapper.querySelector("[data-password-toggle]")) {
-                        const toggle = document.createElement("button");
-                        toggle.type = "button";
-                        toggle.className = "auth-password-toggle";
-                        toggle.setAttribute("data-password-toggle", "");
-                        toggle.textContent = "Show";
-                        wrapper.appendChild(toggle);
-                        toggle.addEventListener("click", () => {
-                            const isPassword = input.type === "password";
-                            input.type = isPassword ? "text" : "password";
-                            toggle.textContent = isPassword ? "Hide" : "Show";
-                        });
-                    }
-                });
-            });
+        <section class="section program-section" id="programs" aria-labelledby="program-title">
+            <div class="container">
+                <div class="section-heading reveal"><div><p class="section-index">03 · PROGRAM EXPLORER</p><h2 id="program-title">Choose what you’ll<br><span>build next.</span></h2></div><p>Five focused pathways. Each one taught live, grounded in tools used in the field, and designed to move from understanding to implementation.</p></div>
+                <div class="program-explorer reveal">
+                    <div class="program-tabs" role="tablist" aria-label="Programs">
+                        <button class="program-tab is-active" id="tab-web" role="tab" aria-selected="true" aria-controls="panel-web" tabindex="0" data-program-tab="web"><span>01</span><strong>Web Development</strong><small>Full stack · Industry 4.0</small></button>
+                        <button class="program-tab" id="tab-data" role="tab" aria-selected="false" aria-controls="panel-data" tabindex="-1" data-program-tab="data"><span>02</span><strong>Data Science</strong><small>ML · Analytics · MLOps</small></button>
+                        <button class="program-tab" id="tab-cyber" role="tab" aria-selected="false" aria-controls="panel-cyber" tabindex="-1" data-program-tab="cyber"><span>03</span><strong>Cyber Security</strong><small>Offense · Defense · GRC</small></button>
+                        <button class="program-tab" id="tab-ai" role="tab" aria-selected="false" aria-controls="panel-ai" tabindex="-1" data-program-tab="ai"><span>04</span><strong>AI / Machine Learning</strong><small>GenAI · NLP · Deployment</small></button>
+                        <button class="program-tab" id="tab-python" role="tab" aria-selected="false" aria-controls="panel-python" tabindex="-1" data-program-tab="python"><span>05</span><strong>Python</strong><small>Core · APIs · Automation</small></button>
+                    </div>
+                    <div class="program-panels">
+                        <article class="program-panel is-active" id="panel-web" role="tabpanel" aria-labelledby="tab-web" data-program-panel="web">
+                            <div class="program-copy"><p class="program-meta">ADVANCED DIPLOMA · INDUSTRY 4.0</p><h3>Full Stack Web Development</h3><p>Build complete digital products across modern frontends, Python backends, databases, and AI-enabled features.</p><div class="tech-list"><span>Python</span><span>Django</span><span>Flask</span><span>MEARN</span><span>Angular</span><span>MySQL</span></div><a class="arrow-link" href="{% url 'student_register' %}">Explore this program <span aria-hidden="true">↗</span></a></div>
+                            <div class="program-visual program-visual--web" aria-hidden="true"><div class="visual-grid"></div><div class="build-node build-node--one"><i></i><strong>Interface</strong><small>Angular</small></div><div class="build-line build-line--one"></div><div class="build-node build-node--two"><i></i><strong>API</strong><small>Django</small></div><div class="build-line build-line--two"></div><div class="build-node build-node--three"><i></i><strong>Data</strong><small>MySQL</small></div><div class="visual-status">PROJECT PIPELINE · ACTIVE</div></div>
+                            <div class="program-footer"><div><span>Learning style</span><strong>Project-first, mentor-guided</strong></div><div><span>Outcome</span><strong>Portfolio-ready full stack foundation</strong></div></div>
+                        </article>
+                        <article class="program-panel" id="panel-data" role="tabpanel" aria-labelledby="tab-data" data-program-panel="data" hidden>
+                            <div class="program-copy"><p class="program-meta">ADVANCED DIPLOMA · ML TO MLOPS</p><h3>Data Science</h3><p>Move from data thinking and model building to applied AI, cloud workflows, and deployment-ready practice.</p><div class="tech-list"><span>Machine Learning</span><span>Deep Learning</span><span>NLP</span><span>GenAI</span><span>Big Data</span><span>MLOps</span></div><a class="arrow-link" href="{% url 'student_register' %}">Explore this program <span aria-hidden="true">↗</span></a></div>
+                            <div class="program-visual program-visual--data" aria-hidden="true"><div class="chart-bars"><i style="--h:32%"></i><i style="--h:48%"></i><i style="--h:40%"></i><i style="--h:68%"></i><i style="--h:61%"></i><i style="--h:88%"></i><i style="--h:76%"></i></div><div class="data-curve"><span></span></div><div class="visual-status">MODEL CONFIDENCE · 92.4%</div></div>
+                            <div class="program-footer"><div><span>Learning style</span><strong>Experimentation to production</strong></div><div><span>Outcome</span><strong>Modern data portfolio direction</strong></div></div>
+                        </article>
+                        <article class="program-panel" id="panel-cyber" role="tabpanel" aria-labelledby="tab-cyber" data-program-panel="cyber" hidden>
+                            <div class="program-copy"><p class="program-meta">ADVANCED DIPLOMA · 8 MONTHS</p><h3>Cyber Security</h3><p>Develop offensive and defensive awareness across investigations, cloud environments, application security, and governance.</p><div class="tech-list"><span>Ethical Hacking</span><span>DFIR</span><span>Cloud Security</span><span>AppSec</span><span>GRC</span></div><a class="arrow-link" href="{% url 'student_register' %}">Explore this program <span aria-hidden="true">↗</span></a></div>
+                            <div class="program-visual program-visual--cyber" aria-hidden="true"><div class="shield-mark">KH<div class="shield-scan"></div></div><div class="security-orbit orbit-one"></div><div class="security-orbit orbit-two"></div><div class="visual-status">SYSTEM STATUS · PROTECTED</div></div>
+                            <div class="program-footer"><div><span>Learning style</span><strong>Hands-on security exposure</strong></div><div><span>Outcome</span><strong>Foundation for cyber specialization</strong></div></div>
+                        </article>
+                        <article class="program-panel" id="panel-ai" role="tabpanel" aria-labelledby="tab-ai" data-program-panel="ai" hidden>
+                            <div class="program-copy"><p class="program-meta">ADVANCED DIPLOMA · MODERN AI</p><h3>AI &amp; Machine Learning</h3><p>Build practical understanding across deep learning, generative AI, NLP, cloud AI, and model deployment.</p><div class="tech-list"><span>Deep Learning</span><span>Generative AI</span><span>NLP</span><span>Cloud AI</span><span>Deployment</span></div><a class="arrow-link" href="{% url 'student_register' %}">Explore this program <span aria-hidden="true">↗</span></a></div>
+                            <div class="program-visual program-visual--ai" aria-hidden="true"><div class="neural-core"></div><span class="neural-node n1"></span><span class="neural-node n2"></span><span class="neural-node n3"></span><span class="neural-node n4"></span><span class="neural-node n5"></span><div class="visual-status">NEURAL WORKFLOW · TRAINING</div></div>
+                            <div class="program-footer"><div><span>Learning style</span><strong>Applied, modern-stack orientation</strong></div><div><span>Outcome</span><strong>Future-facing AI readiness</strong></div></div>
+                        </article>
+                        <article class="program-panel" id="panel-python" role="tabpanel" aria-labelledby="tab-python" data-program-panel="python" hidden>
+                            <div class="program-copy"><p class="program-meta">MASTER PROGRAM · 3 MONTHS</p><h3>Python</h3><p>Build strong language fundamentals, then apply them through APIs, web scraping, databases, automation, and mini-projects.</p><div class="tech-list"><span>Core Python</span><span>OOP</span><span>Modules</span><span>APIs</span><span>Automation</span><span>Databases</span></div><a class="arrow-link" href="{% url 'student_register' %}">Explore this program <span aria-hidden="true">↗</span></a></div>
+                            <div class="program-visual program-visual--python" aria-hidden="true"><pre><span>01</span> skills = [<i>"code"</i>, <i>"build"</i>]
+<span>02</span> <b>for</b> skill <b>in</b> skills:
+<span>03</span>     practice(skill)
+<span>04</span>     ship(project)</pre><div class="visual-status">RUN COMPLETE · 0 ERRORS</div></div>
+                            <div class="program-footer"><div><span>Learning style</span><strong>Fast, focused, hands-on</strong></div><div><span>Outcome</span><strong>Utility-driven coding confidence</strong></div></div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-            const counters = document.querySelectorAll("[data-counter]");
-            if (counters.length) {
-                const runCounter = (element) => {
-                    const target = Number(element.dataset.target || "0");
-                    const suffix = element.dataset.suffix ?? (target >= 10 ? "%" : "");
-                    const start = performance.now();
-                    const duration = 1400;
-                    const step = (now) => {
-                        const progress = Math.min((now - start) / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        element.textContent = Math.round(target * eased) + suffix;
-                        if (progress < 1) requestAnimationFrame(step);
-                    };
-                    requestAnimationFrame(step);
-                };
-                const counterObserver = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        runCounter(entry.target);
-                        counterObserver.unobserve(entry.target);
-                    });
-                }, { threshold: 0.45 });
-                counters.forEach((counter) => counterObserver.observe(counter));
-            }
+        <section class="section journey-section" id="experience" aria-labelledby="journey-title">
+            <div class="journey-light"></div>
+            <div class="container">
+                <div class="journey-heading reveal"><p class="section-index">04 · THE LEARNING EXPERIENCE</p><h2 id="journey-title">A clear path from<br><span>curious to capable.</span></h2><p>Every stage is connected. What you learn becomes what you build; what you build becomes what mentors refine; what you refine becomes proof.</p></div>
+                <div class="journey-track reveal"><div class="journey-line"><span></span></div><article><span class="journey-dot is-active">01</span><p>WEEK 01</p><h3>Learn live</h3><p>Understand concepts in real time with an expert and a focused cohort.</p></article><article><span class="journey-dot">02</span><p>BUILD CYCLE</p><h3>Make projects</h3><p>Turn each concept into practical work, assignments, and working features.</p></article><article><span class="journey-dot">03</span><p>FEEDBACK LOOP</p><h3>Work with mentors</h3><p>Review the work, resolve gaps, and improve with direct technical guidance.</p></article><article><span class="journey-dot">04</span><p>NEXT MOVE</p><h3>Become career ready</h3><p>Prepare for interviews, internships, certifications, and real opportunities.</p></article></div>
+            </div>
+        </section>
 
-            const spotlight = document.querySelector("[data-spotlight]");
-            if (spotlight) {
-                const lines = [
-                    "Recognized by DPIIT under the Startup India initiative.",
-                    "Focused on 100% live classes, practical learning, and career growth.",
-                    "Built around transparent pricing, mentorship, and internship support."
-                ];
-                let lineIndex = 0;
-                const rotateSpotlight = () => {
-                    spotlight.textContent = lines[lineIndex];
-                    spotlight.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 320, easing: "ease-out" });
-                    lineIndex = (lineIndex + 1) % lines.length;
-                };
-                rotateSpotlight();
-                window.setInterval(rotateSpotlight, 3200);
-            }
+        <section class="signals" aria-labelledby="signals-title">
+            <div class="container">
+                <div class="signals-top reveal"><p class="section-index">05 · CORE SIGNALS</p><h2 id="signals-title">Proof is in the structure.</h2><p>No inflated outcome claims—just the learning model and support system you can expect.</p></div>
+                <div class="signal-grid reveal"><article><div class="signal-value"><span data-count="100">0</span><i>%</i></div><h3>Live classes</h3><p>Mentor-led from the beginning</p></article><article><div class="signal-value"><span data-count="6">0</span><i></i></div><h3>Support areas</h3><p>From guidance to placement help</p></article><article><div class="signal-value"><span data-count="3">0</span><i></i></div><h3>Internship tracks</h3><p>Web, data, and cyber pathways</p></article><article><div class="signal-value"><span data-count="1">0</span><i></i></div><h3>Bengaluru base</h3><p>Koramangala, Karnataka</p></article></div>
+            </div>
+        </section>
 
-            document.querySelectorAll("[data-tabs]").forEach((tabGroup) => {
-                const triggers = tabGroup.querySelectorAll("[data-tab-trigger]");
-                const panels = tabGroup.parentElement.querySelectorAll("[data-tab-panel]");
-                triggers.forEach((trigger) => {
-                    trigger.addEventListener("click", () => {
-                        const target = trigger.dataset.tabTrigger;
-                        triggers.forEach((item) => item.classList.toggle("active", item === trigger));
-                        panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.tabPanel === target));
-                    });
-                });
-            });
+        <section class="section mentorship-section" id="mentorship" aria-labelledby="mentorship-title">
+            <div class="container mentorship-layout">
+                <div class="mentor-story reveal"><p class="section-index">06 · MENTORSHIP + CAREER SUPPORT</p><h2 id="mentorship-title">You do the work.<br><span>We stay close.</span></h2><p>Support should be useful, honest, and available when it matters. Kodehax pairs technical mentorship with practical career direction.</p><div class="mentor-quote"><div class="mentor-avatar" aria-hidden="true">KH</div><blockquote>“Good mentorship doesn’t hand you answers. It helps you see the next move.”</blockquote><div><strong>Kodehax mentor network</strong><span>Technical guidance · Career direction</span></div></div></div>
+                <div class="support-accordion reveal" data-accordion>
+                    <article class="support-item is-open"><button type="button" aria-expanded="true" aria-controls="support-career"><span><small>01</small>Career guidance &amp; interview prep</span><i aria-hidden="true"></i></button><div class="support-panel" id="support-career"><p>Shape a stronger resume, practise interviews, understand role expectations, and approach opportunities with clearer positioning.</p><div class="support-tags"><span>Resume guidance</span><span>Mock interviews</span><span>Placement assistance</span></div></div></article>
+                    <article class="support-item"><button type="button" aria-expanded="false" aria-controls="support-projects"><span><small>02</small>Internships &amp; live projects</span><i aria-hidden="true"></i></button><div class="support-panel" id="support-projects"><p>Apply classroom learning through project workflows and internship pathways in web development, data, analytics, and cyber security.</p><div class="support-tags"><span>Live briefs</span><span>Team workflows</span><span>Portfolio proof</span></div></div></article>
+                    <article class="support-item"><button type="button" aria-expanded="false" aria-controls="support-mentor"><span><small>03</small>1-on-1 mentorship</span><i aria-hidden="true"></i></button><div class="support-panel" id="support-mentor"><p>Get focused help when you are blocked, direct feedback on your work, and a realistic plan for strengthening weak areas.</p><div class="support-tags"><span>Doubt resolution</span><span>Code feedback</span><span>Direction</span></div></div></article>
+                    <article class="support-item"><button type="button" aria-expanded="false" aria-controls="support-certs"><span><small>04</small>Certification support</span><i aria-hidden="true"></i></button><div class="support-panel" id="support-certs"><p>Prepare toward relevant, globally recognized certifications with guidance that connects study effort to your chosen path.</p><div class="support-tags"><span>Preparation path</span><span>Learning plan</span><span>Industry context</span></div></div></article>
+                </div>
+            </div>
+        </section>
 
-            document.querySelectorAll("[data-accordion]").forEach((accordion) => {
-                accordion.querySelectorAll(".accordion-item").forEach((item) => {
-                    const trigger = item.querySelector(".accordion-trigger");
-                    if (!trigger) return;
-                    trigger.addEventListener("click", () => {
-                        const wasOpen = item.classList.contains("open");
-                        accordion.querySelectorAll(".accordion-item").forEach((entry) => entry.classList.remove("open"));
-                        if (!wasOpen) item.classList.add("open");
-                    });
-                });
-            });
-        })();
-    </script>
+        <section class="final-cta" aria-labelledby="final-title">
+            <div class="cta-grid" aria-hidden="true"></div><div class="cta-orb" aria-hidden="true"></div>
+            <div class="container cta-inner reveal"><p class="section-index">YOUR NEXT MOVE</p><h2 id="final-title">Your career shouldn’t<br>depend on promises.<br><span>Build something real.</span></h2><p>Start with a live, practical program and leave with work that shows what you can do.</p><div class="hero-actions"><a class="button button--light" href="#programs">Explore programs <span aria-hidden="true">↗</span></a><a class="button button--ghost" href="{% url 'student_register' %}">Join Kodehax <span aria-hidden="true">→</span></a></div></div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-main"><div class="footer-brand"><a class="brand" href="{% url 'home' %}"><img src="{% static 'image/image.png' %}" alt="" width="44" height="44"><span class="brand-copy"><strong>Kodehax</strong><small>Academy</small></span></a><p>Live learning. Practical work.<br>Career momentum.</p></div><div class="footer-links"><div><span>Explore</span><a href="#why">Why Kodehax</a><a href="#programs">Programs</a><a href="#experience">Experience</a></div><div><span>Portals</span><a href="{% url 'student_login' %}">Student login</a><a href="{% url 'teacher_login' %}">Teacher login</a><a href="{% url 'student_register' %}">Join now</a></div></div><div class="footer-location"><span>BENGALURU, INDIA</span><p>Built from Koramangala<br>for learners everywhere.</p></div></div>
+        <div class="container footer-bottom"><p>&copy; 2026 Kodehax Academy LLP</p><p>DPIIT recognized · Startup India</p><a href="#main-content">Back to top ↑</a></div>
+    </footer>
+    </div>
+    {% endblock %}
+
+    <script src="{% static 'js/landing.js' %}" defer></script>
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
-
-
