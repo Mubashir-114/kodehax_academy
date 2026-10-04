@@ -4,37 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Kodehax Academy</title>
+    <meta name="description" content="Kodehax Academy offers live, mentor-led technology programs built around practical projects and career readiness.">
+    <title>Kodehax Academy | Learn live. Build for real.</title>
     <link rel="icon" type="image/png" href="{% static 'image/image.png' %}">
-    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-1: #020617;
-            --bg-2: #0b1224;
-            --bg-3: #0f172a;
-            --surface: rgba(255, 255, 255, 0.04);
-            --surface-2: rgba(255, 255, 255, 0.06);
-            --line: rgba(255, 255, 255, 0.1);
-            --line-strong: rgba(255, 255, 255, 0.15);
-            --text: #e5eefb;
-            --muted: #9fb0c9;
-            --title: #f8fbff;
+            --bg-deep: #030611;
+            --bg-surface: #070d1e;
+            --bg-elevated: #0d152d;
+            --card-surface: rgba(13, 22, 45, 0.72);
+            --card-surface-soft: rgba(255, 255, 255, 0.035);
+            --line: rgba(184, 202, 255, 0.12);
+            --line-strong: rgba(184, 202, 255, 0.22);
+            --text-high: #f8fbff;
+            --text-main: #e2eaf7;
+            --text-muted: #95a5c2;
+            --text-faint: #637392;
+            --blue: #3b82f6;
+            --blue-bright: #60a5fa;
+            --indigo: #6366f1;
+            --violet: #8b5cf6;
+            --purple: #a855f7;
+            --cyan: #38bdf8;
+            --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        * { box-sizing: border-box; }
-        html { scroll-behavior: smooth; background: var(--bg-1); }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background: var(--bg-deep);
+            color-scheme: dark;
+        }
 
         body {
-            margin: 0;
             min-height: 100vh;
-            color: var(--text);
-            font-family: "Manrope", ui-sans-serif, system-ui, sans-serif;
-            background:
-                radial-gradient(circle at 14% 10%, rgba(59,130,246,.18), transparent 22%),
-                radial-gradient(circle at 86% 14%, rgba(99,102,241,.18), transparent 24%),
-                radial-gradient(circle at 58% 56%, rgba(59,130,246,.08), transparent 28%),
-                linear-gradient(145deg, var(--bg-1), var(--bg-2) 52%, var(--bg-3) 100%);
+            color: var(--text-main);
+            font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-deep);
+            background-image:
+                radial-gradient(circle at 18% 8%, rgba(59, 130, 246, 0.18), transparent 30%),
+                radial-gradient(circle at 82% 14%, rgba(139, 92, 246, 0.16), transparent 28%),
+                radial-gradient(circle at 50% 45%, rgba(99, 102, 241, 0.08), transparent 35%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.12), transparent 32%);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body::before {
@@ -42,1339 +64,2298 @@
             position: fixed;
             inset: 0;
             background-image:
-                linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px);
-            background-size: 38px 38px;
-            opacity: 0.24;
+                linear-gradient(rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.04) 1px, transparent 1px);
+            background-size: 32px 32px;
             pointer-events: none;
-            mask-image: radial-gradient(circle at center, black 46%, transparent 88%);
-            -webkit-mask-image: radial-gradient(circle at center, black 46%, transparent 88%);
+            z-index: -1;
+            mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
+            -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 90%);
         }
 
-        .page-shell {
-            width: min(100%, 430px);
-            margin: 0 auto;
-            padding: 14px 14px 32px;
-            position: relative;
-        }
-
-        .page-shell::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at top, rgba(59,130,246,.12), transparent 28%),
-                radial-gradient(circle at 84% 10%, rgba(168,85,247,.12), transparent 22%);
-            pointer-events: none;
-        }
-
-        .glass {
-            background: linear-gradient(180deg, var(--surface-2), var(--surface));
-            border: 1px solid var(--line-strong);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow:
-                0 26px 60px rgba(2, 6, 23, 0.58),
-                inset 0 1px 0 rgba(255,255,255,.08),
-                inset 0 0 0 1px rgba(255,255,255,.02);
-        }
-
-        .top-bar {
-            position: sticky;
-            top: 12px;
-            z-index: 25;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding: 14px 16px;
-            border-radius: 24px;
-        }
-        .top-bar-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        a {
             color: inherit;
             text-decoration: none;
         }
 
-        .brand img {
-            width: 44px;
-            height: 44px;
-            object-fit: cover;
+        button {
+            font: inherit;
+            color: inherit;
+            background: none;
+            border: 0;
+            cursor: pointer;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: "Space Grotesk", "Manrope", sans-serif;
+            color: var(--text-high);
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+        }
+
+        p {
+            line-height: 1.65;
+            color: var(--text-muted);
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--blue-bright);
+            outline-offset: 3px;
+        }
+
+        .page-shell {
+            width: 100%;
+            max-width: 540px;
+            margin: 0 auto;
+            padding: 0 16px 40px;
+            position: relative;
+        }
+
+        /* Ambient Glass Mixin */
+        .glass-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition: transform 0.2s var(--ease), border-color 0.2s var(--ease);
+        }
+
+        .glass-card:active {
+            transform: scale(0.99);
+        }
+
+        /* Buttons & Actions */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 0 20px;
             border-radius: 14px;
-            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.34);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+            transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), filter 0.18s var(--ease);
+            text-align: center;
         }
 
-        .brand-mark {
-            font-size: 11px;
-            letter-spacing: 0.24em;
-            text-transform: uppercase;
-            color: #8193b3;
+        .btn:active {
+            transform: scale(0.97);
         }
 
-        .brand-name {
-            margin-top: 2px;
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #4f46e5 52%, #7c3aed);
+            color: #ffffff;
+            box-shadow: 0 12px 28px rgba(79, 70, 229, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary:active {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-high);
+            border: 1px solid var(--line-strong);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-secondary:active {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Flash Message Stack */
+        .flash-stack {
+            position: fixed;
+            top: 10px;
+            inset-inline: 14px;
+            z-index: 100;
+            max-width: 512px;
+            margin: 0 auto;
+            display: grid;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .flash-msg {
+            pointer-events: auto;
+            padding: 12px 16px;
+            border-radius: 14px;
+            background: rgba(13, 21, 44, 0.94);
+            border: 1px solid var(--line-strong);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            color: var(--text-main);
+            font-size: 13px;
+        }
+
+        .flash-msg button {
+            color: #fff;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            position: sticky;
+            top: 10px;
+            z-index: 40;
+            background: rgba(4, 8, 20, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--line-strong);
+            border-radius: 20px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .brand-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-link img {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            object-fit: cover;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+        }
+
+        .brand-meta {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+
+        .brand-meta strong {
+            font-family: "Space Grotesk", sans-serif;
             font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-meta small {
+            font-size: 9px;
             font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-login {
+            padding: 7px 13px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 10px;
+            transition: color 0.18s;
+        }
+
+        .header-login:active {
             color: #fff;
         }
 
-        .top-nav {
+        .header-join {
+            min-height: 38px;
+            padding: 0 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2563eb, #6366f1);
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(79, 70, 229, 0.32);
+        }
+
+        .header-nav-rail {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding-top: 10px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .header-nav-rail::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-pill {
+            flex: 0 0 auto;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            white-space: nowrap;
+            transition: all 0.18s var(--ease);
+        }
+
+        .nav-pill:active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: scale(0.96);
+        }
+
+        /* Eyebrows & Section Headers */
+        .eyebrow-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 13px;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(96, 165, 250, 0.24);
+            color: #dbeafe;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #38bdf8;
+            box-shadow: 0 0 10px #38bdf8;
+            animation: beacon 2s infinite ease-in-out;
+        }
+
+        @keyframes beacon {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+        }
+
+        .section-kicker {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #8195b8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .section-kicker::before {
+            content: "";
+            width: 18px;
+            height: 1px;
+            background: #637392;
+        }
+
+        .section-header h2 {
+            font-size: 27px;
+            line-height: 1.14;
+            color: #fff;
+        }
+
+        .section-header p {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.65;
+            color: var(--text-muted);
+        }
+
+        /* Hero Section */
+        .mobile-hero {
+            padding-top: 8px;
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .hero-title {
+            margin-top: 16px;
+            font-size: clamp(2.4rem, 8.5vw, 3.2rem);
+            line-height: 1.02;
+            letter-spacing: -0.04em;
+        }
+
+        .hero-gradient {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 55%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-lead {
+            margin-top: 14px;
+            font-size: 15px;
+            line-height: 1.68;
+            color: var(--text-muted);
+            max-width: 95%;
+        }
+
+        .hero-actions {
+            margin-top: 22px;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-        .top-nav-links {
+
+        .hero-trust {
+            margin-top: 22px;
             display: flex;
             align-items: center;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 2px;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .top-nav-links::-webkit-scrollbar { display: none; }
-        .top-link,
-        .auth-link {
-            min-height: 46px;
-            border-radius: 999px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 16px;
-            border: 1px solid rgba(255,255,255,.1);
-            background: rgba(255,255,255,.04);
-            color: #dbe7f8;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 700;
-            white-space: nowrap;
-            transition: transform .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
-        }
-        .top-link.active,
-        .top-link:hover,
-        .auth-link:hover {
-            background: linear-gradient(135deg, rgba(37,99,235,.24), rgba(79,70,229,.18));
-            border-color: rgba(129,140,248,.3);
-            color: #fff;
-        }
-        .auth-links {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 8px;
-        }
-        .auth-link.register {
-            padding: 0 20px;
-            background: linear-gradient(135deg, #2563eb, #4f46e5 48%, #7c3aed);
-            border-color: transparent;
-            box-shadow: 0 18px 34px rgba(79,70,229,.28);
-        }
-        .auth-link.register:hover { filter: brightness(1.06); }
-
-        .top-link:active,
-        .auth-link:active,
-        .hero-btn:active,
-        .cta-btn:active { transform: scale(.97); }
-
-        .section {
-            position: relative;
-            z-index: 1;
-            margin-top: 70px;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        .page-section {
-            display: none;
-            animation: pageFade .32s ease;
+        .avatar-stack {
+            display: flex;
+            flex: 0 0 auto;
         }
 
-        .page-section.active {
-            display: block;
-        }
-
-        .page-intro {
-            margin-top: 26px;
-            text-align: left;
-        }
-
-        .page-kicker {
-            font-size: 11px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #95a9c9;
-        }
-
-        .page-intro h2 {
-            margin: 10px 0 0;
-            font-size: 34px;
-            line-height: 1.08;
-            color: #fff;
-        }
-
-        .page-intro p {
-            margin: 12px 0 0;
-            font-size: 15px;
-            line-height: 1.75;
-            color: var(--muted);
-        }
-
-        .hero {
-            text-align: center;
-            margin-top: 26px;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 14px;
-            border-radius: 999px;
-            border: 1px solid rgba(129,140,248,.22);
-            background: rgba(2,6,23,.5);
-            color: #d2def2;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-
-        .hero h1 {
-            margin: 18px 0 0;
-            font-size: clamp(2.75rem, 10vw, 4.2rem);
-            line-height: .93;
-            letter-spacing: -.05em;
-            color: var(--title);
-        }
-
-        .hero p {
-            margin: 16px auto 0;
-            max-width: 340px;
-            color: var(--muted);
-            font-size: 16px;
-            line-height: 1.8;
-        }
-
-        .hero-btn,
-        .cta-btn {
-            width: 100%;
-            min-height: 60px;
-            border-radius: 22px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: #fff;
-            font-size: 17px;
+        .avatar-stack span {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid var(--bg-deep);
+            color: #93c5fd;
+            font-size: 9px;
             font-weight: 800;
-            background: linear-gradient(135deg, #2563eb, #4f46e5 48%, #7c3aed);
-            box-shadow: 0 24px 46px rgba(79,70,229,.42), 0 0 34px rgba(59,130,246,.16);
-            margin-top: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: -7px;
         }
 
-        .hero-stage {
+        .avatar-stack span:first-child {
+            margin-left: 0;
+            background: linear-gradient(135deg, #2563eb, #4f46e5);
+            color: #fff;
+        }
+
+        .hero-trust p {
+            font-size: 12px;
+            line-height: 1.45;
+            color: var(--text-muted);
+        }
+
+        .hero-trust strong {
+            color: var(--text-high);
+            font-weight: 700;
+        }
+
+        /* Mobile Experience Stage */
+        .stage-box {
             margin-top: 24px;
-            padding: 18px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,.1);
-            background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
-            box-shadow: 0 34px 80px rgba(2,6,23,.58);
+            border-radius: 22px;
+            padding: 14px;
+            background: linear-gradient(180deg, rgba(13, 21, 44, 0.85), rgba(7, 12, 26, 0.95));
+            border: 1px solid var(--line-strong);
+            box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
             position: relative;
+            overflow: hidden;
         }
 
-        .hero-stage::before {
+        .stage-box::before {
             content: "";
             position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 18% 12%, rgba(59,130,246,.18), transparent 28%),
-                radial-gradient(circle at 82% 18%, rgba(168,85,247,.18), transparent 24%);
+            top: -40px;
+            right: -40px;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.25), transparent 70%);
             pointer-events: none;
         }
 
-        .device {
-            position: relative;
-            z-index: 1;
-            border-radius: 28px;
-            padding: 16px;
-            background: linear-gradient(180deg, rgba(2,6,23,.96), rgba(15,23,42,.92));
-            border: 1px solid rgba(255,255,255,.08);
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 22px 46px rgba(2,6,23,.46);
-        }
-
-        .device-notch {
-            width: 112px;
-            height: 8px;
-            border-radius: 999px;
-            background: rgba(148,163,184,.22);
-            margin: 0 auto 14px;
-        }
-
-        .device-head {
+        .stage-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            text-align: left;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
         }
 
-        .device-kicker {
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #90a4c6;
-        }
-
-        .device-title {
-            margin-top: 4px;
-            font-size: 16px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .live-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 7px 11px;
-            border-radius: 999px;
-            background: rgba(255,255,255,.04);
-            border: 1px solid rgba(255,255,255,.08);
-            font-size: 11px;
-            color: #dbe7f8;
-        }
-
-        .live-pill span {
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            background: #38bdf8;
-            box-shadow: 0 0 14px rgba(56,189,248,.85);
-        }
-
-        .device-grid {
-            margin-top: 16px;
-            display: grid;
-            gap: 12px;
-        }
-
-        .device-panel {
-            padding: 14px;
-            border-radius: 20px;
-            background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.025));
-            border: 1px solid rgba(255,255,255,.08);
-            text-align: left;
-        }
-
-        .device-panel .eyebrow {
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #90a4c6;
-        }
-
-        .device-panel strong {
-            display: block;
-            margin-top: 6px;
-            font-size: 16px;
-            color: #fff;
-        }
-
-        .device-panel p {
-            margin: 8px 0 0;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #cad7eb;
-        }
-
-        .device-metric {
+        .stage-dots {
             display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            gap: 12px;
+            gap: 5px;
         }
 
-        .device-metric .value {
-            font-size: 34px;
-            line-height: 1;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .device-metric .note {
-            font-size: 12px;
-            color: #b7c8e0;
-        }
-
-        .float-card {
-            position: absolute;
-            z-index: 2;
-            padding: 12px 14px;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,.1);
-            background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 18px 38px rgba(2,6,23,.44);
-            text-align: left;
-        }
-
-        .float-card.top { top: -12px; right: -4px; transform: rotate(7deg); }
-        .float-card.bottom { left: -4px; bottom: 18px; transform: rotate(-6deg); }
-
-        .float-label {
-            font-size: 9px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #adbbd5;
-        }
-
-        .float-value {
-            margin-top: 6px;
-            font-size: 15px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .float-note {
-            margin-top: 3px;
-            font-size: 11px;
-            color: #d8e1f4;
-        }
-
-        .marquee {
-            margin-top: 18px;
-            padding: 13px 0;
-            border-radius: 20px;
-            overflow: hidden;
-        }
-
-        .marquee-track {
-            display: flex;
-            gap: 22px;
-            min-width: max-content;
-            padding-left: 14px;
-            animation: marqueeDrift 18s linear infinite;
-        }
-
-        .marquee-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #d7e3f7;
-        }
-
-        .marquee-item::before {
-            content: "";
+        .stage-dots span {
             width: 7px;
             height: 7px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
-            box-shadow: 0 0 14px rgba(99,102,241,.45);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .stats-grid {
-            margin-top: 18px;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        .stat-card {
-            padding: 14px;
-            border-radius: 22px;
-        }
-
-        .stat-label {
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #96a9c8;
-        }
-
-        .stat-value {
-            margin-top: 8px;
-            font-size: 31px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .stat-note {
-            margin-top: 4px;
+        .stage-title {
             font-size: 12px;
-            line-height: 1.55;
-            color: #c2d0e7;
-        }
-
-        .spotlight {
-            margin-top: 14px;
-            padding: 16px;
-            border-radius: 22px;
-        }
-
-        .spotlight-label {
-            font-size: 10px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #94a7c7;
-        }
-
-        .spotlight-line {
-            margin-top: 10px;
-            min-height: 54px;
-            font-size: 15px;
-            line-height: 1.7;
-            color: #eef4ff;
-        }
-
-        .section-card {
-            padding: 18px 16px;
-            border-radius: 26px;
-        }
-
-        .section-head {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .section-title {
-            font-size: 13px;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #95a9c9;
-        }
-
-        .section-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: #dce7f8;
-        }
-
-        .section-status span {
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            background: #38bdf8;
-            box-shadow: 0 0 14px rgba(56,189,248,.85);
-        }
-
-        .chat-tabs,
-        .switcher {
-            display: flex;
-            gap: 8px;
-            overflow: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .chat-tabs::-webkit-scrollbar,
-        .switcher::-webkit-scrollbar { display: none; }
-
-        .chat-tab,
-        .switch-btn {
-            border: 1px solid rgba(255,255,255,.09);
-            background: rgba(255,255,255,.04);
-            color: #d3def1;
-            border-radius: 999px;
-            padding: 10px 14px;
-            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .chat-tab.active,
-        .switch-btn.active {
-            background: linear-gradient(135deg, rgba(37,99,235,.24), rgba(79,70,229,.18));
-            border-color: rgba(129,140,248,.34);
             color: #fff;
-        }
-
-        .chat-flow {
-            margin-top: 14px;
-            display: grid;
-            gap: 12px;
-        }
-
-        .chat-panel,
-        .switch-panel { display: none; }
-
-        .chat-panel.active,
-        .switch-panel.active { display: block; }
-
-        .bubble {
-            max-width: 88%;
-            padding: 14px 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,.1);
-        }
-
-        .bubble.user {
-            margin-left: auto;
-            background: rgba(255,255,255,.045);
-        }
-
-        .bubble.ai {
-            background: linear-gradient(135deg, rgba(37,99,235,.24), rgba(79,70,229,.22));
-            box-shadow: 0 18px 44px rgba(59,130,246,.18), 0 0 34px rgba(99,102,241,.12);
-        }
-
-        .bubble-label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: #9eb2d0;
-        }
-
-        .bubble-text {
-            font-size: 15px;
-            line-height: 1.7;
-            color: #f8fbff;
-        }
-
-        .typing {
-            display: inline-flex;
+            display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            background: rgba(191,219,254,.9);
-            animation: typingPulse 1s infinite ease-in-out;
+        .stage-title small {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        .typing-dot:nth-child(2) { animation-delay: .15s; }
-        .typing-dot:nth-child(3) { animation-delay: .3s; }
-
-        .live-panel {
-            margin-top: 14px;
-            padding: 14px 15px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,.09);
-            background: rgba(255,255,255,.03);
-        }
-
-        .live-row {
-            display: flex;
+        .live-tag {
+            display: inline-flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: #38bdf8;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .stage-grid {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
 
-        .live-row strong { font-size: 15px; color: #fff; }
-        .live-row span { font-size: 12px; color: #b8c8df; }
+        .stage-panel {
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
 
-        .progress {
-            margin-top: 12px;
-            height: 7px;
+        .mentor-feed {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .mentor-visual-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mentor-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .mentor-audio {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 14px;
+        }
+
+        .mentor-audio i {
+            width: 3px;
+            background: #60a5fa;
+            border-radius: 2px;
+            animation: audioPulse 1.2s infinite ease-in-out;
+        }
+
+        .mentor-audio i:nth-child(1) { height: 40%; animation-delay: 0.1s; }
+        .mentor-audio i:nth-child(2) { height: 80%; animation-delay: 0.3s; }
+        .mentor-audio i:nth-child(3) { height: 50%; animation-delay: 0.2s; }
+        .mentor-audio i:nth-child(4) { height: 100%; animation-delay: 0.4s; }
+
+        @keyframes audioPulse {
+            0%, 100% { transform: scaleY(0.4); }
+            50% { transform: scaleY(1); }
+        }
+
+        .mentor-info {
+            margin-top: 10px;
+        }
+
+        .mentor-info small {
+            display: block;
+            font-size: 10px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .mentor-info strong {
+            display: block;
+            margin-top: 2px;
+            font-size: 12px;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .lesson-info small {
+            font-size: 10px;
+            color: #38bdf8;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .lesson-info strong {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #fff;
+            line-height: 1.35;
+        }
+
+        .mini-progress {
+            margin-top: 8px;
+            height: 4px;
             border-radius: 999px;
-            background: rgba(148,163,184,.14);
+            background: rgba(255, 255, 255, 0.1);
             overflow: hidden;
         }
 
-        .progress-bar {
-            width: 0;
+        .mini-progress span {
+            display: block;
+            width: 68%;
             height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
             border-radius: inherit;
-            background: linear-gradient(90deg, #38bdf8, #6366f1, #8b5cf6);
-            box-shadow: 0 0 18px rgba(99,102,241,.26);
-            transition: width 1s ease;
         }
 
-        .features {
+        .lesson-meta-row {
+            margin-top: 6px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .code-box {
+            margin-top: 10px;
+            padding: 12px;
+            border-radius: 14px;
+            background: #040816;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-faint);
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .c-purple { color: #c084fc; font-weight: 600; }
+        .c-blue { color: #60a5fa; }
+        .c-amber { color: #fbbf24; }
+
+        .stage-chips {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .chip-card {
+            padding: 8px 10px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            font-size: 11px;
+        }
+
+        .chip-card small {
+            display: block;
+            color: var(--text-faint);
+            font-size: 9px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .chip-card strong {
+            display: block;
+            margin-top: 2px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        /* Trust Band */
+        .trust-grid {
+            margin-bottom: 48px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .trust-cell {
+            padding: 14px 12px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .trust-num {
+            font-size: 11px;
+            font-weight: 800;
+            color: #60a5fa;
+            letter-spacing: 0.1em;
+        }
+
+        .trust-cell strong {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .trust-cell small {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.35;
+        }
+
+        /* Section 02 · Why Kodehax */
+        .why-composition {
             display: grid;
             gap: 12px;
+            margin-bottom: 50px;
         }
 
-        .feature {
+        .why-featured {
+            padding: 20px 16px;
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(37, 99, 235, 0.14), rgba(13, 21, 45, 0.85) 60%);
+            border: 1px solid rgba(96, 165, 250, 0.28);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+        }
+
+        .card-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #93c5fd;
+            margin-bottom: 8px;
+        }
+
+        .why-featured h3 {
+            font-size: 20px;
+            line-height: 1.25;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .why-featured p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .why-split-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .why-mini-card {
+            padding: 16px 14px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+        }
+
+        .why-mini-card .card-tag {
+            color: #a78bfa;
+        }
+
+        .why-mini-card h4 {
+            font-size: 15px;
+            line-height: 1.3;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .why-mini-card p {
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .why-banner-card {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--line);
             display: flex;
             gap: 14px;
             align-items: flex-start;
-            padding: 16px;
-            border-radius: 24px;
         }
 
-        .feature-icon {
-            flex: 0 0 auto;
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
+        .why-banner-icon {
+            flex: 0 0 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+            border: 1px solid rgba(167, 139, 250, 0.3);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(129,140,248,.18);
-            background: linear-gradient(135deg, rgba(37,99,235,.24), rgba(79,70,229,.18));
-            color: #eef4ff;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
-        }
-
-        .feature h3 {
-            margin: 0;
-            font-size: 17px;
-            font-weight: 800;
-            color: #fff;
-        }
-
-        .feature p {
-            margin: 8px 0 0;
-            font-size: 14px;
-            line-height: 1.75;
-            color: #c7d4e8;
-        }
-
-        .surface-block {
-            margin-top: 14px;
-            padding: 16px;
-            border-radius: 24px;
-        }
-
-        .surface-block h3 {
-            margin: 0;
+            color: #c084fc;
             font-size: 18px;
-            font-weight: 800;
+            font-weight: 700;
+        }
+
+        .why-banner-body h4 {
+            font-size: 16px;
             color: #fff;
+            margin-bottom: 4px;
         }
 
-        .surface-block p {
-            margin: 8px 0 0;
-            font-size: 14px;
-            line-height: 1.75;
-            color: #c9d7eb;
+        .why-banner-body p {
+            font-size: 12px;
+            line-height: 1.55;
+            color: var(--text-muted);
         }
 
-        .surface-grid {
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 10px;
+        /* Section 03 · Program Explorer */
+        .program-section {
+            margin-bottom: 50px;
         }
 
-        .surface-metric {
-            padding: 12px;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,.08);
-            background: rgba(255,255,255,.035);
+        .program-nav-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+            margin-bottom: 16px;
         }
 
-        .surface-metric .label {
+        .program-nav-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .prog-tab-btn {
+            flex: 0 0 auto;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, 0.035);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s var(--ease);
+            white-space: nowrap;
+        }
+
+        .prog-tab-btn span {
             font-size: 10px;
+            color: var(--text-faint);
+            font-weight: 800;
+        }
+
+        .prog-tab-btn.is-active {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(99, 102, 241, 0.2));
+            border-color: rgba(96, 165, 250, 0.4);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(37, 99, 235, 0.22);
+        }
+
+        .prog-tab-btn.is-active span {
+            color: #60a5fa;
+        }
+
+        .prog-card {
+            display: none;
+            padding: 18px 16px;
+            border-radius: 22px;
+            background: linear-gradient(180deg, rgba(14, 23, 49, 0.8), rgba(8, 14, 30, 0.95));
+            border: 1px solid var(--line-strong);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+            animation: cardFadeIn 0.28s var(--ease) forwards;
+        }
+
+        .prog-card.is-active {
+            display: block;
+        }
+
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .prog-meta-kicker {
+            font-size: 10px;
+            font-weight: 800;
             letter-spacing: 0.16em;
             text-transform: uppercase;
-            color: #8ea1c0;
+            color: #60a5fa;
+            margin-bottom: 6px;
         }
 
-        .surface-metric .value {
-            margin-top: 8px;
-            font-size: 15px;
-            font-weight: 700;
+        .prog-card h3 {
+            font-size: 22px;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+
+        .prog-card p {
+            font-size: 13px;
+            line-height: 1.65;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .tech-pill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .tech-pill {
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 11px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        /* Program Visual Preview Surfaces */
+        .prog-visual-preview {
+            padding: 14px;
+            border-radius: 14px;
+            background: #050918;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            margin-bottom: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pipeline-nodes {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 4px;
+        }
+
+        .node-box {
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
+        }
+
+        .node-box small {
+            display: block;
+            font-size: 9px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+        }
+
+        .node-box strong {
+            display: block;
+            font-size: 11px;
             color: #fff;
         }
 
-        .cta-shell {
-            padding: 18px 16px;
-            border-radius: 28px;
-            background:
-                radial-gradient(circle at top left, rgba(59,130,246,.3), transparent 32%),
-                radial-gradient(circle at top right, rgba(168,85,247,.24), transparent 28%),
-                linear-gradient(135deg, rgba(30,41,59,.9), rgba(15,23,42,.96));
-            position: relative;
-            overflow: hidden;
+        .node-arrow {
+            color: #60a5fa;
+            font-size: 12px;
+            font-weight: 800;
         }
 
-        .cta-shell::before,
-        .cta-shell::after {
+        .prog-visual-status {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .prog-visual-status span::before {
+            content: "●";
+            color: #38bdf8;
+            margin-right: 6px;
+            font-size: 8px;
+            vertical-align: middle;
+        }
+
+        .prog-footer-info {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+        }
+
+        .info-row span {
+            color: var(--text-faint);
+        }
+
+        .info-row strong {
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        /* Section 04 · Learning Journey */
+        .journey-section {
+            margin-bottom: 50px;
+        }
+
+        .journey-timeline {
+            position: relative;
+            padding-left: 32px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .journey-timeline::before {
             content: "";
             position: absolute;
+            top: 14px;
+            bottom: 24px;
+            left: 11px;
+            width: 2px;
+            background: linear-gradient(180deg, #3b82f6, #6366f1 50%, #a855f7 90%, transparent);
             border-radius: 999px;
-            pointer-events: none;
         }
 
-        .cta-shell::before {
-            width: 112px;
-            height: 112px;
-            top: -18px;
-            right: -18px;
-            background: radial-gradient(circle, rgba(99,102,241,.28), transparent 70%);
+        .journey-node {
+            position: relative;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+            transition: all 0.22s var(--ease);
         }
 
-        .cta-shell::after {
-            width: 132px;
-            height: 132px;
-            left: -20px;
-            bottom: -28px;
-            background: radial-gradient(circle, rgba(59,130,246,.24), transparent 72%);
+        .node-pin {
+            position: absolute;
+            top: 16px;
+            left: -32px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--bg-deep);
+            border: 2px solid #3b82f6;
+            color: #93c5fd;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
         }
 
-        .cta-shell > * { position: relative; z-index: 1; }
+        .journey-node:nth-child(2) .node-pin { border-color: #6366f1; color: #a5b4fc; }
+        .journey-node:nth-child(3) .node-pin { border-color: #8b5cf6; color: #c4b5fd; }
+        .journey-node:nth-child(4) .node-pin { border-color: #a855f7; color: #e9d5ff; }
 
-        .cta-kicker {
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.18em;
+        .journey-node small {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            color: #cad6ee;
+            color: #818cf8;
         }
 
-        .cta-shell h3 {
-            margin: 12px 0 0;
-            font-size: 28px;
-            line-height: 1.15;
+        .journey-node h3 {
+            font-size: 17px;
+            margin: 4px 0 6px;
             color: #fff;
         }
 
-        .cta-copy {
-            margin-top: 12px;
-            font-size: 15px;
-            line-height: 1.8;
-            color: #d7e2f5;
+        .journey-node p {
+            font-size: 12px;
+            line-height: 1.55;
+            color: var(--text-muted);
         }
 
-        .course-grid,
-        .info-grid {
+        /* Section 05 · Core Signals / Metrics */
+        .signals-section {
+            margin-bottom: 50px;
+        }
+
+        .signals-grid {
             display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 12px;
         }
 
-        .course-card,
-        .info-card {
-            padding: 16px;
-            border-radius: 24px;
+        .signal-card {
+            padding: 18px 14px;
+            border-radius: 20px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+            border: 1px solid var(--line);
+            text-align: left;
         }
 
-        .course-card strong,
-        .info-card strong {
-            display: block;
-            font-size: 17px;
+        .signal-card:nth-child(1) {
+            border-color: rgba(96, 165, 250, 0.25);
+            background: linear-gradient(180deg, rgba(37, 99, 235, 0.1), rgba(13, 21, 45, 0.6));
+        }
+
+        .signal-val {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 38px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.04em;
             color: #fff;
-        }
-
-        .course-card p,
-        .info-card p {
-            margin: 8px 0 0;
-            font-size: 14px;
-            line-height: 1.75;
-            color: #c7d4e8;
-        }
-
-        .mini-pills {
-            margin-top: 14px;
             display: flex;
-            flex-wrap: wrap;
+            align-items: baseline;
+        }
+
+        .signal-val i {
+            font-style: normal;
+            font-size: 22px;
+            color: #60a5fa;
+            margin-left: 2px;
+        }
+
+        .signal-card h3 {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .signal-card p {
+            margin-top: 4px;
+            font-size: 11px;
+            line-height: 1.4;
+            color: var(--text-muted);
+        }
+
+        /* Section 06 · Mentorship & Career Support */
+        .mentorship-section {
+            margin-bottom: 50px;
+        }
+
+        .mentor-quote-card {
+            padding: 16px;
+            border-radius: 20px;
+            background: linear-gradient(145deg, rgba(99, 102, 241, 0.12), rgba(13, 21, 45, 0.8));
+            border: 1px solid rgba(129, 140, 248, 0.22);
+            margin-bottom: 16px;
+        }
+
+        .quote-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .quote-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quote-header small {
+            font-size: 11px;
+            font-weight: 700;
+            color: #cbd5e1;
+        }
+
+        .mentor-quote-card blockquote {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            font-style: italic;
+        }
+
+        /* Accordion */
+        .accordion-list {
+            display: grid;
             gap: 8px;
         }
 
-        .mini-pill {
-            padding: 8px 12px;
-            border-radius: 999px;
-            border: 1px solid rgba(129,140,248,.22);
-            background: rgba(255,255,255,.045);
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #e4edfb;
+        .acc-item {
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--line);
+            overflow: hidden;
+            transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
         }
 
-        .profile-hero {
-            padding: 18px 16px;
-            border-radius: 28px;
+        .acc-item.is-open {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(129, 140, 248, 0.3);
+        }
+
+        .acc-trigger {
+            width: 100%;
+            min-height: 58px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            gap: 12px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .acc-trigger-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .acc-num {
+            font-size: 10px;
+            font-weight: 800;
+            color: #60a5fa;
+            letter-spacing: 0.08em;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 3px 6px;
+            border-radius: 6px;
+        }
+
+        .acc-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .acc-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            flex: 0 0 22px;
+            transition: transform 0.24s var(--ease), background 0.2s;
+        }
+
+        .acc-icon::before,
+        .acc-icon::after {
+            content: "";
+            position: absolute;
+            background: #94a3b8;
+            border-radius: 1px;
+            transition: transform 0.24s var(--ease), opacity 0.2s;
+        }
+
+        .acc-icon::before {
+            width: 10px;
+            height: 1.5px;
+        }
+
+        .acc-icon::after {
+            width: 1.5px;
+            height: 10px;
+        }
+
+        .acc-item.is-open .acc-icon {
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        .acc-item.is-open .acc-icon::after {
+            transform: scaleY(0);
+            opacity: 0;
+        }
+
+        .acc-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.32s var(--ease), opacity 0.25s var(--ease);
+            opacity: 0;
+        }
+
+        .acc-item.is-open .acc-panel {
+            max-height: 240px;
+            opacity: 1;
+        }
+
+        .acc-content {
+            padding: 0 14px 16px 14px;
+        }
+
+        .acc-content p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .acc-tags {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .acc-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #93c5fd;
+            border: 1px solid rgba(147, 197, 253, 0.18);
+        }
+
+        /* Final CTA */
+        .mobile-final-cta {
+            padding: 28px 18px;
+            border-radius: 24px;
             background:
-                radial-gradient(circle at top right, rgba(59,130,246,.22), transparent 34%),
-                linear-gradient(135deg, rgba(17,24,39,.92), rgba(30,41,59,.98));
+                radial-gradient(circle at top right, rgba(139, 92, 246, 0.25), transparent 45%),
+                radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.25), transparent 45%),
+                linear-gradient(145deg, #090e24, #050814);
+            border: 1px solid var(--line-strong);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+            margin-bottom: 36px;
             position: relative;
             overflow: hidden;
         }
 
-        .profile-hero h3 {
-            margin: 10px 0 0;
-            font-size: 28px;
+        .final-kicker {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #60a5fa;
+            margin-bottom: 10px;
+        }
+
+        .mobile-final-cta h2 {
+            font-size: 26px;
             line-height: 1.15;
             color: #fff;
+            margin-bottom: 10px;
         }
 
-        .profile-hero p {
-            margin: 12px 0 0;
-            font-size: 15px;
-            line-height: 1.8;
-            color: #d7e2f5;
+        .mobile-final-cta p {
+            font-size: 14px;
+            line-height: 1.65;
+            color: #cbd5e1;
+            margin-bottom: 20px;
         }
 
-        .profile-stat-grid {
-            margin-top: 14px;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        .final-actions {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
         }
 
-        .profile-stat {
-            padding: 12px;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,.08);
-            background: rgba(255,255,255,.04);
+        /* Mobile Footer */
+        .mobile-footer {
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
-        .profile-stat .label {
-            font-size: 10px;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: #8ea1c0;
+        .footer-brand-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .profile-stat .value {
-            margin-top: 8px;
-            font-size: 15px;
-            font-weight: 700;
-            line-height: 1.55;
+        .footer-brand-row img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+        }
+
+        .footer-brand-copy strong {
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 16px;
             color: #fff;
         }
 
-        button.top-link {
-            border: 0;
-            cursor: pointer;
-            font: inherit;
+        .footer-brand-copy p {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
-        .reveal {
+        .footer-nav-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .footer-col span {
+            display: block;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #8195b8;
+            margin-bottom: 10px;
+        }
+
+        .footer-col a {
+            display: block;
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            transition: color 0.18s;
+        }
+
+        .footer-col a:active {
+            color: #fff;
+        }
+
+        .footer-location {
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-location small {
+            display: block;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .footer-location p {
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-top: 3px;
+        }
+
+        .footer-bottom-line {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-faint);
+            padding-bottom: 16px;
+        }
+
+        .footer-bottom-line a {
+            color: #93c5fd;
+            align-self: flex-start;
+        }
+
+        /* Scroll Reveal animations */
+        .reveal-item {
             opacity: 0;
-            transform: translateY(26px);
-            transition: opacity .7s ease, transform .7s ease;
+            transform: translateY(16px);
+            transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
         }
 
-        .reveal.visible {
+        .reveal-item.is-visible {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .hidden { display: none !important; }
-
-        @media (max-width: 380px) {
-            .page-shell { padding-left: 12px; padding-right: 12px; }
-            .hero h1 { font-size: 42px; }
-            .surface-grid, .stats-grid, .profile-stat-grid { grid-template-columns: 1fr; }
-        }
-
-        @keyframes marqueeDrift {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-
-        @keyframes typingPulse {
-            0%, 80%, 100% { transform: scale(.7); opacity: .45; }
-            40% { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes pageFade {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal-item {
+                opacity: 1 !important;
+                transform: none !important;
+            }
         }
     </style>
 </head>
 <body>
     {% if messages %}
-    <div style="position: fixed; inset-inline: 0; top: 12px; z-index: 45; padding: 0 14px;">
-        <div style="max-width: 430px; margin: 0 auto; display: grid; gap: 8px;">
-            {% for message in messages %}
-            <div class="glass" style="border-radius: 18px; padding: 12px 14px; color: #d9e4f7; font-size: 13px;">
-                <p style="margin:0;">{{ message }}</p>
-            </div>
-            {% endfor %}
+    <div class="flash-stack" aria-live="polite">
+        {% for message in messages %}
+        <div class="flash-msg">
+            <span>{{ message }}</span>
+            <button type="button" aria-label="Dismiss" onclick="this.closest('.flash-msg').remove();">&times;</button>
         </div>
+        {% endfor %}
     </div>
     {% endif %}
 
     <div class="page-shell">
-        <header class="glass top-bar reveal visible">
-            <div class="top-bar-row">
-                <a href="{% url 'home' %}" class="brand">
-                    <img src="{% static 'image/image.png' %}" alt="Kodehax Academy logo">
-                    <div>
-                        <div class="brand-mark">Kodehax</div>
-                        <div class="brand-name">Academy</div>
+        <!-- Sticky Mobile Navigation -->
+        <header class="mobile-header">
+            <div class="header-top">
+                <a href="{% url 'home' %}" class="brand-link" aria-label="Kodehax Academy home">
+                    <img src="{% static 'image/image.png' %}" alt="Kodehax Academy" width="38" height="38">
+                    <div class="brand-meta">
+                        <strong>Kodehax</strong>
+                        <small>Academy</small>
                     </div>
                 </a>
-                <div class="auth-links">
-                    <a href="{% url 'student_login' %}" class="auth-link">Login</a>
-                    <a href="{% url 'student_register' %}" class="auth-link register">Join Now</a>
+                <div class="header-actions">
+                    <a href="{% url 'student_login' %}" class="header-login">Log in</a>
+                    <a href="{% url 'student_register' %}" class="btn btn-primary header-join">Join now ↗</a>
                 </div>
             </div>
-            <nav class="top-nav" aria-label="Mobile navigation">
-                <div class="top-nav-links">
-                    <button type="button" class="top-link active" data-page-trigger="home">Home</button>
-                    <button type="button" class="top-link" data-page-trigger="profile">About</button>
-                    <button type="button" class="top-link" data-page-trigger="ai">Services</button>
-                    <button type="button" class="top-link" data-page-trigger="courses">Courses</button>
-                    <button type="button" class="top-link" data-page-trigger="profile">Contact</button>
-                </div>
+            <nav class="header-nav-rail" aria-label="Mobile in-page navigation">
+                <a href="#why" class="nav-pill">Why Kodehax</a>
+                <a href="#programs" class="nav-pill">Programs</a>
+                <a href="#journey" class="nav-pill">Journey</a>
+                <a href="#signals" class="nav-pill">Signals</a>
+                <a href="#mentorship" class="nav-pill">Mentorship</a>
+                <a href="{% url 'teacher_login' %}" class="nav-pill">Teacher</a>
             </nav>
         </header>
 
-        <section class="hero reveal visible page-section active" data-page-section="home">
-            <span class="badge">AI-Powered LMS</span>
-            <h1>Learn Smarter with AI</h1>
-            <p>Touch-friendly lessons, instant guidance, and premium learning flows built for modern students.</p>
-            <a href="{% url 'student_register' %}" class="hero-btn">Start Learning</a>
-
-            <div class="hero-stage">
-                <div class="float-card top">
-                    <div class="float-label">Live Session</div>
-                    <div class="float-value">AI Tutor Online</div>
-                    <div class="float-note">Explaining in real time</div>
-                </div>
-                <div class="float-card bottom">
-                    <div class="float-label">Momentum</div>
-                    <div class="float-value">+18% Focus</div>
-                    <div class="float-note">vs last week</div>
+        <main id="main-content">
+            <!-- Mobile Hero -->
+            <section class="mobile-hero reveal-item">
+                <div class="eyebrow-pill">
+                    <span class="live-dot" aria-hidden="true"></span>
+                    DPIIT RECOGNIZED · STARTUP INDIA
                 </div>
 
-                <div class="device">
-                    <div class="device-notch"></div>
-                    <div class="device-head">
-                        <div>
-                            <div class="device-kicker">Mobile Learning Surface</div>
-                            <div class="device-title">AI lesson flow</div>
-                        </div>
-                        <div class="live-pill"><span></span>Live</div>
+                <h1 class="hero-title">
+                    Learn live.<br>
+                    <span class="hero-gradient">Build for real.</span>
+                </h1>
+
+                <p class="hero-lead">
+                    Industry-led tech education for people who want to do the work—not just watch it. Learn with mentors, ship practical projects, and move toward a career with proof.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="{% url 'student_register' %}" class="btn btn-primary btn-full">
+                        Start your journey ↗
+                    </a>
+                    <a href="#programs" class="btn btn-secondary btn-full">
+                        Explore programs ↓
+                    </a>
+                </div>
+
+                <div class="hero-trust">
+                    <div class="avatar-stack" aria-hidden="true">
+                        <span>KH</span>
+                        <span>01</span>
+                        <span>∞</span>
                     </div>
-                    <div class="device-grid">
-                        <div class="device-panel">
-                            <div class="eyebrow">Current Topic</div>
-                            <strong>Python loops and iteration</strong>
-                            <p>Explanation, examples, and next practice are stacked into one calm screen.</p>
+                    <p>
+                        <strong>Human guidance at every step.</strong><br>
+                        Live sessions, direct feedback, transparent learning.
+                    </p>
+                </div>
+
+                <!-- Interactive Live Classroom Window -->
+                <div class="stage-box reveal-item" aria-label="Live classroom mobile preview">
+                    <div class="stage-bar">
+                        <div class="stage-dots" aria-hidden="true">
+                            <span></span><span></span><span></span>
                         </div>
-                        <div class="device-panel">
-                            <div class="device-metric">
-                                <div>
-                                    <div class="eyebrow">Confidence</div>
-                                    <div class="value">94%</div>
+                        <div class="stage-title">
+                            Full Stack Development
+                            <small>· Live</small>
+                        </div>
+                        <div class="live-tag">
+                            <span class="live-dot" aria-hidden="true"></span> Live
+                        </div>
+                    </div>
+
+                    <div class="stage-grid">
+                        <div class="stage-panel mentor-feed">
+                            <div class="mentor-visual-row">
+                                <div class="mentor-avatar" aria-hidden="true">AJ</div>
+                                <div class="mentor-audio" aria-hidden="true">
+                                    <i></i><i></i><i></i><i></i>
                                 </div>
-                                <div class="note">adaptive review ready</div>
+                            </div>
+                            <div class="mentor-info">
+                                <small>Lead mentor</small>
+                                <strong>Arjun · Building API</strong>
+                            </div>
+                        </div>
+
+                        <div class="stage-panel lesson-info">
+                            <small>Today's session</small>
+                            <strong>Connect Django API to frontend</strong>
+                            <div class="mini-progress" aria-hidden="true">
+                                <span></span>
+                            </div>
+                            <div class="lesson-meta-row">
+                                <span>42 min</span>
+                                <span>7 learners</span>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="glass marquee">
-                <div class="marquee-track">
-                    <span class="marquee-item">Live AI guidance</span>
-                    <span class="marquee-item">Mentor-backed paths</span>
-                    <span class="marquee-item">Mobile-first lessons</span>
-                    <span class="marquee-item">Smart progress</span>
-                    <span class="marquee-item">Live AI guidance</span>
-                    <span class="marquee-item">Mentor-backed paths</span>
-                    <span class="marquee-item">Mobile-first lessons</span>
-                    <span class="marquee-item">Smart progress</span>
-                </div>
-            </div>
-
-            <div class="stats-grid">
-                <div class="glass stat-card reveal">
-                    <div class="stat-label">Completion</div>
-                    <div class="stat-value" data-counter data-target="92" data-suffix="%">0</div>
-                    <div class="stat-note">lesson continuation rate</div>
-                </div>
-                <div class="glass stat-card reveal">
-                    <div class="stat-label">AI Support</div>
-                    <div class="stat-value" data-counter data-target="24" data-suffix="h">0</div>
-                    <div class="stat-note">hour guidance rhythm</div>
-                </div>
-            </div>
-
-            <div class="glass spotlight reveal">
-                <div class="spotlight-label">Live Spotlight</div>
-                <div class="spotlight-line" data-spotlight-line>Adaptive study flows keep lessons, AI help, and action steps connected on one mobile screen.</div>
-            </div>
-        </section>
-
-        <section class="section reveal page-section" data-page-section="ai">
-            <div class="page-intro">
-                <div class="page-kicker">AI</div>
-                <h2>Live-feeling help for concepts, coding questions, and next steps.</h2>
-                <p>The AI tab is now mapped as its own mobile screen so the bottom icon behaves like the screenshot instead of redirecting away from the page.</p>
-            </div>
-            <div class="glass section-card">
-                <div class="section-head">
-                    <div class="section-title">AI Chat Preview</div>
-                    <div class="section-status"><span></span>Live help</div>
-                </div>
-
-                <div class="chat-tabs" data-switcher>
-                    <button type="button" class="chat-tab active" data-trigger="python">Python</button>
-                    <button type="button" class="chat-tab" data-trigger="sql">SQL</button>
-                    <button type="button" class="chat-tab" data-trigger="api">API</button>
-                </div>
-
-                <div class="chat-flow">
-                    <div class="chat-panel active" data-panel="python">
-                        <div class="bubble user">
-                            <span class="bubble-label">User</span>
-                            <div class="bubble-text">Explain Python loops</div>
+                    <div class="code-box" aria-label="Code snippet preview">
+                        <div class="code-header">
+                            <span>views.py</span>
+                            <span>Saved</span>
                         </div>
-                        <div class="bubble ai">
-                            <span class="bubble-label">AI Tutor</span>
-                            <div class="typing" data-typing>
-                                <span class="typing-dot"></span>
-                                <span class="typing-dot"></span>
-                                <span class="typing-dot"></span>
+                        <code>
+                            <span class="c-purple">def</span> <span class="c-blue">project_list</span>(request):<br>
+                            &nbsp;&nbsp;projects = Project.objects.<span class="c-blue">all</span>()<br>
+                            &nbsp;&nbsp;<span class="c-purple">return</span> JsonResponse({<span class="c-amber">"results"</span>: projects})
+                        </code>
+                    </div>
+
+                    <div class="stage-chips">
+                        <div class="chip-card">
+                            <small>Track progress</small>
+                            <strong>84% · Portfolio</strong>
+                        </div>
+                        <div class="chip-card">
+                            <small>Mentor feedback</small>
+                            <strong>✓ Clear next step</strong>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trust Highlights Band -->
+            <div class="trust-grid reveal-item" aria-label="Key academy commitments">
+                <div class="trust-cell">
+                    <span class="trust-num">01</span>
+                    <strong>100% live</strong>
+                    <small>No passive course library</small>
+                </div>
+                <div class="trust-cell">
+                    <span class="trust-num">02</span>
+                    <strong>Mentor-led</strong>
+                    <small>Guidance from real people</small>
+                </div>
+                <div class="trust-cell">
+                    <span class="trust-num">03</span>
+                    <strong>Project-driven</strong>
+                    <small>Practice that becomes proof</small>
+                </div>
+                <div class="trust-cell">
+                    <span class="trust-num">04</span>
+                    <strong>Career-focused</strong>
+                    <small>Skills aligned to outcomes</small>
+                </div>
+            </div>
+
+            <!-- Section 02 · Why Kodehax -->
+            <section class="reveal-item" id="why" aria-labelledby="why-heading">
+                <div class="section-header">
+                    <div class="section-kicker">02 · WHY KODEHAX</div>
+                    <h2 id="why-heading">Education that doesn’t hide behind promises.</h2>
+                    <p>We replace vague outcomes with a visible learning process: show up live, practise deliberately, get direct feedback, and build work you can stand behind.</p>
+                </div>
+
+                <div class="why-composition">
+                    <!-- Featured Principle -->
+                    <article class="why-featured">
+                        <span class="card-tag">01 · LEARN TOGETHER</span>
+                        <h3>Live classes, not a content graveyard.</h3>
+                        <p>Ask questions in the moment, work through concepts with an expert, and learn alongside a focused cohort.</p>
+                    </article>
+
+                    <!-- Split Pair -->
+                    <div class="why-split-row">
+                        <article class="why-mini-card">
+                            <span class="card-tag">02 · PRACTICE</span>
+                            <h4>Practical from session one.</h4>
+                            <p>Build real features and projects that become your portfolio.</p>
+                        </article>
+                        <article class="why-mini-card">
+                            <span class="card-tag">03 · DIRECTION</span>
+                            <h4>Tracks built for careers.</h4>
+                            <p>Structured pathways connecting depth to roles and interviews.</p>
+                        </article>
+                    </div>
+
+                    <!-- Supportive Banner Card -->
+                    <article class="why-banner-card">
+                        <div class="why-banner-icon" aria-hidden="true">◎</div>
+                        <div class="why-banner-body">
+                            <span class="card-tag" style="color:#c084fc;">04 · MENTORSHIP</span>
+                            <h4>Never stay blocked.</h4>
+                            <p>Direct guidance and honest feedback help you understand what to improve and where to go next.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Section 03 · Program Explorer -->
+            <section class="program-section reveal-item" id="programs" aria-labelledby="program-heading">
+                <div class="section-header">
+                    <div class="section-kicker">03 · PROGRAM EXPLORER</div>
+                    <h2 id="program-heading">Choose what you’ll build next.</h2>
+                    <p>Five focused pathways. Each one taught live, grounded in tools used in the field, and designed to move from understanding to implementation.</p>
+                </div>
+
+                <!-- Horizontally Scrollable Category Pills -->
+                <div class="program-nav-scroll" role="tablist" aria-label="Program pathways">
+                    <button class="prog-tab-btn is-active" id="mtab-web" role="tab" aria-selected="true" aria-controls="mpanel-web" data-mobile-tab="web">
+                        <span>01</span> Web Development
+                    </button>
+                    <button class="prog-tab-btn" id="mtab-data" role="tab" aria-selected="false" aria-controls="mpanel-data" data-mobile-tab="data">
+                        <span>02</span> Data Science
+                    </button>
+                    <button class="prog-tab-btn" id="mtab-cyber" role="tab" aria-selected="false" aria-controls="mpanel-cyber" data-mobile-tab="cyber">
+                        <span>03</span> Cyber Security
+                    </button>
+                    <button class="prog-tab-btn" id="mtab-ai" role="tab" aria-selected="false" aria-controls="mpanel-ai" data-mobile-tab="ai">
+                        <span>04</span> AI / ML
+                    </button>
+                    <button class="prog-tab-btn" id="mtab-python" role="tab" aria-selected="false" aria-controls="mpanel-python" data-mobile-tab="python">
+                        <span>05</span> Python
+                    </button>
+                </div>
+
+                <!-- Program Panels -->
+                <div class="program-panels-container">
+                    <!-- Web Development -->
+                    <article class="prog-card is-active" id="mpanel-web" role="tabpanel" aria-labelledby="mtab-web" data-mobile-panel="web">
+                        <div class="prog-meta-kicker">ADVANCED DIPLOMA · INDUSTRY 4.0</div>
+                        <h3>Full Stack Web Development</h3>
+                        <p>Build complete digital products across modern frontends, Python backends, databases, and AI-enabled features.</p>
+                        
+                        <div class="tech-pill-list" aria-label="Technologies taught">
+                            <span class="tech-pill">Python</span>
+                            <span class="tech-pill">Django</span>
+                            <span class="tech-pill">Flask</span>
+                            <span class="tech-pill">MEARN</span>
+                            <span class="tech-pill">Angular</span>
+                            <span class="tech-pill">MySQL</span>
+                        </div>
+
+                        <div class="prog-visual-preview" aria-hidden="true">
+                            <div class="pipeline-nodes">
+                                <div class="node-box"><small>Interface</small><strong>Angular</strong></div>
+                                <span class="node-arrow">→</span>
+                                <div class="node-box"><small>API</small><strong>Django</strong></div>
+                                <span class="node-arrow">→</span>
+                                <div class="node-box"><small>Data</small><strong>MySQL</strong></div>
                             </div>
-                            <div class="bubble-text hidden" data-ai-response>Python loops repeat a block of code for each item or until a condition changes, so you can automate patterns instead of writing the same line again.</div>
+                            <div class="prog-visual-status">
+                                <span>Project Pipeline</span>
+                                <strong>Active</strong>
+                            </div>
+                        </div>
+
+                        <div class="prog-footer-info">
+                            <div class="info-row">
+                                <span>Learning style</span>
+                                <strong>Project-first, mentor-guided</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Outcome</span>
+                                <strong>Portfolio-ready full stack foundation</strong>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'student_register' %}" class="btn btn-primary btn-full">
+                            Explore this program ↗
+                        </a>
+                    </article>
+
+                    <!-- Data Science -->
+                    <article class="prog-card" id="mpanel-data" role="tabpanel" aria-labelledby="mtab-data" data-mobile-panel="data">
+                        <div class="prog-meta-kicker">ADVANCED DIPLOMA · ML TO MLOPS</div>
+                        <h3>Data Science</h3>
+                        <p>Move from data thinking and model building to applied AI, cloud workflows, and deployment-ready practice.</p>
+
+                        <div class="tech-pill-list" aria-label="Technologies taught">
+                            <span class="tech-pill">Machine Learning</span>
+                            <span class="tech-pill">Deep Learning</span>
+                            <span class="tech-pill">NLP</span>
+                            <span class="tech-pill">GenAI</span>
+                            <span class="tech-pill">Big Data</span>
+                            <span class="tech-pill">MLOps</span>
+                        </div>
+
+                        <div class="prog-visual-preview" aria-hidden="true">
+                            <div style="display:flex; align-items:flex-end; gap:6px; height:48px; padding-bottom:4px;">
+                                <span style="flex:1; height:35%; background:rgba(96,165,250,0.5); border-radius:4px;"></span>
+                                <span style="flex:1; height:55%; background:rgba(96,165,250,0.6); border-radius:4px;"></span>
+                                <span style="flex:1; height:45%; background:rgba(96,165,250,0.5); border-radius:4px;"></span>
+                                <span style="flex:1; height:75%; background:rgba(96,165,250,0.7); border-radius:4px;"></span>
+                                <span style="flex:1; height:65%; background:rgba(96,165,250,0.6); border-radius:4px;"></span>
+                                <span style="flex:1; height:92%; background:linear-gradient(180deg, #60a5fa, #3b82f6); border-radius:4px;"></span>
+                                <span style="flex:1; height:80%; background:rgba(96,165,250,0.8); border-radius:4px;"></span>
+                            </div>
+                            <div class="prog-visual-status">
+                                <span>Model Confidence</span>
+                                <strong>92.4%</strong>
+                            </div>
+                        </div>
+
+                        <div class="prog-footer-info">
+                            <div class="info-row">
+                                <span>Learning style</span>
+                                <strong>Experimentation to production</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Outcome</span>
+                                <strong>Modern data portfolio direction</strong>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'student_register' %}" class="btn btn-primary btn-full">
+                            Explore this program ↗
+                        </a>
+                    </article>
+
+                    <!-- Cyber Security -->
+                    <article class="prog-card" id="mpanel-cyber" role="tabpanel" aria-labelledby="mtab-cyber" data-mobile-panel="cyber">
+                        <div class="prog-meta-kicker">ADVANCED DIPLOMA · 8 MONTHS</div>
+                        <h3>Cyber Security</h3>
+                        <p>Develop offensive and defensive awareness across investigations, cloud environments, application security, and governance.</p>
+
+                        <div class="tech-pill-list" aria-label="Technologies taught">
+                            <span class="tech-pill">Ethical Hacking</span>
+                            <span class="tech-pill">DFIR</span>
+                            <span class="tech-pill">Cloud Security</span>
+                            <span class="tech-pill">AppSec</span>
+                            <span class="tech-pill">GRC</span>
+                        </div>
+
+                        <div class="prog-visual-preview" aria-hidden="true">
+                            <div style="display:flex; align-items:center; justify-content:center; gap:12px; padding:8px 0;">
+                                <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, rgba(37,99,235,0.3), rgba(124,58,237,0.3)); border:1px solid #60a5fa; display:flex; align-items:center; justify-content:center; font-weight:800; color:#fff; font-size:12px;">
+                                    KH
+                                </div>
+                                <div style="font-size:12px; color:#e2e8f0; font-weight:600;">
+                                    Defensive &amp; Offensive Security Modules
+                                </div>
+                            </div>
+                            <div class="prog-visual-status">
+                                <span>System Status</span>
+                                <strong>Protected</strong>
+                            </div>
+                        </div>
+
+                        <div class="prog-footer-info">
+                            <div class="info-row">
+                                <span>Learning style</span>
+                                <strong>Hands-on security exposure</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Outcome</span>
+                                <strong>Foundation for cyber specialization</strong>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'student_register' %}" class="btn btn-primary btn-full">
+                            Explore this program ↗
+                        </a>
+                    </article>
+
+                    <!-- AI / ML -->
+                    <article class="prog-card" id="mpanel-ai" role="tabpanel" aria-labelledby="mtab-ai" data-mobile-panel="ai">
+                        <div class="prog-meta-kicker">ADVANCED DIPLOMA · MODERN AI</div>
+                        <h3>AI &amp; Machine Learning</h3>
+                        <p>Build practical understanding across deep learning, generative AI, NLP, cloud AI, and model deployment.</p>
+
+                        <div class="tech-pill-list" aria-label="Technologies taught">
+                            <span class="tech-pill">Deep Learning</span>
+                            <span class="tech-pill">Generative AI</span>
+                            <span class="tech-pill">NLP</span>
+                            <span class="tech-pill">Cloud AI</span>
+                            <span class="tech-pill">Deployment</span>
+                        </div>
+
+                        <div class="prog-visual-preview" aria-hidden="true">
+                            <div style="display:flex; align-items:center; justify-content:space-around; padding:8px 0;">
+                                <span style="width:10px; height:10px; border-radius:50%; background:#38bdf8; box-shadow:0 0 10px #38bdf8;"></span>
+                                <span style="height:1px; flex:1; background:linear-gradient(90deg, #38bdf8, #8b5cf6);"></span>
+                                <span style="width:16px; height:16px; border-radius:50%; background:#6366f1; box-shadow:0 0 14px #6366f1;"></span>
+                                <span style="height:1px; flex:1; background:linear-gradient(90deg, #8b5cf6, #c084fc);"></span>
+                                <span style="width:10px; height:10px; border-radius:50%; background:#c084fc; box-shadow:0 0 10px #c084fc;"></span>
+                            </div>
+                            <div class="prog-visual-status">
+                                <span>Neural Workflow</span>
+                                <strong>Training Active</strong>
+                            </div>
+                        </div>
+
+                        <div class="prog-footer-info">
+                            <div class="info-row">
+                                <span>Learning style</span>
+                                <strong>Applied, modern-stack orientation</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Outcome</span>
+                                <strong>Future-facing AI readiness</strong>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'student_register' %}" class="btn btn-primary btn-full">
+                            Explore this program ↗
+                        </a>
+                    </article>
+
+                    <!-- Python -->
+                    <article class="prog-card" id="mpanel-python" role="tabpanel" aria-labelledby="mtab-python" data-mobile-panel="python">
+                        <div class="prog-meta-kicker">MASTER PROGRAM · 3 MONTHS</div>
+                        <h3>Python</h3>
+                        <p>Build strong language fundamentals, then apply them through APIs, web scraping, databases, automation, and mini-projects.</p>
+
+                        <div class="tech-pill-list" aria-label="Technologies taught">
+                            <span class="tech-pill">Core Python</span>
+                            <span class="tech-pill">OOP</span>
+                            <span class="tech-pill">Modules</span>
+                            <span class="tech-pill">APIs</span>
+                            <span class="tech-pill">Automation</span>
+                            <span class="tech-pill">Databases</span>
+                        </div>
+
+                        <div class="prog-visual-preview" aria-hidden="true">
+                            <div style="font-family:monospace; font-size:11px; line-height:1.45; color:#cbd5e1;">
+                                <span style="color:#c084fc;">for</span> skill <span style="color:#c084fc;">in</span> [<span style="color:#60a5fa;">"code"</span>, <span style="color:#60a5fa;">"build"</span>]:<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;practice(skill)<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;ship(project)
+                            </div>
+                            <div class="prog-visual-status">
+                                <span>Run Complete</span>
+                                <strong>0 Errors</strong>
+                            </div>
+                        </div>
+
+                        <div class="prog-footer-info">
+                            <div class="info-row">
+                                <span>Learning style</span>
+                                <strong>Fast, focused, hands-on</strong>
+                            </div>
+                            <div class="info-row">
+                                <span>Outcome</span>
+                                <strong>Utility-driven coding confidence</strong>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'student_register' %}" class="btn btn-primary btn-full">
+                            Explore this program ↗
+                        </a>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Section 04 · Learning Journey -->
+            <section class="journey-section reveal-item" id="journey" aria-labelledby="journey-heading">
+                <div class="section-header">
+                    <div class="section-kicker">04 · THE LEARNING EXPERIENCE</div>
+                    <h2 id="journey-heading">A clear path from curious to capable.</h2>
+                    <p>Every stage is connected. What you learn becomes what you build; what you build becomes what mentors refine; what you refine becomes proof.</p>
+                </div>
+
+                <div class="journey-timeline">
+                    <article class="journey-node">
+                        <span class="node-pin" aria-hidden="true">01</span>
+                        <small>WEEK 01</small>
+                        <h3>Learn live</h3>
+                        <p>Understand concepts in real time with an expert and a focused cohort.</p>
+                    </article>
+
+                    <article class="journey-node">
+                        <span class="node-pin" aria-hidden="true">02</span>
+                        <small>BUILD CYCLE</small>
+                        <h3>Make projects</h3>
+                        <p>Turn each concept into practical work, assignments, and working features.</p>
+                    </article>
+
+                    <article class="journey-node">
+                        <span class="node-pin" aria-hidden="true">03</span>
+                        <small>FEEDBACK LOOP</small>
+                        <h3>Work with mentors</h3>
+                        <p>Review the work, resolve gaps, and improve with direct technical guidance.</p>
+                    </article>
+
+                    <article class="journey-node">
+                        <span class="node-pin" aria-hidden="true">04</span>
+                        <small>NEXT MOVE</small>
+                        <h3>Become career ready</h3>
+                        <p>Prepare for interviews, internships, certifications, and real opportunities.</p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Section 05 · Core Signals / Metrics -->
+            <section class="signals-section reveal-item" id="signals" aria-labelledby="signals-heading">
+                <div class="section-header">
+                    <div class="section-kicker">05 · CORE SIGNALS</div>
+                    <h2 id="signals-heading">Proof is in the structure.</h2>
+                    <p>No inflated outcome claims—just the learning model and support system you can expect.</p>
+                </div>
+
+                <div class="signals-grid">
+                    <article class="signal-card">
+                        <div class="signal-val">
+                            <span data-count="100">100</span><i>%</i>
+                        </div>
+                        <h3>Live classes</h3>
+                        <p>Mentor-led from the beginning</p>
+                    </article>
+
+                    <article class="signal-card">
+                        <div class="signal-val">
+                            <span data-count="6">6</span>
+                        </div>
+                        <h3>Support areas</h3>
+                        <p>From guidance to placement help</p>
+                    </article>
+
+                    <article class="signal-card">
+                        <div class="signal-val">
+                            <span data-count="3">3</span>
+                        </div>
+                        <h3>Internship tracks</h3>
+                        <p>Web, data, and cyber pathways</p>
+                    </article>
+
+                    <article class="signal-card">
+                        <div class="signal-val">
+                            <span data-count="1">1</span>
+                        </div>
+                        <h3>Bengaluru base</h3>
+                        <p>Koramangala, Karnataka</p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Section 06 · Mentorship & Career Support -->
+            <section class="mentorship-section reveal-item" id="mentorship" aria-labelledby="mentorship-heading">
+                <div class="section-header">
+                    <div class="section-kicker">06 · MENTORSHIP + CAREER SUPPORT</div>
+                    <h2 id="mentorship-heading">You do the work.<br><span>We stay close.</span></h2>
+                    <p>Support should be useful, honest, and available when it matters. Kodehax pairs technical mentorship with practical career direction.</p>
+                </div>
+
+                <div class="mentor-quote-card">
+                    <div class="quote-header">
+                        <div class="quote-badge" aria-hidden="true">KH</div>
+                        <div>
+                            <small>Kodehax Mentor Network</small>
                         </div>
                     </div>
+                    <blockquote>“Good mentorship doesn’t hand you answers. It helps you see the next move.”</blockquote>
+                </div>
 
-                    <div class="chat-panel" data-panel="sql">
-                        <div class="bubble user">
-                            <span class="bubble-label">User</span>
-                            <div class="bubble-text">When do I use a LEFT JOIN?</div>
+                <!-- Touch-native Accordion -->
+                <div class="accordion-list" data-accordion>
+                    <!-- Item 1 -->
+                    <article class="acc-item is-open">
+                        <button type="button" class="acc-trigger" aria-expanded="true" aria-controls="macc-career">
+                            <div class="acc-trigger-left">
+                                <span class="acc-num">01</span>
+                                <span class="acc-title">Career guidance &amp; interview prep</span>
+                            </div>
+                            <span class="acc-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="acc-panel" id="macc-career">
+                            <div class="acc-content">
+                                <p>Shape a stronger resume, practise interviews, understand role expectations, and approach opportunities with clearer positioning.</p>
+                                <div class="acc-tags">
+                                    <span class="acc-tag">Resume guidance</span>
+                                    <span class="acc-tag">Mock interviews</span>
+                                    <span class="acc-tag">Placement assistance</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bubble ai">
-                            <span class="bubble-label">AI Tutor</span>
-                            <div class="bubble-text">Use a LEFT JOIN when you want every row from the left table, even if the right table has missing matches.</div>
+                    </article>
+
+                    <!-- Item 2 -->
+                    <article class="acc-item">
+                        <button type="button" class="acc-trigger" aria-expanded="false" aria-controls="macc-projects">
+                            <div class="acc-trigger-left">
+                                <span class="acc-num">02</span>
+                                <span class="acc-title">Internships &amp; live projects</span>
+                            </div>
+                            <span class="acc-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="acc-panel" id="macc-projects">
+                            <div class="acc-content">
+                                <p>Apply classroom learning through project workflows and internship pathways in web development, data, analytics, and cyber security.</p>
+                                <div class="acc-tags">
+                                    <span class="acc-tag">Live briefs</span>
+                                    <span class="acc-tag">Team workflows</span>
+                                    <span class="acc-tag">Portfolio proof</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </article>
 
-                    <div class="chat-panel" data-panel="api">
-                        <div class="bubble user">
-                            <span class="bubble-label">User</span>
-                            <div class="bubble-text">Why is my API returning 401?</div>
+                    <!-- Item 3 -->
+                    <article class="acc-item">
+                        <button type="button" class="acc-trigger" aria-expanded="false" aria-controls="macc-mentorship">
+                            <div class="acc-trigger-left">
+                                <span class="acc-num">03</span>
+                                <span class="acc-title">1-on-1 mentorship</span>
+                            </div>
+                            <span class="acc-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="acc-panel" id="macc-mentorship">
+                            <div class="acc-content">
+                                <p>Get focused help when you are blocked, direct feedback on your work, and a realistic plan for strengthening weak areas.</p>
+                                <div class="acc-tags">
+                                    <span class="acc-tag">Doubt resolution</span>
+                                    <span class="acc-tag">Code feedback</span>
+                                    <span class="acc-tag">Direction</span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="bubble ai">
-                            <span class="bubble-label">AI Tutor</span>
-                            <div class="bubble-text">A 401 usually means your request is missing valid authentication, so check the token, header format, and expiry first.</div>
+                    </article>
+
+                    <!-- Item 4 -->
+                    <article class="acc-item">
+                        <button type="button" class="acc-trigger" aria-expanded="false" aria-controls="macc-certs">
+                            <div class="acc-trigger-left">
+                                <span class="acc-num">04</span>
+                                <span class="acc-title">Certification support</span>
+                            </div>
+                            <span class="acc-icon" aria-hidden="true"></span>
+                        </button>
+                        <div class="acc-panel" id="macc-certs">
+                            <div class="acc-content">
+                                <p>Prepare toward relevant, globally recognized certifications with guidance that connects study effort to your chosen path.</p>
+                                <div class="acc-tags">
+                                    <span class="acc-tag">Preparation path</span>
+                                    <span class="acc-tag">Learning plan</span>
+                                    <span class="acc-tag">Industry context</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </article>
                 </div>
+            </section>
 
-                <div class="live-panel">
-                    <div class="live-row"><strong>AI session confidence</strong><span>Updated now</span></div>
-                    <div class="progress"><div class="progress-bar" data-progress="86"></div></div>
+            <!-- Final CTA -->
+            <section class="mobile-final-cta reveal-item" aria-labelledby="final-heading">
+                <div class="final-kicker">YOUR NEXT MOVE</div>
+                <h2 id="final-heading">Your career shouldn’t depend on promises.<br><span class="hero-gradient">Build something real.</span></h2>
+                <p>Start with a live, practical program and leave with work that shows what you can do.</p>
+                <div class="final-actions">
+                    <a href="{% url 'student_register' %}" class="btn btn-primary btn-full">
+                        Start your journey ↗
+                    </a>
+                    <a href="#programs" class="btn btn-secondary btn-full">
+                        Explore programs ↓
+                    </a>
                 </div>
-            </div>
-        </section>
+            </section>
+        </main>
 
-        <section class="section reveal page-section" data-page-section="courses">
-            <div class="page-intro">
-                <div class="page-kicker">Courses</div>
-                <h2>Programs mapped to the academy, not generic placeholders.</h2>
-                <p>Kodehax Academy is presented as a practical tech learning platform, so this mobile tab focuses on the main learning areas and the support around them.</p>
+        <!-- Compact Mobile Footer -->
+        <footer class="mobile-footer">
+            <div class="footer-brand-row">
+                <img src="{% static 'image/image.png' %}" alt="Kodehax Academy" width="40" height="40">
+                <div class="footer-brand-copy">
+                    <strong>Kodehax Academy</strong>
+                    <p>Live learning. Practical work. Career momentum.</p>
+                </div>
             </div>
-            <div class="features" style="margin-top: 18px;">
-                <article class="glass feature">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"></path>
-                            <path d="M12 12l8-4.5"></path>
-                            <path d="M12 12v9"></path>
-                            <path d="M12 12L4 7.5"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>Web Development</h3>
-                        <p>Structured paths for frontend, backend, and full-stack skills with practical build-oriented learning.</p>
-                    </div>
-                </article>
 
-                <article class="glass feature">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4 4V6a2 2 0 0 1 2-2z"></path>
-                            <path d="M9 9h6"></path>
-                            <path d="M9 13h4"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>Data Science and Analytics</h3>
-                        <p>Programs built around data thinking, structured problem solving, and translating analysis into insight.</p>
-                    </div>
-                </article>
+            <div class="footer-nav-grid">
+                <div class="footer-col">
+                    <span>EXPLORE</span>
+                    <a href="#why">Why Kodehax</a>
+                    <a href="#programs">Programs</a>
+                    <a href="#journey">Journey</a>
+                    <a href="#mentorship">Mentorship</a>
+                </div>
+                <div class="footer-col">
+                    <span>PORTALS</span>
+                    <a href="{% url 'student_login' %}">Student Login</a>
+                    <a href="{% url 'teacher_login' %}">Teacher Login</a>
+                    <a href="{% url 'student_register' %}">Join Now</a>
+                </div>
+            </div>
 
-                <article class="glass feature">
-                    <div class="feature-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M4 15c2.5-3 5.5-4.5 8-4.5s5.5 1.5 8 4.5"></path>
-                            <path d="M12 4v6"></path>
-                            <circle cx="12" cy="16" r="4"></circle>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3>Cyber Security and AI</h3>
-                        <p>Technical learning areas that align with current industry interest and skill-building demand.</p>
-                    </div>
-                </article>
+            <div class="footer-location">
+                <small>BENGALURU, INDIA</small>
+                <p>Built from Koramangala for learners everywhere.</p>
             </div>
-        </section>
 
-        <section class="section reveal page-section" data-page-section="profile">
-            <div class="page-intro">
-                <div class="page-kicker">Profile</div>
-                <h2>Kodehax Academy as a proper mobile information screen.</h2>
-                <p>This tab now maps the academy identity, offerings, and support model instead of sending users to an unrelated login route.</p>
+            <div class="footer-bottom-line">
+                <div>&copy; 2026 Kodehax Academy LLP</div>
+                <div>DPIIT recognized · Startup India</div>
+                <a href="#main-content">Back to top ↑</a>
             </div>
-            <div class="glass profile-hero" style="margin-top: 18px;">
-                <div class="cta-kicker">Kodehax Academy</div>
-                <h3>Career-focused online tech education with practical learning at the center.</h3>
-                <p>Based on Kodehax Academy's public positioning, this screen highlights the strongest themes: guided teaching, mentorship, projects, internships, certification help, and placement-oriented support.</p>
-                <div class="mini-pills">
-                    <span class="mini-pill">Mentorship</span>
-                    <span class="mini-pill">Live Projects</span>
-                    <span class="mini-pill">Internships</span>
-                    <span class="mini-pill">Placement Help</span>
-                </div>
-            </div>
-            <div class="profile-stat-grid">
-                <div class="glass profile-stat">
-                    <div class="label">Positioning</div>
-                    <div class="value">Online academy for real, employable tech skills</div>
-                </div>
-                <div class="glass profile-stat">
-                    <div class="label">Learning Model</div>
-                    <div class="value">Structured instruction with practical application</div>
-                </div>
-                <div class="glass profile-stat">
-                    <div class="label">Support</div>
-                    <div class="value">Mentor guidance, projects, and career direction</div>
-                </div>
-                <div class="glass profile-stat">
-                    <div class="label">Presence</div>
-                    <div class="value">Koramangala, Bengaluru, Karnataka</div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section reveal page-section" data-page-section="courses">
-            <div class="cta-shell">
-                <div class="cta-kicker">Start Today</div>
-                <h3>Build real skills with guided learning and career momentum.</h3>
-                <div class="cta-copy">Use this courses tab as the mobile entry point into Kodehax Academy programs, then move into registration when you are ready to join.</div>
-                <a href="{% url 'student_register' %}" class="cta-btn">Explore Courses and Join</a>
-            </div>
-        </section>
+        </footer>
     </div>
 
+    <!-- Mobile Interactions Script -->
     <script>
         (() => {
-            const revealItems = document.querySelectorAll(".reveal");
-            if (revealItems.length) {
-                const observer = new IntersectionObserver((entries) => {
+            "use strict";
+
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+            // 1. Reveal on scroll
+            const revealItems = document.querySelectorAll(".reveal-item");
+            if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+                revealItems.forEach((el) => el.classList.add("is-visible"));
+            } else {
+                const observer = new IntersectionObserver((entries, obs) => {
                     entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        entry.target.classList.add("visible");
-                        observer.unobserve(entry.target);
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("is-visible");
+                            obs.unobserve(entry.target);
+                        }
                     });
-                }, { threshold: 0.18 });
-                revealItems.forEach((item) => {
-                    if (!item.classList.contains("visible")) observer.observe(item);
-                });
+                }, { threshold: 0.12, rootMargin: "0px 0px -30px 0px" });
+                revealItems.forEach((el) => observer.observe(el));
             }
 
-            document.querySelectorAll("[data-typing]").forEach((typing, index) => {
-                const response = typing.parentElement ? typing.parentElement.querySelector("[data-ai-response]") : null;
-                if (!response) return;
-                window.setTimeout(() => {
-                    typing.classList.add("hidden");
-                    response.classList.remove("hidden");
-                    response.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 420, easing: "ease-out", fill: "forwards" });
-                }, 1800 + (index * 120));
+            // 2. Program Tabs
+            const progTabs = document.querySelectorAll("[data-mobile-tab]");
+            const progPanels = document.querySelectorAll("[data-mobile-panel]");
+
+            const selectProgTab = (tab) => {
+                const target = tab.dataset.mobileTab;
+                progTabs.forEach((btn) => {
+                    const active = btn === tab;
+                    btn.classList.toggle("is-active", active);
+                    btn.setAttribute("aria-selected", String(active));
+                });
+                progPanels.forEach((panel) => {
+                    const active = panel.dataset.mobilePanel === target;
+                    panel.classList.toggle("is-active", active);
+                });
+                // ensure active tab is scrolled into view smoothly in horizontal rail
+                tab.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            };
+
+            progTabs.forEach((tab) => {
+                tab.addEventListener("click", () => selectProgTab(tab));
             });
 
-            const counters = document.querySelectorAll("[data-counter]");
-            if (counters.length) {
-                const runCounter = (element) => {
-                    const target = Number(element.dataset.target || "0");
-                    const suffix = element.dataset.suffix || "";
-                    const start = performance.now();
-                    const duration = 1400;
-                    const step = (now) => {
-                        const progress = Math.min((now - start) / duration, 1);
-                        const eased = 1 - Math.pow(1 - progress, 3);
-                        element.textContent = Math.round(target * eased) + suffix;
-                        if (progress < 1) requestAnimationFrame(step);
-                    };
-                    requestAnimationFrame(step);
+            // 3. Mentorship Accordion
+            const accItems = document.querySelectorAll(".acc-item");
+            accItems.forEach((item) => {
+                const trigger = item.querySelector(".acc-trigger");
+                trigger?.addEventListener("click", () => {
+                    const isOpen = item.classList.contains("is-open");
+                    accItems.forEach((other) => {
+                        other.classList.remove("is-open");
+                        other.querySelector(".acc-trigger")?.setAttribute("aria-expanded", "false");
+                    });
+                    if (!isOpen) {
+                        item.classList.add("is-open");
+                        trigger.setAttribute("aria-expanded", "true");
+                    }
+                });
+            });
+
+            // 4. Metric Number Count-up Animation
+            const counters = document.querySelectorAll("[data-count]");
+            const animateCount = (el) => {
+                const target = Number(el.dataset.count || 0);
+                if (prefersReducedMotion) {
+                    el.textContent = target;
+                    return;
+                }
+                const start = performance.now();
+                const duration = 1200;
+                el.textContent = "0";
+                const step = (now) => {
+                    const elapsed = Math.min((now - start) / duration, 1);
+                    const eased = 1 - Math.pow(1 - elapsed, 3);
+                    el.textContent = Math.round(target * eased);
+                    if (elapsed < 1) requestAnimationFrame(step);
                 };
-                const observer = new IntersectionObserver((entries) => {
+                requestAnimationFrame(step);
+            };
+
+            if ("IntersectionObserver" in window) {
+                const countObserver = new IntersectionObserver((entries, obs) => {
                     entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        runCounter(entry.target);
-                        observer.unobserve(entry.target);
+                        if (entry.isIntersecting) {
+                            animateCount(entry.target);
+                            obs.unobserve(entry.target);
+                        }
                     });
-                }, { threshold: 0.35 });
-                counters.forEach((counter) => observer.observe(counter));
+                }, { threshold: 0.4 });
+                counters.forEach((c) => countObserver.observe(c));
+            } else {
+                counters.forEach(animateCount);
             }
-
-            const spotlight = document.querySelector("[data-spotlight-line]");
-            if (spotlight) {
-                const lines = [
-                    "Adaptive study flows keep lessons, AI help, and action steps connected on one mobile screen.",
-                    "Glass surfaces and glow states make the mobile UI feel premium without changing the core palette.",
-                    "Touch-first spacing and motion cues help learners move faster with less friction."
-                ];
-                let index = 0;
-                window.setInterval(() => {
-                    index = (index + 1) % lines.length;
-                    spotlight.textContent = lines[index];
-                    spotlight.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], { duration: 320, easing: "ease-out" });
-                }, 2800);
-            }
-
-            const pageTriggers = document.querySelectorAll("[data-page-trigger]");
-            const pageSections = document.querySelectorAll("[data-page-section]");
-            if (pageTriggers.length && pageSections.length) {
-                const setPage = (target) => {
-                    pageTriggers.forEach((trigger) => trigger.classList.toggle("active", trigger.dataset.pageTrigger === target));
-                    pageSections.forEach((section) => section.classList.toggle("active", section.dataset.pageSection === target));
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                };
-                pageTriggers.forEach((trigger) => {
-                    trigger.addEventListener("click", () => setPage(trigger.dataset.pageTrigger));
-                });
-            }
-
-            document.querySelectorAll("[data-switcher]").forEach((switcher) => {
-                const triggers = switcher.querySelectorAll("[data-trigger]");
-                if (!triggers.length) return;
-                const scope = switcher.parentElement;
-                const panels = scope.querySelectorAll("[data-panel]");
-                triggers.forEach((trigger) => {
-                    trigger.addEventListener("click", () => {
-                        const target = trigger.dataset.trigger;
-                        triggers.forEach((item) => item.classList.toggle("active", item === trigger));
-                        panels.forEach((panel) => panel.classList.toggle("active", panel.dataset.panel === target));
-                    });
-                });
-            });
-
-            document.querySelectorAll("[data-progress]").forEach((bar) => {
-                const target = Math.max(0, Math.min(100, Number(bar.dataset.progress || "0")));
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        bar.style.width = target + "%";
-                        observer.unobserve(entry.target);
-                    });
-                }, { threshold: 0.35 });
-                observer.observe(bar);
-            });
         })();
     </script>
 </body>

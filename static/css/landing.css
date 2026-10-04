@@ -287,6 +287,46 @@ h1, h2, h3 { font-family: "Space Grotesk", "Manrope", sans-serif; }
     .final-cta h2 { font-size: 58px; }
 }
 
+@media (max-width: 1023.98px) {
+    .landing-root { min-width: 100%; }
+    .container { width: calc(100% - 32px); }
+    .site-header { padding: 12px 16px; }
+    .nav-shell { grid-template-columns: auto 1fr; height: auto; min-height: 56px; padding: 6px 12px; }
+    .primary-nav { display: none; }
+    .nav-actions { gap: 12px; }
+    .hero { min-height: auto; padding: 100px 0 50px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+    .hero h1 { font-size: 42px; line-height: 1.05; }
+    .hero-lead { font-size: 15px; }
+    .experience-stage { transform: none; margin: 0 auto; max-width: 100%; width: 100%; }
+    .float-card { display: none; }
+    .trust-band { padding: 36px 0; }
+    .trust-band-inner { grid-template-columns: 1fr; gap: 20px; }
+    .trust-items { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .trust-items > div { padding-left: 0; }
+    .section { padding: 80px 0; }
+    .why-layout, .mentorship-layout { grid-template-columns: 1fr; gap: 36px; }
+    .principles { grid-template-columns: 1fr; }
+    .program-explorer { grid-template-columns: 1fr; gap: 20px; }
+    .program-tabs { flex-direction: row; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+    .program-tabs::-webkit-scrollbar { display: none; }
+    .program-tab { flex: 0 0 auto; min-width: 160px; padding: 12px 14px; }
+    .program-copy { padding: 28px 20px; }
+    .program-copy h3 { font-size: 28px; }
+    .journey-track { flex-direction: column; gap: 24px; }
+    .journey-line { display: none; }
+    .signal-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .signal-value { font-size: 42px; }
+    .final-cta { min-height: auto; padding: 80px 0; }
+    .final-cta h2 { font-size: 38px; }
+    .footer-main { grid-template-columns: 1fr; gap: 32px; }
+    .footer-links { grid-template-columns: 1fr 1fr; gap: 24px; }
+    .footer-location { text-align: left; }
+    .footer-bottom { grid-template-columns: 1fr; gap: 10px; text-align: center; }
+    .footer-bottom p:nth-child(2) { text-align: center; }
+    .footer-bottom a { justify-self: center; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

@@ -106,6 +106,7 @@
         }
         const start = performance.now();
         const duration = 1250;
+        element.textContent = "0";
         const tick = (now) => {
             const elapsed = Math.min((now - start) / duration, 1);
             const eased = 1 - Math.pow(1 - elapsed, 3);
