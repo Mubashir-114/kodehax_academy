@@ -1,5 +1,32 @@
 {% extends "mobile/base.html" %}
+{% load static %}
 {% block title %}Profile | Kodehax Academy{% endblock %}
+{% block extra_head %}
+<style>
+    .mfa-switch { position: relative; display: inline-flex; align-items: center; gap: .6rem; cursor: pointer; }
+    .mfa-switch input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    .mfa-switch-track { position: relative; display: inline-block; width: 3.5rem; height: 2rem; border-radius: 999px; background: #cbd5e1; transition: background .18s ease; }
+    .mfa-switch-track::after { content: ""; position: absolute; top: 50%; left: .2rem; transform: translateY(-50%); width: 1.5rem; height: 1.5rem; border-radius: 999px; background: #fff; box-shadow: 0 1px 3px rgba(15, 23, 42, .35); transition: left .18s ease; }
+    .mfa-switch input:checked + .mfa-switch-track { background: #0d9488; }
+    .mfa-switch input:checked + .mfa-switch-track::after { left: 1.7rem; }
+    .mfa-switch input:focus-visible + .mfa-switch-track { outline: 2px solid #0d9488; outline-offset: 2px; }
+    .mfa-options { display: grid; gap: .5rem; margin-top: .6rem; }
+    .mfa-option { position: relative; display: flex; align-items: center; min-height: 2.9rem; padding: 0 1rem; border-radius: 1rem; border: 1px solid rgba(148, 163, 184, .45); background: rgba(255, 255, 255, .92); color: #0f172a; font-size: .9rem; font-weight: 600; cursor: pointer; }
+    .mfa-option input { position: absolute; inset: 0; opacity: 0; }
+    .mfa-option:has(input:checked) { border-color: #0d9488; background: rgba(13, 148, 136, .12); }
+    .mfa-presets { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .6rem; }
+    .mfa-chip { min-height: 2.75rem; padding: 0 .85rem; border-radius: .9rem; border: 1px solid rgba(148, 163, 184, .5); background: rgba(255, 255, 255, .95); color: #334155; font-size: .85rem; font-weight: 600; transition: border-color .16s ease, background .16s ease; }
+    .mfa-chip.is-active { border-color: #0d9488; background: rgba(13, 148, 136, .14); color: #0f172a; }
+    .mfa-custom { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .75rem; min-height: 3rem; padding: 0 .75rem 0 1rem; border-radius: 1rem; border: 1px solid rgba(148, 163, 184, .5); background: rgba(255, 255, 255, .95); }
+    .mfa-custom input { width: 5rem; border: 0; background: transparent; text-align: center; font-size: 1rem; font-weight: 700; color: #0f172a; outline: none; }
+    .mfa-custom input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+    .mfa-custom input::-webkit-outer-spin-button,
+    .mfa-custom input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .mfa-label { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: #64748b; font-weight: 700; }
+    .mfa-help { margin-top: .5rem; font-size: .78rem; color: #64748b; }
+    [hidden] { display: none !important; }
+</style>
+{% endblock %}
 {% block content %}
 <header class="hero mb-4 p-5 reveal-1">
     <h1 class="text-2xl font-semibold">Profile</h1>
@@ -30,6 +57,72 @@
     </dl>
 </section>
 
+<section class="card p-5 mb-4 reveal-3">
+    <p class="mfa-label text-teal-700">Security</p>
+    <h2 class="mt-1 text-base font-semibold">Two-factor authentication</h2>
+    <p class="mt-2 text-sm text-slate-500">KodeHax will ask for an email verification code according to this schedule after your password is confirmed.</p>
+    <form method="post" action="{% url 'update_login_security' %}" class="mt-3" data-login-security-form
+        data-current-enabled="{{ request.user.login_2fa_enabled|yesno:'true,false' }}"
+        data-current-mode="{{ request.user.login_2fa_mode }}"
+        data-current-days="{{ request.user.login_2fa_days }}"
+        data-recent-otp="{{ recent_login_2fa_otp|yesno:'true,false' }}"
+        data-force-reauth="{{ request.GET.reauth|yesno:'true,false' }}">
+        {% csrf_token %}
+        <label class="mfa-switch">
+            <input type="checkbox" name="login_2fa_enabled" value="on" data-2fa-toggle {% if request.user.login_2fa_enabled %}checked{% endif %}>
+            <span class="mfa-switch-track" aria-hidden="true"></span>
+            <span class="text-xs font-semibold text-slate-500" data-2fa-state>{% if request.user.login_2fa_enabled %}ON{% else %}OFF{% endif %}</span>
+        </label>
+
+        <div class="mt-4" data-2fa-config {% if not request.user.login_2fa_enabled %}hidden{% endif %}>
+            <p class="mfa-label">Ask for a verification code</p>
+            <div class="mfa-options" role="radiogroup" aria-label="Ask for a verification code">
+                <label class="mfa-option">
+                    <input type="radio" name="login_2fa_mode" value="every_login" data-2fa-mode {% if request.user.login_2fa_mode == 'every_login' %}checked{% endif %}>
+                    <span>Every login</span>
+                </label>
+                <label class="mfa-option">
+                    <input type="radio" name="login_2fa_mode" value="interval" data-2fa-mode {% if request.user.login_2fa_mode == 'interval' %}checked{% endif %}>
+                    <span>Every N days</span>
+                </label>
+                <label class="mfa-option">
+                    <input type="radio" name="login_2fa_mode" value="inactivity" data-2fa-mode {% if request.user.login_2fa_mode == 'inactivity' %}checked{% endif %}>
+                    <span>After inactivity</span>
+                </label>
+            </div>
+
+            <div class="mt-4" data-2fa-days-block {% if request.user.login_2fa_mode == 'every_login' %}hidden{% endif %}>
+                <p class="mfa-label" data-days-label>{% if request.user.login_2fa_mode == 'inactivity' %}After inactivity of{% else %}Every{% endif %}</p>
+                <div class="mfa-presets">
+                    <button type="button" class="mfa-chip{% if request.user.login_2fa_days == 1 %} is-active{% endif %}" data-days-preset="1">1 day</button>
+                    <button type="button" class="mfa-chip{% if request.user.login_2fa_days == 2 %} is-active{% endif %}" data-days-preset="2">2 days</button>
+                    <button type="button" class="mfa-chip{% if request.user.login_2fa_days == 3 %} is-active{% endif %}" data-days-preset="3">3 days</button>
+                    <button type="button" class="mfa-chip{% if request.user.login_2fa_days == 7 %} is-active{% endif %}" data-days-preset="7">7 days</button>
+                    <button type="button" class="mfa-chip{% if request.user.login_2fa_days == 14 %} is-active{% endif %}" data-days-preset="14">14 days</button>
+                    <button type="button" class="mfa-chip{% if request.user.login_2fa_days == 30 %} is-active{% endif %}" data-days-preset="30">30 days</button>
+                </div>
+                <label class="mfa-custom">
+                    <span class="mfa-help" style="margin: 0;">Custom</span>
+                    <input type="number" name="login_2fa_days" min="1" max="90" step="1" value="{{ request.user.login_2fa_days }}" data-days-input inputmode="numeric" aria-label="Custom interval in days">
+                    <span class="mfa-help" style="margin: 0;">days</span>
+                </label>
+                <p class="mfa-help">Choose 1–90 days. This applies to the schedule selected above.</p>
+            </div>
+        </div>
+
+        <div class="mt-3" data-reauth-password {% if request.GET.reauth != '1' %}hidden{% endif %}>
+            <label class="mfa-label" for="mobile-login-2fa-current-password">Confirm current password</label>
+            <input id="mobile-login-2fa-current-password" type="password" name="current_password"
+                autocomplete="current-password" class="mt-2 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                aria-describedby="mobile-login-2fa-reauth-help"
+                {% if request.GET.reauth == '1' and not recent_login_2fa_otp %}required{% endif %}>
+            <p id="mobile-login-2fa-reauth-help" class="mfa-help">Required for less-secure changes unless you verified an email code recently.</p>
+        </div>
+        <p class="mt-3 text-xs text-slate-500" data-2fa-off-note {% if request.user.login_2fa_enabled %}hidden{% endif %}>Login will use your password without an additional OTP. Email verification and account recovery protections remain enabled.</p>
+        <button type="submit" class="btn-primary w-full px-4 py-3 text-sm mt-4">Save changes</button>
+    </form>
+</section>
+
 <section class="card p-5 reveal-3">
     <a href="{% url 'profile_change_password' %}" class="btn-muted block px-4 py-3 text-sm text-center">Change password</a>
     <form method="post" action="{% url 'logout' %}" class="mt-3">
@@ -37,4 +130,7 @@
         <button class="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800">Logout</button>
     </form>
 </section>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/login_security.js' %}" defer></script>
 {% endblock %}

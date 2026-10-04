@@ -1,6 +1,230 @@
 {% extends "student/base.html" %}
+{% load static %}
 
 {% block header %}Student Profile{% endblock %}
+
+{% block extra_styles %}
+<style>
+  .sec-panel {
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.74));
+    border: 1px solid rgba(71, 85, 105, 0.62);
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 50px rgba(2, 6, 23, 0.32);
+    overflow: hidden;
+  }
+  .sec-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1.5rem 1.75rem;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+  }
+  .sec-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #5eead4;
+    font-weight: 700;
+  }
+  .sec-head h2 {
+    margin-top: 0.4rem;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .sec-sub {
+    margin-top: 0.5rem;
+    max-width: 46rem;
+    color: #94a3b8;
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+  .sec-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    cursor: pointer;
+    user-select: none;
+    flex: 0 0 auto;
+  }
+  .sec-toggle input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+  .sec-toggle-track {
+    position: relative;
+    width: 3.25rem;
+    height: 1.85rem;
+    border-radius: 999px;
+    background: rgba(51, 65, 85, 0.9);
+    border: 1px solid rgba(100, 116, 139, 0.6);
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+  .sec-toggle-track::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0.22rem;
+    transform: translateY(-50%);
+    width: 1.33rem;
+    height: 1.33rem;
+    border-radius: 999px;
+    background: #e2e8f0;
+    transition: left 0.18s ease, background 0.18s ease;
+  }
+  .sec-toggle input:checked + .sec-toggle-track {
+    background: rgba(20, 184, 166, 0.92);
+    border-color: rgba(45, 212, 191, 0.92);
+  }
+  .sec-toggle input:checked + .sec-toggle-track::after {
+    left: 1.6rem;
+    background: #04211f;
+  }
+  .sec-toggle input:focus-visible + .sec-toggle-track {
+    outline: 2px solid rgba(45, 212, 191, 0.9);
+    outline-offset: 2px;
+  }
+  .sec-state {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #cbd5e1;
+    min-width: 2.1rem;
+  }
+  .sec-body { padding: 1.5rem 1.75rem; }
+  .sec-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 700;
+  }
+  .sec-seg {
+    display: inline-flex;
+    gap: 0.25rem;
+    margin-top: 0.75rem;
+    padding: 0.28rem;
+    border-radius: 0.9rem;
+    border: 1px solid rgba(71, 85, 105, 0.6);
+    background: rgba(2, 6, 23, 0.6);
+  }
+  .sec-seg label { position: relative; display: inline-flex; }
+  .sec-seg input { position: absolute; inset: 0; opacity: 0; }
+  .sec-seg span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.4rem;
+    padding: 0 1rem;
+    border-radius: 0.65rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: background 0.16s ease, color 0.16s ease, box-shadow 0.16s ease;
+  }
+  .sec-seg input:checked + span {
+    background: rgba(20, 184, 166, 0.18);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.5);
+  }
+  .sec-seg input:focus-visible + span {
+    outline: 2px solid rgba(45, 212, 191, 0.9);
+    outline-offset: 2px;
+  }
+  .sec-days { margin-top: 1.35rem; }
+  .sec-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  .sec-chip {
+    min-height: 2.5rem;
+    padding: 0 0.9rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(71, 85, 105, 0.66);
+    background: rgba(2, 6, 23, 0.5);
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.16s ease, background 0.16s ease, color 0.16s ease;
+  }
+  .sec-chip:hover { border-color: rgba(45, 212, 191, 0.55); color: #fff; }
+  .sec-chip.is-active {
+    border-color: rgba(45, 212, 191, 0.82);
+    background: rgba(20, 184, 166, 0.2);
+    color: #fff;
+  }
+  .sec-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    padding: 0.2rem 0.65rem 0.2rem 0.85rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(71, 85, 105, 0.66);
+    background: rgba(2, 6, 23, 0.5);
+  }
+  .sec-custom input {
+    width: 4.25rem;
+    border: 0;
+    background: transparent;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-align: center;
+    outline: none;
+  }
+  .sec-custom input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+  .sec-custom input::-webkit-outer-spin-button,
+  .sec-custom input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .sec-help { margin-top: 0.6rem; color: #94a3b8; font-size: 0.8rem; }
+  .sec-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.6rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(71, 85, 105, 0.5);
+  }
+  .sec-note {
+    max-width: 44rem;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+  .sec-save { min-height: 2.75rem; padding: 0 1.25rem; font-size: 0.875rem; flex: 0 0 auto; }
+  [hidden] { display: none !important; }
+
+  @media (max-width: 1023px) {
+    .sec-head { flex-direction: column; padding: 1.25rem; }
+    .sec-head h2 { font-size: 1.2rem; }
+    .sec-body { padding: 1.25rem; }
+    .sec-toggle-track { width: 3.5rem; height: 2rem; }
+    .sec-toggle-track::after { width: 1.5rem; height: 1.5rem; }
+    .sec-toggle input:checked + .sec-toggle-track::after { left: 1.7rem; }
+    .sec-seg { display: flex; flex-direction: column; width: 100%; }
+    .sec-seg label { width: 100%; }
+    .sec-seg span { width: 100%; min-height: 2.9rem; justify-content: flex-start; padding: 0 1rem; font-size: 0.9rem; }
+    .sec-chips { gap: 0.6rem; }
+    .sec-chip { flex: 1 1 calc(33.333% - 0.6rem); min-height: 2.9rem; }
+    .sec-custom { width: 100%; justify-content: space-between; min-height: 2.9rem; }
+    .sec-custom input { width: 5rem; font-size: 1rem; }
+    .sec-actions { flex-direction: column; align-items: stretch; }
+    .sec-note { order: 2; }
+    .sec-save { order: 1; width: 100%; min-height: 3rem; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="space-y-6 pb-20 md:pb-0">
@@ -172,6 +396,83 @@
 
   </div>
 </div>
+
+  <section class="sec-panel reveal delay-2" id="login-security" aria-labelledby="login-security-title">
+    <form method="post" action="{% url 'update_login_security' %}" data-login-security-form
+      data-current-enabled="{{ request.user.login_2fa_enabled|yesno:'true,false' }}"
+      data-current-mode="{{ request.user.login_2fa_mode }}"
+      data-current-days="{{ request.user.login_2fa_days }}"
+      data-recent-otp="{{ recent_login_2fa_otp|yesno:'true,false' }}"
+      data-force-reauth="{{ request.GET.reauth|yesno:'true,false' }}">
+      {% csrf_token %}
+      <div class="sec-head">
+        <div>
+          <p class="sec-kicker">Security</p>
+          <h2 id="login-security-title">Two-factor authentication</h2>
+          <p class="sec-sub">KodeHax will ask for an email verification code according to this schedule after your password is confirmed.</p>
+        </div>
+        <label class="sec-toggle">
+          <input type="checkbox" name="login_2fa_enabled" value="on" data-2fa-toggle {% if request.user.login_2fa_enabled %}checked{% endif %}>
+          <span class="sec-toggle-track" aria-hidden="true"></span>
+          <span class="sec-state" data-2fa-state>{% if request.user.login_2fa_enabled %}ON{% else %}OFF{% endif %}</span>
+        </label>
+      </div>
+
+      <div class="sec-body">
+        <div data-2fa-config {% if not request.user.login_2fa_enabled %}hidden{% endif %}>
+          <p class="sec-label">Ask for a verification code</p>
+          <div class="sec-seg" role="radiogroup" aria-label="Ask for a verification code">
+            <label>
+              <input type="radio" name="login_2fa_mode" value="every_login" data-2fa-mode {% if request.user.login_2fa_mode == 'every_login' %}checked{% endif %}>
+              <span>Every login</span>
+            </label>
+            <label>
+              <input type="radio" name="login_2fa_mode" value="interval" data-2fa-mode {% if request.user.login_2fa_mode == 'interval' %}checked{% endif %}>
+              <span>Every N days</span>
+            </label>
+            <label>
+              <input type="radio" name="login_2fa_mode" value="inactivity" data-2fa-mode {% if request.user.login_2fa_mode == 'inactivity' %}checked{% endif %}>
+              <span>After inactivity</span>
+            </label>
+          </div>
+
+          <div class="sec-days" data-2fa-days-block {% if request.user.login_2fa_mode == 'every_login' %}hidden{% endif %}>
+            <p class="sec-label" data-days-label>{% if request.user.login_2fa_mode == 'inactivity' %}After inactivity of{% else %}Every{% endif %}</p>
+            <div class="sec-chips">
+              <button type="button" class="sec-chip{% if request.user.login_2fa_days == 1 %} is-active{% endif %}" data-days-preset="1">1 day</button>
+              <button type="button" class="sec-chip{% if request.user.login_2fa_days == 2 %} is-active{% endif %}" data-days-preset="2">2 days</button>
+              <button type="button" class="sec-chip{% if request.user.login_2fa_days == 3 %} is-active{% endif %}" data-days-preset="3">3 days</button>
+              <button type="button" class="sec-chip{% if request.user.login_2fa_days == 7 %} is-active{% endif %}" data-days-preset="7">7 days</button>
+              <button type="button" class="sec-chip{% if request.user.login_2fa_days == 14 %} is-active{% endif %}" data-days-preset="14">14 days</button>
+              <button type="button" class="sec-chip{% if request.user.login_2fa_days == 30 %} is-active{% endif %}" data-days-preset="30">30 days</button>
+              <span class="sec-custom">
+                <span class="sec-help" style="margin: 0;">Custom</span>
+                <input type="number" name="login_2fa_days" min="1" max="90" step="1" value="{{ request.user.login_2fa_days }}" data-days-input inputmode="numeric" aria-label="Custom interval in days">
+                <span class="sec-help" style="margin: 0;">days</span>
+              </span>
+            </div>
+            <p class="sec-help">Choose 1–90 days. This applies to the schedule selected above.</p>
+          </div>
+        </div>
+
+        <div class="sec-actions">
+          <div data-reauth-password {% if request.GET.reauth != '1' %}hidden{% endif %}>
+            <label class="sec-label" for="login-2fa-current-password">Confirm current password</label>
+            <input id="login-2fa-current-password" type="password" name="current_password"
+              autocomplete="current-password" class="w-full max-w-sm rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-100"
+              aria-describedby="login-2fa-reauth-help"
+              {% if request.GET.reauth == '1' and not recent_login_2fa_otp %}required{% endif %}>
+            <p id="login-2fa-reauth-help" class="sec-help">Required for less-secure changes unless you verified an email code recently.</p>
+          </div>
+          <p class="sec-note" data-2fa-off-note {% if request.user.login_2fa_enabled %}hidden{% endif %}>Login will use your password without an additional OTP. Email verification and account recovery protections remain enabled.</p>
+          <button type="submit" class="btn-primary sec-save">Save changes</button>
+        </div>
+      </div>
+    </form>
+  </section>
 </div>
 
+{% endblock %}
+{% block extra_scripts %}
+<script src="{% static 'js/login_security.js' %}" defer></script>
 {% endblock %}

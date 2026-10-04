@@ -19,6 +19,7 @@ from daily_challenges.services import get_today_challenge_set, refresh_challenge
 from skill_assessment.models import StudentSkill
 from .models import ChatMessage, ChatSession, ImageQuery
 from .context_processors import ACTIVE_CLASSROOM_SESSION_KEY, resolve_active_student_classroom
+from accounts.services import has_recent_login_2fa_otp
 from .services.vision import ImageQueryError, upload_image_to_ai
 from .services.chat_memory import (
     append_message,
@@ -1422,7 +1423,14 @@ def student_profile(request):
 
     profile, _ = StudentProfile.objects.get_or_create(user=request.user)
 
-    return render_for_device(request, "student/profile.html", {"profile": profile})
+    return render_for_device(
+        request,
+        "student/profile.html",
+        {
+            "profile": profile,
+            "recent_login_2fa_otp": has_recent_login_2fa_otp(request.session),
+        },
+    )
 
 
 @login_required

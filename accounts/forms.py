@@ -17,7 +17,12 @@ from django.utils.http import urlsafe_base64_encode
 logger = logging.getLogger(__name__)
 
 from .models import TeacherInvitation
-from .services import mask_email
+from .services import (
+    LOGIN_2FA_DEFAULT_DAYS,
+    LOGIN_2FA_MAX_DAYS,
+    LOGIN_2FA_MIN_DAYS,
+    mask_email,
+)
 from .tokens import email_verification_token, teacher_invitation_token
 
 User = get_user_model()
@@ -169,6 +174,56 @@ class ProfilePasswordChangeForm(StyledFormMixin, PasswordChangeForm):
     def __init__(self, user, *args, **kwargs):
         super().__init__(user, *args, **kwargs)
         self._apply_classes()
+
+
+class LoginSecurityForm(StyledFormMixin, forms.ModelForm):
+    """Server-side validation for the profile Security → 2FA settings.
+
+    Only the three login-2FA fields can be changed. The submitted mode/day
+    combination is validated rather than trusted, so crafted POSTs cannot store
+    an out-of-range interval or a mode/day mismatch.
+    """
+
+    class Meta:
+        model = User
+        fields = ("login_2fa_enabled", "login_2fa_mode", "login_2fa_days")
+        widgets = {
+            "login_2fa_days": forms.NumberInput(
+                attrs={"min": LOGIN_2FA_MIN_DAYS, "max": LOGIN_2FA_MAX_DAYS, "inputmode": "numeric"}
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._apply_classes()
+
+    def clean_login_2fa_days(self):
+        days = self.cleaned_data.get("login_2fa_days")
+        if days is None:
+            return LOGIN_2FA_DEFAULT_DAYS
+        if days < LOGIN_2FA_MIN_DAYS or days > LOGIN_2FA_MAX_DAYS:
+            raise forms.ValidationError(
+                f"Enter a whole number of days between {LOGIN_2FA_MIN_DAYS} and {LOGIN_2FA_MAX_DAYS}."
+            )
+        return days
+
+    def clean(self):
+        cleaned_data = super().clean()
+        enabled = cleaned_data.get("login_2fa_enabled")
+        mode = cleaned_data.get("login_2fa_mode")
+        days = cleaned_data.get("login_2fa_days")
+
+        if enabled:
+            if mode == User.Login2FAMode.EVERY_LOGIN:
+                # The day value is irrelevant for every-login; normalise it so a
+                # stale/crafted value is never stored.
+                cleaned_data["login_2fa_days"] = LOGIN_2FA_DEFAULT_DAYS
+            elif days is None:
+                self.add_error(
+                    "login_2fa_days",
+                    f"Enter a whole number of days between {LOGIN_2FA_MIN_DAYS} and {LOGIN_2FA_MAX_DAYS}.",
+                )
+        return cleaned_data
 
 
 class TeacherInvitationAdminForm(StyledFormMixin, forms.ModelForm):

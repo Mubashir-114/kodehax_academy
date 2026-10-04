@@ -14,13 +14,13 @@ from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils import timezone
-from datetime import timedelta
 from kodehax_academy.mobile import render_for_device
 
 from .forms import (
     ForgotPasswordForm,
     LoginForm,
     LoginOTPForm,
+    LoginSecurityForm,
     ProfilePasswordChangeForm,
     ResetPasswordForm,
     StudentRegistrationForm,
@@ -32,16 +32,22 @@ from .models import TeacherInvitation
 from .services import (
     EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS,
     EMAIL_VERIFICATION_SESSION_KEY,
+    LOGIN_2FA_MAX_DAYS,
+    LOGIN_2FA_MIN_DAYS,
+    LOGIN_2FA_REAUTH_SESSION_KEY,
     LOGIN_OTP_MAX_ATTEMPTS,
     LOGIN_OTP_RESEND_COOLDOWN_SECONDS,
     LOGIN_OTP_SESSION_KEY,
     build_email_verification_state,
     build_login_otp_state,
     generate_login_otp,
+    has_recent_login_2fa_otp,
     hash_login_otp,
+    is_login_2fa_policy_weaker,
     mask_email,
     now_timestamp,
     send_login_otp_email,
+    should_require_login_otp,
 )
 from .tokens import email_verification_token, teacher_invitation_token
 
@@ -480,19 +486,22 @@ def _login_user(request, role, template_name):
             login(request, authenticated_user)
             return redirect("adminpanel_dashboard")
 
-        if authenticated_user.last_otp_verified_at:
-            time_since_last_otp = timezone.now() - authenticated_user.last_otp_verified_at
-            if time_since_last_otp < timedelta(hours=24):
-                _clear_login_otp_state(request)
-                logger.info(
-                    "login_otp_skipped user_id=%s email=%s flow_step=login "
-                    "reason=otp_verified_within_24h last_otp_verified_at=%s",
-                    authenticated_user.pk,
-                    mask_email(authenticated_user.email),
-                    authenticated_user.last_otp_verified_at.isoformat(),
-                )
-                login(request, authenticated_user)
-                return redirect(_dashboard_redirect_for_role(authenticated_user.role))
+        if not should_require_login_otp(authenticated_user):
+            _clear_login_otp_state(request)
+            logger.info(
+                "login_otp_skipped user_id=%s email=%s flow_step=login "
+                "reason=2fa_policy enabled=%s mode=%s days=%s last_otp_verified_at=%s",
+                authenticated_user.pk,
+                mask_email(authenticated_user.email),
+                authenticated_user.login_2fa_enabled,
+                authenticated_user.login_2fa_mode,
+                authenticated_user.login_2fa_days,
+                authenticated_user.last_otp_verified_at.isoformat()
+                if authenticated_user.last_otp_verified_at
+                else None,
+            )
+            login(request, authenticated_user)
+            return redirect(_dashboard_redirect_for_role(authenticated_user.role))
 
         try:
             _send_login_otp(request, authenticated_user, role, authenticated_user.backend)
@@ -597,6 +606,8 @@ def verify_login_otp(request):
             user.is_email_verified,
         )
         login(request, user, backend=backend)
+        request.session[LOGIN_2FA_REAUTH_SESSION_KEY] = now_timestamp()
+        request.session.modified = True
         messages.success(request, "Login successful.")
         return redirect(_dashboard_redirect_for_role(user.role))
 
@@ -730,6 +741,66 @@ def send_profile_password_reset(request):
     send_password_reset_email(request, request.user)
     messages.success(request, "A password reset link has been sent to your email address.")
     return redirect("student_profile" if request.user.role == "student" else "teacher_profile")
+
+
+@login_required
+def update_login_security(request):
+    """Persist the signed-in user's login 2FA (OTP) policy.
+
+    The form instance is always the authenticated user, so a crafted POST can
+    only change the caller's own preferences. Validation is server-side.
+    """
+    user = request.user
+    redirect_target = "teacher_profile" if user.role == "teacher" else "student_profile"
+
+    if request.method != "POST":
+        return redirect(redirect_target)
+
+    current_policy = {
+        "login_2fa_enabled": user.login_2fa_enabled,
+        "login_2fa_mode": user.login_2fa_mode,
+        "login_2fa_days": user.login_2fa_days,
+    }
+    form = LoginSecurityForm(request.POST, instance=user)
+    if form.is_valid():
+        if is_login_2fa_policy_weaker(current_policy, form.cleaned_data):
+            password = request.POST.get("current_password", "")
+            if not has_recent_login_2fa_otp(request.session) and not user.check_password(password):
+                logger.info(
+                    "login_2fa_update_rejected user_id=%s email=%s reason=reauth_required",
+                    user.pk,
+                    mask_email(user.email),
+                )
+                messages.error(
+                    request,
+                    "Confirm your current password or verify your email code again before "
+                    "making this less-secure change.",
+                )
+                return redirect(f"{reverse(redirect_target)}?reauth=1")
+
+        form.save()
+        logger.info(
+            "login_2fa_updated user_id=%s email=%s enabled=%s mode=%s days=%s",
+            user.pk,
+            mask_email(user.email),
+            user.login_2fa_enabled,
+            user.login_2fa_mode,
+            user.login_2fa_days,
+        )
+        messages.success(request, "Login two-factor authentication settings saved.")
+    else:
+        logger.info(
+            "login_2fa_update_rejected user_id=%s email=%s fields=%s",
+            user.pk,
+            mask_email(user.email),
+            sorted(form.errors.keys()),
+        )
+        messages.error(
+            request,
+            "We couldn't save your two-factor settings. Choose a valid option between "
+            f"{LOGIN_2FA_MIN_DAYS} and {LOGIN_2FA_MAX_DAYS} days and try again.",
+        )
+    return redirect(redirect_target)
 
 
 def teacher_invite_register(request, uid, token):

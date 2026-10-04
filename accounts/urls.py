@@ -17,6 +17,7 @@ urlpatterns = [
     path("forgot-password/", views.forgot_password, name="forgot_password"),
     path("reset-password/<uid>/<token>/", views.reset_password, name="reset_password"),
     path("profile/change-password/", views.profile_change_password, name="profile_change_password"),
+    path("profile/login-security/", views.update_login_security, name="update_login_security"),
     path("profile/send-reset-link/", views.send_profile_password_reset, name="profile_send_reset_link"),
     path("teacher-invite/<uid>/<token>/", views.teacher_invite_register, name="teacher_invite_register"),
 ]

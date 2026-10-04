@@ -19,6 +19,7 @@ from django.db.models import Count
 from datetime import timedelta
 import re
 from student.models import StudentProfile
+from accounts.services import has_recent_login_2fa_otp
 from chat.ai_service import ai_error_payload, normalize_ai_exception
 from .services.ai_tools import generate_quiz, generate_notes, generate_coding_assignment
 from .services.evaluation import (
@@ -767,6 +768,7 @@ def teacher_profile(request):
         "stats": stats,
         "profile": profile,
         "updated": request.GET.get("updated") == "1",
+        "recent_login_2fa_otp": has_recent_login_2fa_otp(request.session),
     }
 
     return render(request, "teacher/profile.html", context)
