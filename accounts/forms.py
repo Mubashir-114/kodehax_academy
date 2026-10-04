@@ -17,6 +17,7 @@ from django.utils.http import urlsafe_base64_encode
 logger = logging.getLogger(__name__)
 
 from .models import TeacherInvitation
+from .services import mask_email
 from .tokens import email_verification_token, teacher_invitation_token
 
 User = get_user_model()
@@ -303,13 +304,28 @@ def send_verification_email(request, user):
         },
     )
 
-    return send_mail(
-        subject="Verify your Kodehax Academy email",
-        message=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        fail_silently=False,
+    try:
+        sent = send_mail(
+            subject="Verify your Kodehax Academy email",
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+    except Exception:
+        logger.exception(
+            "verification_email_send_failed user_id=%s email=%s flow_step=send_verification_email",
+            user.pk,
+            mask_email(user.email),
+        )
+        raise
+    logger.info(
+        "verification_email_sent user_id=%s email=%s flow_step=send_verification_email sent=%s",
+        user.pk,
+        mask_email(user.email),
+        sent,
     )
+    return sent
 
 
 def send_password_reset_email(request, user):

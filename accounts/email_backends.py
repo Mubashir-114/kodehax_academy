@@ -1,10 +1,26 @@
+import logging
+
 import requests
 
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 
 
+logger = logging.getLogger(__name__)
+
 BREVO_EMAIL_URL = "https://api.brevo.com/v3/smtp/email"
+
+
+def _mask_address(address):
+    """Mask an email local part for safe diagnostics (never log full addresses)."""
+    if not address or "@" not in address:
+        return address or ""
+    local, domain = address.split("@", 1)
+    if len(local) <= 2:
+        masked_local = f"{local[:1]}*"
+    else:
+        masked_local = f"{local[:2]}{'*' * max(len(local) - 2, 1)}"
+    return f"{masked_local}@{domain}"
 
 
 class BrevoEmailError(Exception):
@@ -66,4 +82,24 @@ class BrevoEmailBackend(BaseEmailBackend):
             )
             response.raise_for_status()
         except requests.RequestException as exc:
+            logger.warning(
+                "brevo_email_request_failed recipients=%s subject=%s error=%s",
+                [_mask_address(address) for address in message.to],
+                message.subject,
+                type(exc).__name__,
+            )
             raise BrevoEmailError("Brevo API request failed.") from exc
+
+        message_id = None
+        try:
+            response_payload = response.json()
+        except ValueError:
+            response_payload = None
+        if isinstance(response_payload, dict):
+            message_id = response_payload.get("messageId")
+        logger.info(
+            "brevo_email_accepted recipients=%s subject=%s provider_message_id=%s",
+            [_mask_address(address) for address in message.to],
+            message.subject,
+            message_id,
+        )

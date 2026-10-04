@@ -13,8 +13,10 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 import ssl
 import importlib.util
+from copy import deepcopy
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.log import DEFAULT_LOGGING
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -359,6 +361,18 @@ DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",
     BREVO_SENDER_EMAIL or EMAIL_HOST_USER or "noreply@kodehaxacademy.local",
 )
+
+# Operational diagnostics for the signup / email-verification / login-OTP flow.
+# These logs never include passwords, OTPs, tokens, API keys or full verification
+# URLs, and email addresses are masked before logging. Extending Django's default
+# logging keeps existing framework logging behavior unchanged.
+LOGGING = deepcopy(DEFAULT_LOGGING)
+LOGGING["loggers"]["accounts"] = {
+    "handlers": ["console"],
+    "level": os.getenv("ACCOUNTS_LOG_LEVEL", "INFO"),
+    "propagate": False,
+}
+
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24
 CSRF_TRUSTED_ORIGINS = _env_list("CSRF_TRUSTED_ORIGINS")
 if not PRODUCTION:
