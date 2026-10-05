@@ -524,7 +524,15 @@
             <td class="py-3.5 text-slate-300">{{ class.students.count }}</td>
             <td class="py-3.5 text-slate-300">{{ class.created_at|date:"M d, Y" }}</td>
             <td class="py-3.5">
-              <a href="{% url 'class_detail' class.id %}" class="btn-muted inline-flex px-3 py-1.5 text-sm">View</a>
+              <div class="flex flex-wrap gap-2">
+                <a href="{% url 'class_detail' class.id %}" class="btn-muted inline-flex px-3 py-1.5 text-sm">View</a>
+                <form method="POST" action="{% url 'delete_classroom' class.id %}" data-confirm="true"
+                  data-confirm-title="Delete Classroom"
+                  data-confirm-message="Permanently delete {{ class.name|escapejs }} and its assignments, submissions, classroom messages, and lecture notes? This cannot be undone.">
+                  {% csrf_token %}
+                  <button type="submit" class="btn-danger inline-flex px-3 py-1.5 text-sm">Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
           {% empty %}

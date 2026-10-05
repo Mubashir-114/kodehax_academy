@@ -639,6 +639,25 @@ def delete_assignment(request, assignment_id):
 
 
 @login_required
+def delete_classroom(request, class_id):
+    classroom, redirect_response = _get_teacher_classroom_or_redirect(request, class_id)
+    if redirect_response:
+        return redirect_response
+
+    if request.method != "POST":
+        messages.error(request, "Invalid request method for deleting classroom.")
+        return redirect("class_detail", id=classroom.id)
+
+    classroom_name = classroom.name
+    classroom.delete()
+    if request.session.get("teacher_active_classroom_id") == class_id:
+        request.session.pop("teacher_active_classroom_id", None)
+
+    messages.success(request, f"Classroom '{classroom_name}' and its related content were deleted.")
+    return redirect("teacher_dashboard")
+
+
+@login_required
 def remove_student_from_classroom(request, class_id, student_id):
     classroom, redirect_response = _get_teacher_classroom_or_redirect(request, class_id)
     if redirect_response:
