@@ -1,286 +1,322 @@
-<p align="center">
+﻿<p align="center">
   <img src="assets/kodehax_banner.png" alt="Kodehax Academy Banner" width="100%" style="border-radius: 12px; margin-bottom: 20px;">
 </p>
 
-<h1 align="center">🎓 Kodehax Academy — AI-Powered Learning Platform</h1>
+<h1 align="center">🎓 Kodehax Academy</h1>
+<h3 align="center">AI-Powered Learning & Developer Education Platform</h3>
 
 <p align="center">
-  <strong>Role-based classrooms, AI-assisted teaching tools, adaptive skill assessment, and daily coding challenges — all in one Django platform.</strong>
+  A Django-based learning platform for structured programming education, classroom workflows, daily coding challenges, and role-aware academic operations.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Django-5.2.5-092E20?logo=django&logoColor=white&style=for-the-badge" alt="Django">
   <img src="https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white&style=for-the-badge" alt="Python">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge" alt="Tailwind CSS">
-  <img src="https://img.shields.io/badge/AI-Groq-F55036?logo=groq&logoColor=white&style=for-the-badge" alt="Groq AI">
-  <img src="https://img.shields.io/badge/Roles-Student%20%7C%20Teacher%20%7C%20Admin-blue?style=for-the-badge" alt="Supported Roles">
+  <img src="https://img.shields.io/badge/MySQL-8%2B-4479A1?logo=mysql&logoColor=white&style=for-the-badge" alt="MySQL">
+  <img src="https://img.shields.io/badge/Tailwind-CSS-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Groq-AI-F55036?logo=groq&logoColor=white&style=for-the-badge" alt="Groq AI">
+  <img src="https://img.shields.io/badge/Brevo-Email-5B7CFA?logo=brevo&logoColor=white&style=for-the-badge" alt="Brevo">
+</p>
+
+<p align="center">
+  <a href="#overview">Overview</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#preview">Preview</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#tech-stack">Tech Stack</a> ·
+  <a href="#engineering-highlights">Engineering Highlights</a> ·
+  <a href="#project-structure">Project Structure</a> ·
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#configuration">Configuration</a> ·
+  <a href="#testing">Testing</a> ·
+  <a href="#security">Security</a> ·
+  <a href="#deployment">Deployment</a> ·
+  <a href="#documentation">Documentation</a> ·
+  <a href="#contributing">Contributing</a> ·
+  <a href="#license">License</a>
 </p>
 
 ---
 
-## ✨ Features
+## Overview
 
-Kodehax Academy is designed to be practical, technical, and AI-assisted from the ground up. Here are the core features:
+Kodehax Academy is a role-aware developer education platform that blends classroom operations, coding practice, and AI-assisted guidance in a single Django application. Students work through assignments and challenges, teachers manage classrooms and assessment workflows, and administrators oversee platform health and operations.
 
-| Feature | Description | Status |
-| :--- | :--- | :---: |
-| **🔐 Role-Based Access** | Separate student, teacher, and admin flows with role-aware auth, redirects, and dashboards. | ✅ Done |
-| **🤖 AI-Assisted Teaching** | Groq-powered quiz generation, lecture notes, coding-assignment authoring, and grading. | ✅ Done |
-| **🧠 Skill Assessment Engine** | Weighted scoring across self-assessment, MCQs, and coding tasks, with skill-level classification. | ✅ Done |
-| **🔥 Daily Coding Challenges** | Adaptive challenge generation, sandboxed execution, hints, penalties, and points tracking. | ✅ Done |
-| **🏫 Classroom Management** | Create classes, manage enrollments, author assignments, auto-grade quizzes. | ✅ Done |
-| **📊 Performance Analytics** | Student progress records and classroom-level analytics views. | ✅ Done |
-| **💬 AI Chat Assistant** | Contextual Groq-backed chat for tutoring, course Q&A, and quiz practice. | ✅ Done |
-| **🛠️ Admin Console** | Platform settings, maintenance mode, teacher approvals, platform-wide analytics. | ✅ Done |
-| **📱 Device-Aware Rendering** | Mobile template routing for a dedicated mobile UX on key screens. | ✅ Done |
+The product is designed to feel like an academic learning system rather than a static course portal. It combines structured learning, guided assessment, challenge-based coding, and actionable progress signals in one experience.
+
+### Product pillars
+
+- Structured learning pathways
+- AI-assisted educational support
+- Daily coding challenges and scoring
+- Student and teacher dashboards
+- Secure role-based workflows
+- Production-ready deployment assumptions
+
+---
+
+## Features
+
+| Area | Highlights |
+| --- | --- |
+| Learning | Student, teacher, and admin experiences with classroom enrollment, assignment delivery, and assessment flows. |
+| Coding | Daily challenge generation, answer workflows, scoring, and practical problem-solving exercises. |
+| AI | Groq-backed chat and educational assistance integrated into student and teacher workflows. |
+| Communication | Brevo-based transactional email and account email flows for onboarding, verification, and recovery. |
+| Analytics | Dashboard summaries, classroom progress context, and performance visibility across learning activities. |
+| Operations | Role-aware access, maintenance controls, secure configuration, and deployment guardrails. |
+
+---
+
+## Preview
 
 <p align="center">
   <img src="assets/dashboards_preview.png" alt="Student, teacher, and admin dashboard preview" width="85%" style="border-radius: 10px; margin-top: 16px;">
 </p>
-<p align="center"><sub>Concept preview of the student, teacher, and admin dashboards</sub></p>
+
+<p align="center"><sub>Student and platform dashboards for learning progress, challenge activity, and classroom visibility.</sub></p>
 
 ---
 
-## 🏗️ Architecture & Data Flow
+## Architecture
 
-Kodehax Academy is a single Django project split into purpose-built apps, with Groq handling every AI-assisted flow:
+<p align="center">
+  <img src="assets/architecture.png" alt="Kodehax architecture overview" width="100%" style="border-radius: 12px; background: #0b1220; padding: 12px;">
+</p>
 
-```mermaid
-flowchart TB
-    A1([🖥️ Desktop Browser]) <--> M[Middleware & Device Routing]
-    A2([📱 Mobile Browser]) <--> M
-    M <--> R[Root URLs & Settings]
+The project is organized as a single Django project with domain-specific apps for accounts, users, student, teacher, admin, daily challenges, skill assessment, and chat. Requests pass through Django URLs and views, then interact with models, templates, and external services such as Groq and Brevo.
 
-    R <--> ACC[accounts]
-    R <--> USR[users]
-    R <--> STU[student]
-    R <--> TCH[teacher]
-    R <--> ADM[adminpanel]
-    R <--> SKA[skill_assessment]
-    R <--> DLC[daily_challenges]
-    R <--> CHT[chat]
+Core architectural responsibilities:
 
-    ACC & USR & STU & TCH & ADM & SKA & DLC --> DB[(MySQL / SQLite)]
-    TCH -- AI grading & generation --> CHT
-    STU -- assistance --> CHT
-    CHT --> GEM[(Groq API)]
+- `accounts` handles auth, verification, and account lifecycle flows.
+- `student` manages student dashboards, classroom access, profile data, and chat workflows.
+- `teacher` handles classroom operations, assignments, notes, and teaching tools.
+- `adminpanel` manages maintenance, platform settings, and admin oversight.
+- `daily_challenges` and `skill_assessment` provide coding and practical evaluation flows.
+- `kodehax_academy` contains shared project settings, URL routing, and runtime configuration.
 
-    classDef default fill:#1E1E2E,stroke:#313244,stroke-width:1px,color:#CDD6F4;
-    classDef highlight fill:#89B4FA,stroke:#74C7EC,stroke-width:2px,color:#11111B;
-    classDef storage fill:#A6E3A1,stroke:#94E2D5,stroke-width:1px,color:#11111B;
-
-    class A1,A2,GEM highlight;
-    class DB storage;
-```
+Production uses MySQL and explicit environment configuration; the repository test settings intentionally use SQLite to keep validation isolated and fast.
 
 ---
 
-## 📂 Project Structure
+## Tech Stack
+
+### Backend
+- Django 5.2.5
+- Python 3.10+ compatibility; Render runtime target is Python 3.12.12
+- MySQL for production data storage
+- Gunicorn for deployment serving
+- PyMySQL compatibility layer for Django/MySQL integration
+
+### Frontend
+- Tailwind CSS
+- Django templates and static asset pipeline
+- WhiteNoise for static asset serving in deployment
+
+### AI and integrations
+- Groq API for model-backed educational features
+- Brevo API-backed transactional email delivery for onboarding, alerts, and account workflows
+- Private S3-compatible media storage with Backblaze B2 and signed/private media URLs in production
+
+### Runtime and tooling
+- Render deployment target
+- `build.sh` to install Python/Node dependencies and compile assets
+- Local SQLite test configuration for repository validation
+
+---
+
+## Engineering Highlights
+
+- Production checks fail closed when required environment variables are missing.
+- Local development and production configuration are intentionally separated.
+- MySQL defaults are enforced for production runtime; SQLite remains limited to test configuration.
+- Private S3-compatible media storage is configured for production through Backblaze B2, with signed/private URLs used where appropriate.
+- External integrations are configured via environment variables instead of committed secrets.
+
+---
+
+## Project Structure
 
 ```text
-kodehax/
-├── kodehax_academy/      # project settings, middleware, mobile rendering, root urls
-├── accounts/             # account flows, OTP/email-related templates and services
-├── users/                # custom user model, auth redirects, shared entry views
-├── student/              # student dashboards, submissions, chat memory, APIs
-├── teacher/              # classroom, assignments, grading, AI tools, performance
-├── adminpanel/           # platform management, maintenance mode, admin dashboards
-├── skill_assessment/     # assessment content, scoring, skill profile logic
-├── daily_challenges/     # challenge generation, code runner, points, sessions
-├── chat/                 # Groq client integration and chat views
-├── templates/            # desktop, mobile, shared, role-specific templates
-├── static/               # Tailwind source, compiled CSS, images
-├── media/                # uploaded files and generated user content
-└── manage.py             # Django entry point
+.
+├── accounts/
+├── adminpanel/
+├── assets/
+├── chat/
+├── daily_challenges/
+├── docs/
+├── kodehax_academy/
+├── skill_assessment/
+├── static/
+├── student/
+├── teacher/
+├── templates/
+├── users/
+├── .env.example
+├── build.sh
+├── LICENSE
+├── manage.py
+├── package.json
+├── PROJECT_REPORT.md
+├── PROJECT_SUMMARY.md
+├── README.md
+├── requirements.txt
+├── SECURITY_REVIEW.md
+└── CODE_EXECUTION.md
 ```
 
 ---
 
-## 🚀 Getting Started
+## Quick Start
 
-### 📋 Prerequisites
+### Prerequisites
 
-Before running the application, make sure you have:
 - [Python](https://www.python.org/) 3.10+
-- [Node.js](https://nodejs.org/) (for the Tailwind build)
-- [MySQL](https://www.mysql.com/) — or use the bundled test_settings for SQLite
-- A [Groq API key](https://console.groq.com/) for the AI-assisted features
+- [Node.js](https://nodejs.org/)
+- [MySQL](https://www.mysql.com/) for local or deployment use
+- [Groq API key](https://console.groq.com/)
 
-### 🛠️ Installation & Setup
+### Local setup
 
-1. **Clone the project and enter the directory:**
-   ```bash
-   git clone https://github.com/Mubashir-114/kodehax_academy.git
-   cd kodehax_academy
-   ```
+```bash
+git clone https://github.com/Mubashir-114/kodehax_academy.git
+cd kodehax_academy
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+npm ci
+cp .env.example .env
+```
 
-2. **Install dependencies (Python + frontend):**
-   ```bash
-   python -m venv venv
-   # On Windows: venv\Scripts\activate | On Linux/Mac: source venv/bin/activate
-   pip install -r requirements.txt
-   npm ci
-   ```
+### Run the app
 
-3. **Configure environment variables:**
-   Create a `.env` file in the project root:
-   ```env
-   DEBUG=True
-   PRODUCTION=False
-   SECRET_KEY=replace-me
-   ALLOWED_HOSTS=127.0.0.1,localhost
-   GROQ_API_KEY=replace-me
-   GROQ_TEXT_MODEL=openai/gpt-oss-20b
-   GROQ_VISION_MODEL=qwen/qwen3.8-27b
-   BREVO_API_KEY=replace-me
-   BREVO_SENDER_EMAIL=verified-sender@example.com
-   BREVO_SENDER_NAME=Kodehax Academy
-   BREVO_API_TIMEOUT=10
-   DAILY_CHALLENGE_TIMEZONE=Asia/Kolkata
-   DAILY_CHALLENGE_PUBLISH_HOUR=10
-   DB_NAME=kodehax_academy
-   DB_USER=root
-   DB_PASSWORD=your-password
-   DB_HOST=localhost
-   DB_PORT=3306
-   ```
+```bash
+python manage.py migrate
+npm run tailwind:build
+python manage.py runserver
+```
 
-   > [!TIP]
-   > SQLite is reserved for tests with `--settings=kodehax_academy.test_settings`. Development and production use MySQL.
+Then open: `http://127.0.0.1:8000/`
 
-4. **Migrate the database and create a superuser:**
-   ```bash
-   python manage.py migrate
-   python manage.py createsuperuser
-   ```
-
-5. **Build the frontend and start the server:**
-   ```bash
-   npm run tailwind:build
-   python manage.py runserver
-   ```
-   Then open `http://127.0.0.1:8000/` 🎉
+> The repository test configuration uses SQLite via `--settings=kodehax_academy.test_settings` and is not the primary runtime setup.
 
 ---
 
-## 📦 Key Dependencies
+## Configuration
 
-- **Backend Framework:** Django
-- **AI Integration:** groq 1.7.0
-- **Database:** PyMySQL 1.1.1 with RSA authentication support
-- **Static Files:** whitenoise
-- **Media Storage:** S3-compatible object storage (django-storages)
-- **Deployment:** Gunicorn and Render native Python
+Create a local `.env` file from the example and keep the values private.
+
+```env
+PRODUCTION=False
+DEBUG=False
+SECRET_KEY=replace-with-a-secure-key
+ALLOWED_HOSTS=localhost,127.0.0.1
+DB_NAME=kodehax_academy
+DB_USER=root
+DB_PASSWORD=your-password
+DB_HOST=localhost
+DB_PORT=3306
+GROQ_API_KEY=your-groq-key
+GROQ_TEXT_MODEL=openai/gpt-oss-20b
+GROQ_VISION_MODEL=qwen/qwen3.8-27b
+BREVO_API_KEY=your-brevo-key
+BREVO_SENDER_EMAIL=noreply@example.com
+BREVO_SENDER_NAME=Kodehax Academy
+MEDIA_STORAGE_BUCKET_NAME=
+MEDIA_STORAGE_ACCESS_KEY_ID=
+MEDIA_STORAGE_SECRET_ACCESS_KEY=
+```
+
+For the full production configuration and operational notes, see [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ---
 
-## 🔒 Security & Best Practices
+## Testing
 
-- Secrets (`SECRET_KEY`, `GROQ_API_KEY`, DB and email credentials) are environment-managed via `.env` and never hardcoded.
-- Daily challenges and skill-assessment code use a shared execution adapter. Public submissions require a separately isolated service; local development limits are not secure isolation. See [CODE_EXECUTION.md](CODE_EXECUTION.md).
-- Account registration and recovery flows include OTP/email-related templates under `accounts/`.
-- `PRODUCTION=True` requires explicit MySQL credentials and production security settings.
+Use the repository’s dedicated SQLite test settings for validation:
 
----
+```bash
+python manage.py test --settings=kodehax_academy.test_settings
+```
 
-## 🗺️ Roadmap
-
-- [ ] Add automated test coverage for core student and teacher workflows
-- [ ] Move sensitive development defaults fully into environment variables
-- [ ] Add richer dashboard analytics and reporting
-- [ ] Expand mobile-specific coverage for more classroom screens
-- [ ] Add CI for migrations, linting, and template build validation
+This keeps the test environment lightweight while preserving the real app structure and route-layer coverage.
 
 ---
 
-## 📄 License
+## Security
+
+This project keeps sensitive values in environment variables rather than hardcoding them into source files. Production configuration is intentionally strict: required host, database, AI, and media settings are validated before app startup, and the app avoids silent fallback to unsafe defaults.
+
+Key safeguards:
+
+- environment-managed secrets and credentials
+- fail-closed media storage checks in production
+- explicit host and debug validation in Django settings
+- separate local development and production assumptions
+
+See [docs/SECURITY.md](docs/SECURITY.md) for the operational security details.
+
+---
+
+## Deployment
+
+Render is the current deployment target for this project. The stack is configured for a Django + MySQL + Gunicorn deployment with static asset compilation and managed environment variables.
+
+### Deployment summary
+
+| Item | Value |
+| --- | --- |
+| Platform | Render |
+| Runtime | Python + Gunicorn |
+| Web server | Gunicorn |
+| Database | MySQL |
+| Frontend build | Tailwind CSS |
+| Health check | `/health/` |
+| Build script | `bash build.sh` |
+
+For the full Render and runtime guidance, see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+---
+
+## Documentation
+
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — platform structure and app responsibilities
+- [docs/SECURITY.md](docs/SECURITY.md) — environment, production, and deployment safety guidance
+- [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — Render and runtime deployment configuration
+- [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) — local setup and validation workflow
+- [PROJECT_REPORT.md](PROJECT_REPORT.md) — project status and verification summary
+- [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) — repository overview and context
+- [GROQ_MIGRATION.md](GROQ_MIGRATION.md) — Groq integration notes
+- [CODE_EXECUTION.md](CODE_EXECUTION.md) — execution safety and operational context
+- [SECURITY_REVIEW.md](SECURITY_REVIEW.md) — security review notes
+
+---
+
+## Roadmap
+
+- Strengthen automated validation across student, teacher, and admin workflows
+- Improve dashboard analytics depth and reporting
+- Extend mobile experience coverage and responsive polish
+- Harden CI and release validation around migrations, templates, and deployment readiness
+
+---
+
+## Contributing
+
+Contributions are welcome. Please keep changes scoped, document behavior changes, and validate with the project’s existing Django test settings before opening a PR.
+
+Recommended workflow:
+
+1. Create a branch for the change.
+2. Update or add focused documentation when behavior changes.
+3. Run the repo’s lightweight validation commands.
+4. Keep environment secrets and deployment values out of version control.
+
+---
+
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
 <p align="center">Made with ❤️ for practical, AI-assisted technical education.</p>
-
-
-## Render native Python deployment
-
-Create a Web Service from `https://github.com/Mubashir-114/kodehax_academy`, using your release branch and repository root (leave Root Directory empty). Select **Python 3**. A paid instance is only required here if you want Render's pre-deploy migrations; email uses Brevo's HTTPS API and does not require SMTP access.
-
-| Setting | Value |
-| --- | --- |
-| Build command | `bash build.sh` |
-| Start command | `gunicorn kodehax_academy.wsgi --bind 0.0.0.0:$PORT` |
-| Health check | `/health/` |
-| Pre-deploy (paid service) | `python manage.py migrate --noinput` |
-| Python version | `PYTHON_VERSION=3.12.12` |
-| Node version | `NODE_VERSION=22.16.0` |
-
-Render's [native runtimes include Node and npm](https://render.com/docs/native-runtimes). `build.sh` installs Python dependencies, runs `npm ci --include=dev` and `npm run tailwind`, then `collectstatic`. No migrations run during build or startup. WhiteNoise serves collected static assets. Scripts use LF line endings.
-
-### Required production environment
-
-Set these privately in Render's Environment settings:
-
-```env
-PRODUCTION=True
-DEBUG=False
-SECRET_KEY=<long-random-private-secret>
-ALLOWED_HOSTS=<service>.onrender.com,your-domain.example
-CSRF_TRUSTED_ORIGINS=https://<service>.onrender.com,https://your-domain.example
-DB_NAME=<existing-database>
-DB_USER=<database-user>
-DB_PASSWORD=<database-password>
-DB_HOST=<reachable-mysql-provider-hostname>
-DB_PORT=3306
-MEDIA_STORAGE_BUCKET_NAME=<private-bucket-name>
-MEDIA_STORAGE_ACCESS_KEY_ID=<private-access-key-id>
-MEDIA_STORAGE_SECRET_ACCESS_KEY=<private-secret-access-key>
-MEDIA_STORAGE_ENDPOINT_URL=https://<provider-s3-endpoint>
-MEDIA_STORAGE_REGION_NAME=<provider-region>
-MEDIA_STORAGE_QUERYSTRING_EXPIRE=3600
-BREVO_API_KEY=<private-brevo-api-key>
-BREVO_SENDER_EMAIL=<brevo-verified-sender-address>
-BREVO_SENDER_NAME=Kodehax Academy
-BREVO_API_TIMEOUT=10
-PYTHON_VERSION=3.12.12
-NODE_VERSION=22.16.0
-```
-
-Render supplies `PORT`. Hosts are comma-separated bare hostnames; trusted origins include HTTPS schemes. Production rejects missing secrets/hosts/database/media-storage values and DEBUG=True. Secure cookies, HTTPS redirect, and HSTS default on. Django recognizes Render's forwarded HTTPS header. `/health/` bypasses HTTPS redirect and maintenance database lookups; it reports liveness, not database readiness.
-
-Host MySQL **separately** and retain the existing schema, data, and migration history. Use MySQL 8.0.11+ for Django 5.2, with provider DNS/port, user permissions, and firewall rules allowing Render outbound connections. `localhost` identifies the web service itself, not the provider. Back up existing data before releases. Do not reset tables or generate replacement migrations.
-
-PyMySQL is used because Render's documented native tools do not guarantee MySQL development headers for mysqlclient. Project initialization calls `pymysql.install_as_MySQLdb()` before Django's backend loads. PyMySQL 1.1.1's compatibility interface satisfies Django **5.2.5** without version overrides; reverify before upgrading Django. The RSA extra supports modern MySQL authentication.
-
-### Verified MySQL TLS
-
-Set `DB_SSL_REQUIRED=True` when required by your provider. Encryption, certificate chain verification, and hostname verification are enforced using system trust roots. For a private provider CA, upload its PEM as a Render Secret File and set `DB_SSL_CA=/etc/secrets/<ca-file>.pem` (also enables verified TLS). Ensure it is available during build and runtime. Use the certificate's DNS hostname as DB_HOST. Do not disable verification to work around errors. Client-certificate authentication is not configured.
-
-### Migrations by plan
-
-On a paid service, set the separate pre-deploy command above. Render [supports pre-deploy on paid web services](https://render.com/docs/deploys). Review `python manage.py migrate --plan` and apply only the existing migrations once per release.
-
-Free services do not offer this pre-deploy step or an interactive service shell. Before routing users to each release, run `python manage.py migrate --noinput` from a trusted workstation or CI runner with the same release, production environment, and MySQL connectivity/TLS. Keep credentials private. Coordinate this manually; `/health/` passing does not prove migrations are applied. Never add migrations to build.sh or the Gunicorn start command.
-
-### Remaining deployment blockers
-
-- **Email:** verification links, login OTPs, password resets, and teacher invitations use `POST https://api.brevo.com/v3/smtp/email` when `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, and `BREVO_SENDER_NAME` are set. `BREVO_API_TIMEOUT` defaults to 10 seconds. Keep the API key private and configure the sender as a verified Brevo sender. If the Brevo variables are absent, configured SMTP credentials remain the fallback; otherwise development defaults to console delivery. `EMAIL_BACKEND` can still explicitly override this selection for local development or tests. Real provider delivery remains an environment-level verification step.
-- **Uploaded media:** production (`PRODUCTION=True`) stores user uploads in durable, private, S3-compatible object storage via `django-storages`, configured through Django's `STORAGES` setting. It refuses to start unless `MEDIA_STORAGE_BUCKET_NAME`, `MEDIA_STORAGE_ACCESS_KEY_ID`, and `MEDIA_STORAGE_SECRET_ACCESS_KEY` are set, so a deployment can never silently fall back to Render's ephemeral filesystem. Objects stay private (`default_acl=None`, `querystring_auth=True`), and every `FileField`/`ImageField` `url` returns a short-lived signed link; profile images and assignment submissions are served the same way. `MEDIA_STORAGE_ENDPOINT_URL` and `MEDIA_STORAGE_REGION_NAME` target any S3-compatible provider, and `MEDIA_STORAGE_QUERYSTRING_EXPIRE` (seconds, default 3600, allowed range 1-86400) sets link lifetime. Development (`PRODUCTION=False`) continues to use the local `media/` folder through `MEDIA_ROOT`/`MEDIA_URL`, and `media/` stays Git-ignored. Existing local `media/` files are **not** migrated automatically: copy them into the bucket under the same keys (or re-upload) before switching, and independently verify object upload and signed access with real provider credentials after deployment. Real provider behavior is not exercised by the repository's automated tests.
-- **AI:** set `GROQ_API_KEY`, `GROQ_TEXT_MODEL=openai/gpt-oss-20b`, and `GROQ_VISION_MODEL=qwen/qwen3.8-27b` server-side with usable quota. Qwen is a preview model; no model substitution is automatic. See [Groq migration and validation](GROQ_MIGRATION.md). Optional `TIME_ZONE`, `DAILY_CHALLENGE_TIMEZONE`, `DAILY_CHALLENGE_PUBLISH_HOUR` default to Asia/Kolkata and hour 10. Existing upload-limit/security environment overrides remain supported. No external scheduler was added.
-
-- **Code execution:** provision and independently verify the isolated HTTPS executor described in [CODE_EXECUTION.md](CODE_EXECUTION.md), then privately configure `CODE_EXECUTION_BACKEND=remote`, `CODE_EXECUTION_URL` and `CODE_EXECUTION_TOKEN`. Until configured, coding requests visibly return 503 without grading, score deductions or consumed attempts. No local fallback occurs in production. The native Render/MySQL deployment stays unchanged.
-
-### Verification commands
-
-```bash
-python -m pip check
-python manage.py check
-python manage.py check --deploy
-python manage.py test --settings=kodehax_academy.test_settings
-npm ci --include=dev
-npm run tailwind
-python manage.py collectstatic --noinput
-# Only with an authorized reachable MySQL connection:
-python manage.py check --database default
-python manage.py migrate --plan
-```
-
-SQLite test settings are preserved. Live MySQL checks, migration execution, and TLS negotiation require an actual reachable server.

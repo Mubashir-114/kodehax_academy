@@ -10,7 +10,7 @@ urlpatterns = [
     path("", include("accounts.urls")),
     path("logout/", _stub_view, name="logout"),
     path("admin-panel/dashboard/", _stub_view, name="adminpanel_dashboard"),
-    path("student/dashboard/", _stub_view, name="student_dashboard"),
+    path("student/", include("student.urls")),
     path("student/skill-assessment/", include("skill_assessment.urls")),
     path("student/skill-profile/", _stub_view, name="skill_assessment_profile"),
     path("student/daily-challenges/", include("daily_challenges.urls")),
