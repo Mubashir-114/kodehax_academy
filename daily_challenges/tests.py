@@ -7,7 +7,16 @@ from skill_assessment.models import CodingProblem
 from users.models import User
 
 from .models import DailyChallenge, DailyChallengeSession, DailyChallengeSet, StudentPoints
-from .services import _normalize_test_cases, _render_template_value, _run_code, _today, preview_solution, refresh_challenge_set
+from .services import (
+    _normalize_test_cases,
+    _render_template_value,
+    _run_code,
+    _should_regenerate_existing_set,
+    _today,
+    get_today_challenge_set,
+    preview_solution,
+    refresh_challenge_set,
+)
 
 
 class DailyChallengeWorkspaceTests(TestCase):
@@ -201,3 +210,23 @@ class DailyChallengeWorkspaceTests(TestCase):
 
         self.assertIsNone(error_payload)
         self.assertEqual(results[0]["actual"], 2)
+
+    def test_short_source_pool_does_not_regenerate_the_same_short_set(self):
+        CodingProblem.objects.exclude(
+            pk__in=[self.problem_one.pk, self.problem_two.pk]
+        ).update(is_active=False)
+        self.assertFalse(_should_regenerate_existing_set(self.challenge_set))
+
+    @patch("daily_challenges.services.refresh_challenge_set")
+    def test_dashboard_read_can_skip_recalculation_and_reuse_prefetch(self, refresh):
+        CodingProblem.objects.exclude(
+            pk__in=[self.problem_one.pk, self.problem_two.pk]
+        ).update(is_active=False)
+        challenge_set = get_today_challenge_set(
+            self.student,
+            refresh_existing=False,
+        )
+
+        self.assertEqual(challenge_set.pk, self.challenge_set.pk)
+        self.assertEqual(len(challenge_set.challenges.all()), 3)
+        refresh.assert_not_called()

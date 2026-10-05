@@ -891,6 +891,13 @@ def _should_regenerate_existing_set(challenge_set):
     if current_count >= DAILY_CHALLENGE_SIZE:
         return False
 
+    # A short source pool cannot produce a full set. Retrying on every page
+    # view only deletes and recreates the same rows, which is especially costly
+    # against a remote database. Regenerate later if the active pool grows.
+    available_count = CodingProblem.objects.filter(is_active=True).count()
+    if available_count <= current_count:
+        return False
+
     has_student_progress = (
         challenge_set.challenges.filter(attempts__gt=0).exists()
         or challenge_set.challenges.exclude(status=DailyChallenge.STATUS_PENDING).exists()
@@ -955,7 +962,7 @@ def generate_daily_challenges(student, challenge_date=None, force=False):
     return DailyChallengeSet.objects.prefetch_related("challenges__problem").get(id=challenge_set.id)
 
 
-def get_today_challenge_set(student):
+def get_today_challenge_set(student, *, refresh_existing=True):
     challenge_date = _today()
     challenge_set = (
         DailyChallengeSet.objects.filter(student=student, date=challenge_date)
@@ -972,8 +979,9 @@ def get_today_challenge_set(student):
         if challenge_set.published_at != expected_publish_at:
             challenge_set.published_at = expected_publish_at
             challenge_set.save(update_fields=["published_at", "updated_at"])
-        refresh_challenge_set(challenge_set)
-        return DailyChallengeSet.objects.prefetch_related("challenges__problem").get(id=challenge_set.id)
+        if refresh_existing:
+            refresh_challenge_set(challenge_set)
+        return challenge_set
     return generate_daily_challenges(student, challenge_date=challenge_date)
 
 

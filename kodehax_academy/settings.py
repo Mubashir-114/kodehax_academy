@@ -66,6 +66,7 @@ if not SECRET_KEY:
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = _env_bool("DEBUG", False)
+POST_AUTH_PERFORMANCE_LOGGING = _env_bool("POST_AUTH_PERFORMANCE_LOGGING", False)
 if PRODUCTION and DEBUG:
     raise ImproperlyConfigured("DEBUG must be False in production.")
 
@@ -370,6 +371,14 @@ LOGGING = deepcopy(DEFAULT_LOGGING)
 LOGGING["loggers"]["accounts"] = {
     "handlers": ["console"],
     "level": os.getenv("ACCOUNTS_LOG_LEVEL", "INFO"),
+    "propagate": False,
+}
+LOGGING["handlers"]["post_auth_console"] = {
+    "class": "logging.StreamHandler",
+}
+LOGGING["loggers"]["post_auth.performance"] = {
+    "handlers": ["post_auth_console"],
+    "level": "INFO",
     "propagate": False,
 }
 

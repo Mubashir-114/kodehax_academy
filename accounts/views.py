@@ -15,6 +15,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from django.utils import timezone
 from kodehax_academy.mobile import render_for_device
+from kodehax_academy.performance import post_auth_span
 
 from .forms import (
     ForgotPasswordForm,
@@ -73,6 +74,11 @@ def _login_redirect_for_role(role):
 
 def _dashboard_redirect_for_role(role):
     return "teacher_dashboard" if role == "teacher" else "student_dashboard"
+
+
+def _post_login_redirect(target):
+    with post_auth_span("post_login.redirect"):
+        return redirect(target)
 
 
 def _clear_login_otp_state(request):
@@ -426,6 +432,14 @@ def verify_email(request, uid, token):
 def _login_user(request, role, template_name):
     form = LoginForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
+        with post_auth_span("login.post", capture_queries=True):
+            return _complete_login(request, role, form)
+
+    return _render(request, template_name, {"form": form})
+
+
+def _complete_login(request, role, form):
+    with post_auth_span("login.validation_and_redirect"):
         if request.user.is_authenticated:
             current_role = "admin" if request.user.is_superuser or request.user.role == "admin" else request.user.role
             logout(request)
@@ -433,9 +447,10 @@ def _login_user(request, role, template_name):
 
         username = form.cleaned_data["username"].strip()
         password = form.cleaned_data["password"]
-        user = User.objects.filter(Q(username__iexact=username) | Q(email__iexact=username)).first()
+        with post_auth_span("login.user_lookup"):
+            user = User.objects.filter(Q(username__iexact=username) | Q(email__iexact=username)).first()
 
-        if not user or not user.check_password(password):
+        if not user:
             logger.info(
                 "login_rejected email=%s flow_step=login reason=invalid_credentials",
                 mask_email(username) if "@" in username else "",
@@ -443,50 +458,76 @@ def _login_user(request, role, template_name):
             messages.error(request, "Invalid username or password")
             return redirect(request.resolver_match.view_name)
 
-        if role == "student" and user.role != "student":
-            messages.error(request, "This account is not a student account")
-            return redirect("student_login")
-
-        if role == "teacher" and not (user.role == "teacher" or user.role == "admin" or user.is_superuser):
-            messages.error(request, "This account is not a teacher or admin account")
-            return redirect("teacher_login")
-
-        if not user.is_email_verified and not user.is_superuser and user.role != "admin":
-            _store_email_verification_state(request, user, cooldown=False)
-            logger.info(
-                "login_rejected user_id=%s email=%s flow_step=login "
-                "reason=email_not_verified active=%s verified=%s",
-                user.pk,
-                mask_email(user.email),
-                user.is_active,
-                user.is_email_verified,
-            )
-            messages.info(request, "Please verify your email before logging in.")
-            return redirect("resend_verification")
-
+        # Django's default backend rejects inactive users before returning the
+        # account. Preserve the existing verified/inactive messaging for that
+        # branch with one password check; active users use authenticate() once.
         if not user.is_active and not user.is_superuser and user.role != "admin":
-            logger.info(
-                "login_rejected user_id=%s email=%s flow_step=login "
-                "reason=account_inactive active=%s verified=%s",
-                user.pk,
-                mask_email(user.email),
-                user.is_active,
-                user.is_email_verified,
-            )
-            messages.error(request, "Your account is inactive. Please contact support.")
-            return redirect(request.resolver_match.view_name)
-
-        authenticated_user = authenticate(request, username=user.username, password=password)
+            with post_auth_span("login.inactive_password_check"):
+                authenticated_user = user if user.check_password(password) else None
+        else:
+            with post_auth_span("login.authenticate"):
+                authenticated_user = authenticate(
+                    request,
+                    username=user.username,
+                    password=password,
+                )
         if authenticated_user is None:
             messages.error(request, "Invalid username or password")
             return redirect(request.resolver_match.view_name)
 
+        if role == "student" and authenticated_user.role != "student":
+            messages.error(request, "This account is not a student account")
+            return redirect("student_login")
+
+        if role == "teacher" and not (
+            authenticated_user.role in ("teacher", "admin")
+            or authenticated_user.is_superuser
+        ):
+            messages.error(request, "This account is not a teacher or admin account")
+            return redirect("teacher_login")
+
+        if (
+            not authenticated_user.is_email_verified
+            and not authenticated_user.is_superuser
+            and authenticated_user.role != "admin"
+        ):
+            _store_email_verification_state(request, authenticated_user, cooldown=False)
+            logger.info(
+                "login_rejected user_id=%s email=%s flow_step=login "
+                "reason=email_not_verified active=%s verified=%s",
+                authenticated_user.pk,
+                mask_email(authenticated_user.email),
+                authenticated_user.is_active,
+                authenticated_user.is_email_verified,
+            )
+            messages.info(request, "Please verify your email before logging in.")
+            return redirect("resend_verification")
+
+        if (
+            not authenticated_user.is_active
+            and not authenticated_user.is_superuser
+            and authenticated_user.role != "admin"
+        ):
+            logger.info(
+                "login_rejected user_id=%s email=%s flow_step=login "
+                "reason=account_inactive active=%s verified=%s",
+                authenticated_user.pk,
+                mask_email(authenticated_user.email),
+                authenticated_user.is_active,
+                authenticated_user.is_email_verified,
+            )
+            messages.error(request, "Your account is inactive. Please contact support.")
+            return redirect(request.resolver_match.view_name)
+
         if authenticated_user.is_superuser or authenticated_user.role == "admin":
             _clear_login_otp_state(request)
-            login(request, authenticated_user)
-            return redirect("adminpanel_dashboard")
+            with post_auth_span("login.django_login"):
+                login(request, authenticated_user)
+            return _post_login_redirect("adminpanel_dashboard")
 
-        if not should_require_login_otp(authenticated_user):
+        with post_auth_span("login.2fa_policy"):
+            requires_otp = should_require_login_otp(authenticated_user)
+        if not requires_otp:
             _clear_login_otp_state(request)
             logger.info(
                 "login_otp_skipped user_id=%s email=%s flow_step=login "
@@ -500,8 +541,11 @@ def _login_user(request, role, template_name):
                 if authenticated_user.last_otp_verified_at
                 else None,
             )
-            login(request, authenticated_user)
-            return redirect(_dashboard_redirect_for_role(authenticated_user.role))
+            with post_auth_span("login.django_login"):
+                login(request, authenticated_user)
+            return _post_login_redirect(
+                _dashboard_redirect_for_role(authenticated_user.role)
+            )
 
         try:
             _send_login_otp(request, authenticated_user, role, authenticated_user.backend)
@@ -523,9 +567,6 @@ def _login_user(request, role, template_name):
         messages.success(request, f"Verification code sent to {mask_email(authenticated_user.email)}.")
         return redirect("verify_login_otp")
 
-    return _render(request, template_name, {"form": form})
-
-
 def student_login(request):
     return _login_user(request, "student", "user/login/std_login.html")
 
@@ -544,6 +585,18 @@ def verify_login_otp(request):
     form = LoginOTPForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
+        with post_auth_span("otp.post", capture_queries=True):
+            return _complete_login_otp(request, state, role, form)
+
+    context = _prepare_login_otp_context(request, form)
+    if context is None:
+        messages.error(request, "Your verification session has expired. Please log in again.")
+        return redirect(_login_redirect_for_role(role))
+    return _render(request, "accounts/verify_login_otp.html", context)
+
+
+def _complete_login_otp(request, state, role, form):
+    with post_auth_span("otp.validation_and_redirect"):
         current_time = now_timestamp()
         if current_time > state.get("expires_at", 0):
             logger.info(
@@ -582,7 +635,8 @@ def verify_login_otp(request):
             messages.error(request, "Invalid OTP. Please try again.")
             return redirect("verify_login_otp")
 
-        user = get_object_or_404(User, pk=state.get("user_id"))
+        with post_auth_span("otp.user_lookup"):
+            user = get_object_or_404(User, pk=state.get("user_id"))
         backend = state.get("backend")
         if not backend:
             _clear_login_otp_state(request)
@@ -595,8 +649,9 @@ def verify_login_otp(request):
             return redirect(_login_redirect_for_role(role))
 
         _clear_login_otp_state(request)
-        user.last_otp_verified_at = timezone.now()
-        user.save(update_fields=["last_otp_verified_at"])
+        with post_auth_span("otp.last_verified_save"):
+            user.last_otp_verified_at = timezone.now()
+            user.save(update_fields=["last_otp_verified_at"])
         logger.info(
             "login_otp_succeeded user_id=%s email=%s flow_step=verify_login_otp "
             "active=%s verified=%s",
@@ -605,18 +660,12 @@ def verify_login_otp(request):
             user.is_active,
             user.is_email_verified,
         )
-        login(request, user, backend=backend)
+        with post_auth_span("otp.django_login"):
+            login(request, user, backend=backend)
         request.session[LOGIN_2FA_REAUTH_SESSION_KEY] = now_timestamp()
         request.session.modified = True
         messages.success(request, "Login successful.")
-        return redirect(_dashboard_redirect_for_role(user.role))
-
-    context = _prepare_login_otp_context(request, form)
-    if context is None:
-        messages.error(request, "Your verification session has expired. Please log in again.")
-        return redirect(_login_redirect_for_role(role))
-    return _render(request, "accounts/verify_login_otp.html", context)
-
+        return _post_login_redirect(_dashboard_redirect_for_role(user.role))
 
 def resend_login_otp(request):
     state = _get_login_otp_state(request)

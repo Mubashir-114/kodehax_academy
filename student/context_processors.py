@@ -10,11 +10,19 @@ def resolve_active_student_classroom(request, joined_classrooms):
     view_name = getattr(resolver_match, "view_name", "")
     classroom = None
 
+    def find_classroom(classroom_id):
+        if classroom_id is None:
+            return None
+        return next(
+            (item for item in joined_classrooms if item.id == int(classroom_id)),
+            None,
+        )
+
     class_id = kwargs.get("class_id")
     if class_id is not None:
-        classroom = joined_classrooms.filter(id=class_id).first()
+        classroom = find_classroom(class_id)
     elif view_name in {"course_readme_view", "course_readme_edit"}:
-        classroom = joined_classrooms.filter(id=kwargs.get("id")).first()
+        classroom = find_classroom(kwargs.get("id"))
     elif "assignment_id" in kwargs:
         assignment = (
             Assignment.objects.filter(
@@ -32,11 +40,11 @@ def resolve_active_student_classroom(request, joined_classrooms):
 
     session_classroom_id = request.session.get(ACTIVE_CLASSROOM_SESSION_KEY)
     if session_classroom_id:
-        classroom = joined_classrooms.filter(id=session_classroom_id).first()
+        classroom = find_classroom(session_classroom_id)
         if classroom:
             return classroom
 
-    classroom = joined_classrooms.first()
+    classroom = joined_classrooms[0] if joined_classrooms else None
     if classroom:
         request.session[ACTIVE_CLASSROOM_SESSION_KEY] = classroom.id
     return classroom
@@ -49,7 +57,16 @@ def student_nav_context(request):
     if getattr(request.user, "role", None) != "student":
         return {}
 
-    joined_classrooms = ClassRoom.objects.filter(students=request.user).order_by("name", "id")
+    joined_classrooms = getattr(request, "_student_classrooms", None)
+    if joined_classrooms is None:
+        joined_classrooms = list(
+            ClassRoom.objects.filter(students=request.user).order_by("name", "id")
+        )
+    else:
+        joined_classrooms = sorted(
+            joined_classrooms,
+            key=lambda classroom: (classroom.name, classroom.id),
+        )
     active_classroom = resolve_active_student_classroom(request, joined_classrooms)
     return {
         "student_classrooms": joined_classrooms,

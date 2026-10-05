@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
+from django.db.models import Count
 import ast
 from .models import StudentProfile
 import json
@@ -50,6 +51,7 @@ from teacher.services.performance import (
 from .upload_validation import validate_assignment_upload, validate_profile_image
 from teacher.services.course_readme import render_course_readme_html
 from kodehax_academy.mobile import render_for_device
+from kodehax_academy.performance import post_auth_span
 
 
 CODE_FENCE_PATTERN = re.compile(r"```[\w+-]*\n[\s\S]*?\n```")
@@ -929,10 +931,20 @@ def _parse_quiz_questions_from_description(raw_text):
 
 @login_required
 def student_dashboard(request):
+    with post_auth_span("dashboard.get", capture_queries=True):
+        return _student_dashboard(request)
+
+
+def _student_dashboard(request):
     redirect_response = _ensure_student(request)
     if redirect_response:
         return redirect_response
 
+    with post_auth_span("dashboard.context"):
+        return _build_student_dashboard_response(request)
+
+
+def _build_student_dashboard_response(request):
     skill_profile = StudentSkill.objects.filter(student=request.user).first()
     if not skill_profile:
         return redirect("skill_assessment_entry")
@@ -947,44 +959,41 @@ def student_dashboard(request):
     if not isinstance(skill_profile.strong_topics, list):
         skill_profile.strong_topics = []
 
-    joined_classes = ClassRoom.objects.filter(
-        students=request.user
-    ).select_related("teacher").prefetch_related("assignments").order_by("-created_at")
+    joined_classes = list(
+        ClassRoom.objects.filter(students=request.user)
+        .select_related("teacher")
+        .annotate(assignment_count=Count("assignments", distinct=True))
+        .order_by("-created_at")
+    )
+    request._student_classrooms = joined_classes
 
-    daily_challenge_set = get_today_challenge_set(request.user)
-    refresh_challenge_set(daily_challenge_set)
-    daily_challenge_set.refresh_from_db()
-    solved_daily_count = daily_challenge_set.challenges.filter(status="solved").count()
-    total_daily_count = daily_challenge_set.challenges.count()
+    with post_auth_span("dashboard.daily_challenges"):
+        daily_challenge_set = get_today_challenge_set(request.user, refresh_existing=False)
+    solved_daily_count = daily_challenge_set.solved_count
+    total_daily_count = len(daily_challenge_set.challenges.all())
     student_points, _ = StudentPoints.objects.get_or_create(student=request.user)
     current_session = DailyChallengeSession.objects.filter(
         student=request.user,
         date=daily_challenge_set.date,
     ).first()
 
-    assignments = Assignment.objects.filter(
-        classroom__students=request.user,
-        due_date__gte=timezone.now(),
-    ).select_related("classroom")
-    assignment_rows = _build_assignment_rows(assignments, request.user)
-    submission_map = {row["assignment"].id: row for row in assignment_rows}
     personal_notes = LectureNote.objects.filter(
         classroom__students=request.user,
     ).select_related("classroom", "teacher")[:4]
 
-    return render_for_device(request, "student/dashboard.html", {
-        "profile": profile,
-        "joined_classes": joined_classes,
-        "submission_map": submission_map,
-        "personal_notes": personal_notes,
-        "skill_profile": skill_profile,
-        "medium_topics": skill_profile.assessment_snapshot.get("medium_topics", []),
-        "daily_challenge_set": daily_challenge_set,
-        "solved_daily_count": solved_daily_count,
-        "total_daily_count": total_daily_count,
-        "student_points": student_points,
-        "current_session": current_session,
-    })
+    with post_auth_span("dashboard.template_render"):
+        return render_for_device(request, "student/dashboard.html", {
+            "profile": profile,
+            "joined_classes": joined_classes,
+            "personal_notes": personal_notes,
+            "skill_profile": skill_profile,
+            "medium_topics": skill_profile.assessment_snapshot.get("medium_topics", []),
+            "daily_challenge_set": daily_challenge_set,
+            "solved_daily_count": solved_daily_count,
+            "total_daily_count": total_daily_count,
+            "student_points": student_points,
+            "current_session": current_session,
+        })
 
 @login_required
 def join_classroom(request):
