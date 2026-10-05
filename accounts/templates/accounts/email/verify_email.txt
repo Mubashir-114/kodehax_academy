@@ -2,7 +2,13 @@ Verify your email for {{ site_name }}.
 
 Hi {{ user.username }},
 
-Please verify your email address by opening the link below:
+Welcome to {{ site_name }}. Confirm this email address to activate your account and sign in.
+
+Verify your email:
 {{ verify_url }}
 
-You must verify your email before logging in.
+This link expires in 24 hours and can be used only once. If it expires, request a new link from the verification page.
+
+If you didn't create a {{ site_name }} account, you can safely ignore this email.
+
+{{ site_name }} - Security notification

@@ -6,9 +6,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives, send_mail
 from django.db import transaction
 from django.template.loader import render_to_string
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -350,23 +351,24 @@ def send_verification_email(request, user):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = email_verification_token.make_token(user)
     verify_url = request.build_absolute_uri(reverse("verify_email", kwargs={"uid": uid, "token": token}))
-    message = render_to_string(
-        "accounts/email/verify_email.txt",
-        {
-            "user": user,
-            "verify_url": verify_url,
-            "site_name": "Kodehax Academy",
-        },
-    )
+    context = {
+        "user": user,
+        "verify_url": verify_url,
+        "site_name": "Kodehax Academy",
+        "logo_url": request.build_absolute_uri(static("image/image.png")),
+    }
+    text_message = render_to_string("accounts/email/verify_email.txt", context)
+    html_message = render_to_string("accounts/email/verify_email.html", context)
 
     try:
-        sent = send_mail(
+        email = EmailMultiAlternatives(
             subject="Verify your Kodehax Academy email",
-            message=message,
+            body=text_message,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=False,
+            to=[user.email],
         )
+        email.attach_alternative(html_message, "text/html")
+        sent = email.send(fail_silently=False)
     except Exception:
         logger.exception(
             "verification_email_send_failed user_id=%s email=%s flow_step=send_verification_email",

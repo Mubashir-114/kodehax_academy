@@ -1,9 +1,15 @@
+Your {{ site_name }} sign-in verification code.
+
 Hi {{ user.username }},
 
-Your login verification code is: {{ otp }}
+Your sign-in verification code is:
 
-This code will expire in {{ expires_minutes }} minutes.
+{{ otp }}
 
-If you did not attempt to log in, please ignore this message.
+Enter this code to finish signing in. It expires in {{ expires_minutes }} minutes.
 
-{{ site_name }}
+Never share this code. {{ site_name }} will never ask you for it.
+
+If you didn't try to sign in, you can ignore this email and consider changing your password.
+
+{{ site_name }} - Security notification

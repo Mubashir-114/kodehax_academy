@@ -1,37 +1,159 @@
 {% extends "mobile/base.html" %}
+
 {% block title %}Check Email | Kodehax Academy{% endblock %}
+
 {% block extra_head %}
 <style>
-    .done-panel {
-        border-radius: 1.2rem;
-        background: linear-gradient(180deg, #141833 0%, #0d1026 100%);
-        border: 1px solid #2a2d4b;
-        box-shadow: 0 20px 40px rgba(2, 4, 12, 0.5);
-        color: #e8e7f7;
+    .mobile-shell > .space-y-2.mb-4 .card {
+        background: linear-gradient(180deg, rgba(18, 24, 46, .96), rgba(10, 14, 28, .98));
+        border-color: rgba(129, 140, 248, .24);
+        box-shadow: 0 16px 36px rgba(2, 4, 12, .5);
+        color: #dbe3f6;
     }
+    .mobile-shell > .space-y-2.mb-4 .card.border-emerald-200 { border-color: rgba(52, 211, 153, .38); color: #a7f3d0; }
+    .mobile-shell > .space-y-2.mb-4 .card.border-rose-200 { border-color: rgba(251, 113, 133, .4); color: #fecdd3; }
+    .mobile-shell > .space-y-2.mb-4 .card.border-slate-200 { border-color: rgba(129, 140, 248, .28); color: #c7d2fe; }
 
-    .done-btn {
-        border-radius: 1rem;
-        background: linear-gradient(90deg, #524dd3 0%, #6e68e3 52%, #8e89f1 100%);
-        color: #fff;
+    .kh-mcard {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        padding: 24px 20px 22px;
+        text-align: center;
+        border: 1px solid rgba(129, 140, 248, .22);
+        background: linear-gradient(180deg, rgba(18, 24, 46, .95), rgba(9, 12, 25, .98));
+        box-shadow: 0 26px 56px rgba(2, 4, 12, .6), inset 0 1px rgba(255, 255, 255, .06);
+        animation: kh-rise .45s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    .kh-mcard::before {
+        content: "";
+        position: absolute;
+        top: -46%;
+        right: -24%;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        pointer-events: none;
+        background: radial-gradient(circle, rgba(91, 140, 255, .22), transparent 70%);
+    }
+    .kh-mcard::after {
+        content: "";
+        position: absolute;
+        bottom: -46%;
+        left: -24%;
+        width: 210px;
+        height: 210px;
+        border-radius: 50%;
+        pointer-events: none;
+        background: radial-gradient(circle, rgba(157, 112, 255, .16), transparent 70%);
+    }
+    .kh-mcard > * { position: relative; }
+    .kh-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 10.5px;
         font-weight: 800;
-        box-shadow: 0 12px 24px rgba(82, 77, 211, 0.34);
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        color: #9fb4e8;
+    }
+    .kh-eyebrow__dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #7fb4ff;
+        box-shadow: 0 0 0 4px rgba(127, 180, 255, .12), 0 0 15px rgba(127, 180, 255, .8);
+    }
+    .kh-mtitle {
+        margin: 13px 0 0;
+        font-family: "Space Grotesk", "Manrope", sans-serif;
+        font-size: 25px;
+        line-height: 1.16;
+        letter-spacing: -.02em;
+        font-weight: 600;
+        color: #f7f9ff;
+    }
+    .kh-mtitle span {
+        color: transparent;
+        background: linear-gradient(105deg, #9cc8ff, #8f86ff 55%, #c39bff);
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+    .kh-mlead { margin-top: 11px; font-size: 13.5px; line-height: 1.65; color: #a9b4cd; }
+    .kh-mnote {
+        margin-top: 16px;
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        padding: 11px 13px;
+        border-radius: 13px;
+        border: 1px solid rgba(129, 140, 248, .16);
+        background: rgba(12, 18, 34, .6);
+        text-align: left;
+        font-size: 12.5px;
+        line-height: 1.55;
+        color: #a9b4cd;
+    }
+    .kh-mnote svg { flex: none; margin-top: 1px; color: #8fb3ff; }
+    .kh-mnote strong { color: #e6ecff; }
+    .kh-actions { margin-top: 18px; display: grid; gap: 10px; }
+    .kh-mbtn {
+        width: 100%;
+        min-height: 52px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #3a6ff0, #6158e8 55%, #8a5bea);
+        box-shadow: 0 16px 32px rgba(58, 82, 210, .35), inset 0 1px rgba(255, 255, 255, .22);
+        -webkit-tap-highlight-color: transparent;
+        transition: transform .16s ease, filter .16s ease;
+    }
+    .kh-mbtn:active { transform: translateY(1px) scale(.995); filter: brightness(.96); }
+    .kh-mbtn--ghost {
+        color: #dbe3f6;
+        border-color: rgba(162, 183, 244, .28);
+        background: rgba(255, 255, 255, .03);
+        box-shadow: none;
+    }
+    .kh-mbtn--ghost:active { border-color: rgba(162, 183, 244, .5); }
+    @keyframes kh-rise {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 {% endblock %}
+
 {% block content %}
-<div class="pt-2 pb-6">
-{% include "mobile/components/auth_drawer.html" %}
-<section class="done-panel p-6 text-center reveal-1">
-    <h1 class="text-2xl font-semibold">Verify Your Email</h1>
-    <p class="mt-3 text-sm text-slate-300">If an account can be registered with those details, check the inbox for a verification link.</p>
-    {% if can_resend_verification %}
-    <a href="{% url 'resend_verification' %}" class="mt-5 inline-flex rounded-xl border border-slate-600 px-4 py-3 text-sm">Resend verification</a>
-    {% endif %}
-    <a href="{% url 'student_login' %}" class="done-btn mt-5 inline-flex px-4 py-3 text-sm">Go to Login</a>
+<div class="pt-2 pb-4">
+<section class="kh-mcard">
+    <p class="kh-eyebrow"><span class="kh-eyebrow__dot" aria-hidden="true"></span>Verification pending</p>
+    <h1 class="kh-mtitle">Check your inbox<br><span>to activate your account.</span></h1>
+    <p class="kh-mlead">
+        If an account can be registered with those details, a verification link is on its way.
+        Open it to confirm your email address, then sign in to continue.
+    </p>
+    <div class="kh-mnote">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 3.75 4.5 6.75v5.4c0 4.2 3.1 7.05 7.5 8.1 4.4-1.05 7.5-3.9 7.5-8.1v-5.4Z"></path>
+            <path d="m9 12 2.1 2.1L15.3 9.9"></path>
+        </svg>
+        <span>The link expires in <strong>24 hours</strong> and can be used once. Check your spam folder if it doesn't arrive within a few minutes.</span>
+    </div>
+    <div class="kh-actions">
+        {% if can_resend_verification %}
+            <a href="{% url 'resend_verification' %}" class="kh-mbtn kh-mbtn--ghost">Resend verification</a>
+        {% endif %}
+        <a href="{% url 'student_login' %}" class="kh-mbtn">Go to login</a>
+    </div>
 </section>
-<div class="mt-4 px-1 text-sm">
-    <a href="/" class="text-slate-600">Back to home</a>
+<div class="mt-3 px-1 text-center text-sm">
+    <a href="/" class="kh-mback" style="color:#8a96b6;">Back to home</a>
 </div>
 </div>
 {% endblock %}

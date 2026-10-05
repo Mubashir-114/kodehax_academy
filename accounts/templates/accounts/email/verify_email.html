@@ -1,0 +1,85 @@
+{% comment %}
+KodeHax Academy branded email-verification template.
+Email-client safe: table layout, inline styles only, no external CSS or JS.
+Rendered as the text/html alternative next to accounts/email/verify_email.txt.
+{% endcomment %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="color-scheme" content="dark light">
+    <title>Verify your email</title>
+</head>
+<body style="margin:0; padding:0; width:100%; background-color:#040610; -webkit-text-size-adjust:100%;">
+    <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:#040610; font-size:1px; line-height:1px;">
+        Confirm your email address to activate your Kodehax Academy account.
+    </div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; background-color:#040610;">
+        <tr>
+            <td align="center" style="padding:28px 12px 36px;">
+
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px; background-color:#0b1020; border:1px solid #232a44; border-radius:18px; overflow:hidden;">
+                    <tr>
+                        <td style="height:4px; line-height:4px; font-size:0; background-color:#4a6ff0; background-image:linear-gradient(90deg,#4a7cff,#6a5cf0 55%,#a06bf5);">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:22px 30px; background-color:#0d1326; border-bottom:1px solid #1e2540;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="vertical-align:middle;">
+                                        {% if logo_url %}<img src="{{ logo_url }}" width="40" height="40" alt="{{ site_name }}" style="display:inline-block; width:40px; height:40px; border-radius:11px; border:0; vertical-align:middle; margin-right:12px; background-color:#141b33;">{% endif %}<span style="display:inline-block; vertical-align:middle; font-family:'Space Grotesk',Arial,Helvetica,sans-serif; font-size:16px; font-weight:700; color:#f4f7ff; letter-spacing:0.01em;">{{ site_name }}</span>
+                                    </td>
+                                    <td align="right" style="vertical-align:middle; font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:#7f8bab;">
+                                        Security
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:32px 30px 6px;">
+                            <p style="margin:0 0 12px; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:#8fb0ff;">Email verification</p>
+                            <h1 style="margin:0 0 14px; font-family:'Space Grotesk',Arial,Helvetica,sans-serif; font-size:26px; line-height:1.28; font-weight:700; color:#f4f7ff;">Confirm your email address</h1>
+                            <p style="margin:0 0 24px; font-family:Arial,Helvetica,sans-serif; font-size:15px; line-height:1.7; color:#a9b4cd;">
+                                Hi {{ user.username }}, welcome to {{ site_name }}. Confirm this email address to activate your account and sign in.
+                            </p>
+
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+                                <tr>
+                                    <td align="center" bgcolor="#4a6ff0" style="border-radius:12px;">
+                                        <a href="{{ verify_url }}" style="display:inline-block; padding:15px 32px; font-family:Arial,Helvetica,sans-serif; font-size:15px; font-weight:700; color:#ffffff; text-decoration:none; border-radius:12px;">Verify my email</a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin:0 0 8px; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:1.6; color:#7f8bab;">Button not working? Copy and paste this link into your browser:</p>
+                            <p style="margin:0 0 24px; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.6; word-break:break-all;"><a href="{{ verify_url }}" style="color:#9db8ff; text-decoration:underline;">{{ verify_url }}</a></p>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; margin:0 0 24px; background-color:#0d1428; border:1px solid #232a44; border-radius:12px;">
+                                <tr>
+                                    <td style="padding:14px 16px; font-family:Arial,Helvetica,sans-serif; font-size:13px; line-height:1.6; color:#a9b4cd;">
+                                        <strong style="color:#e6ecff;">This link expires in 24 hours</strong> and can be used only once. If it expires, request a fresh link from the Kodehax Academy verification page.
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:22px 30px 28px; border-top:1px solid #1e2540; font-family:Arial,Helvetica,sans-serif; font-size:12px; line-height:1.65; color:#6f7c9c;">
+                            If you didn't create a {{ site_name }} account, you can safely ignore this email.<br>
+                            Need help? Contact Kodehax Academy support.
+                            <div style="margin-top:14px; font-size:11px; color:#5a6685;">{{ site_name }} &middot; Security notification</div>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="width:100%; max-width:600px; margin:14px auto 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; line-height:1.5; color:#4d5877; text-align:center;">
+                    &copy; 2026 Kodehax Academy LLP &middot; Bengaluru, India
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

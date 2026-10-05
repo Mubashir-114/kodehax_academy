@@ -2,21 +2,204 @@
 
 {% block title %}Resend Verification | Kodehax Academy{% endblock %}
 
+{% block extra_head %}
+<style>
+    /* Keep the verification screen on the KodeHax dark-premium identity. */
+    .mobile-shell .auth-nav {
+        background: linear-gradient(180deg, rgba(18, 24, 46, .94), rgba(9, 12, 25, .97));
+        border: 1px solid rgba(129, 140, 248, .22);
+        box-shadow: 0 16px 40px rgba(2, 4, 12, .5);
+    }
+    .mobile-shell .auth-nav .text-slate-800 { color: #e8ecfb; }
+    .mobile-shell .auth-nav-toggle {
+        background: rgba(255, 255, 255, .05);
+        border-color: rgba(129, 140, 248, .28);
+        color: #cdd7f2;
+    }
+
+    /* Re-skin mobile flash messages (rendered by mobile/base.html) for this flow. */
+    .mobile-shell > .space-y-2.mb-4 .card {
+        background: linear-gradient(180deg, rgba(18, 24, 46, .96), rgba(10, 14, 28, .98));
+        border-color: rgba(129, 140, 248, .24);
+        box-shadow: 0 16px 36px rgba(2, 4, 12, .5);
+        color: #dbe3f6;
+    }
+    .mobile-shell > .space-y-2.mb-4 .card.border-emerald-200 { border-color: rgba(52, 211, 153, .38); color: #a7f3d0; }
+    .mobile-shell > .space-y-2.mb-4 .card.border-rose-200 { border-color: rgba(251, 113, 133, .4); color: #fecdd3; }
+    .mobile-shell > .space-y-2.mb-4 .card.border-slate-200 { border-color: rgba(129, 140, 248, .28); color: #c7d2fe; }
+
+    .kh-mcard {
+        position: relative;
+        overflow: hidden;
+        border-radius: 22px;
+        padding: 24px 20px 22px;
+        text-align: center;
+        border: 1px solid rgba(129, 140, 248, .22);
+        background: linear-gradient(180deg, rgba(18, 24, 46, .95), rgba(9, 12, 25, .98));
+        box-shadow: 0 26px 56px rgba(2, 4, 12, .6), inset 0 1px rgba(255, 255, 255, .06);
+        animation: kh-rise .45s cubic-bezier(.2, .8, .2, 1) both;
+    }
+    .kh-mcard::before {
+        content: "";
+        position: absolute;
+        top: -46%;
+        right: -24%;
+        width: 220px;
+        height: 220px;
+        border-radius: 50%;
+        pointer-events: none;
+        background: radial-gradient(circle, rgba(91, 140, 255, .22), transparent 70%);
+    }
+    .kh-mcard::after {
+        content: "";
+        position: absolute;
+        bottom: -46%;
+        left: -24%;
+        width: 210px;
+        height: 210px;
+        border-radius: 50%;
+        pointer-events: none;
+        background: radial-gradient(circle, rgba(157, 112, 255, .16), transparent 70%);
+    }
+    .kh-mcard > * { position: relative; }
+
+    .kh-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 10.5px;
+        font-weight: 800;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        color: #9fb4e8;
+    }
+    .kh-eyebrow__dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #7fb4ff;
+        box-shadow: 0 0 0 4px rgba(127, 180, 255, .12), 0 0 15px rgba(127, 180, 255, .8);
+    }
+    .kh-mtitle {
+        margin: 13px 0 0;
+        font-family: "Space Grotesk", "Manrope", sans-serif;
+        font-size: 25px;
+        line-height: 1.16;
+        letter-spacing: -.02em;
+        font-weight: 600;
+        color: #f7f9ff;
+    }
+    .kh-mtitle span {
+        color: transparent;
+        background: linear-gradient(105deg, #9cc8ff, #8f86ff 55%, #c39bff);
+        -webkit-background-clip: text;
+        background-clip: text;
+    }
+    .kh-mlead {
+        margin-top: 11px;
+        font-size: 13.5px;
+        line-height: 1.65;
+        color: #a9b4cd;
+    }
+    .kh-mlead strong { color: #e7edff; font-weight: 700; }
+    .kh-mbtn {
+        width: 100%;
+        min-height: 52px;
+        margin-top: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(135deg, #3a6ff0, #6158e8 55%, #8a5bea);
+        box-shadow: 0 16px 32px rgba(58, 82, 210, .35), inset 0 1px rgba(255, 255, 255, .22);
+        -webkit-tap-highlight-color: transparent;
+        transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+    }
+    .kh-mbtn:active { transform: translateY(1px) scale(.995); filter: brightness(.96); }
+    .kh-mbtn:focus-visible { outline: 2px solid #9fc5ff; outline-offset: 3px; }
+
+    .kh-mnote {
+        margin-top: 14px;
+        display: flex;
+        align-items: flex-start;
+        gap: 9px;
+        padding: 11px 13px;
+        border-radius: 13px;
+        border: 1px solid rgba(129, 140, 248, .16);
+        background: rgba(12, 18, 34, .6);
+        text-align: left;
+        font-size: 12.5px;
+        line-height: 1.55;
+        color: #a9b4cd;
+    }
+    .kh-mnote svg { flex: none; margin-top: 1px; color: #8fb3ff; }
+    .kh-mnote strong { color: #e6ecff; }
+
+    .kh-mback {
+        margin-top: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #9fb0d8;
+    }
+    .kh-mback:active { color: #cdd9f6; }
+
+    @keyframes kh-rise {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="pt-2 pb-6">
+<div class="pt-1 pb-2">
 {% include "mobile/components/auth_drawer.html" %}
-<section class="card p-6 text-center reveal-1">
-    <p class="text-xs uppercase tracking-[0.18em] text-indigo-300">Email verification</p>
-    <h1 class="mt-3 text-2xl font-semibold">Need a fresh link?</h1>
-    <p class="mt-3 text-sm text-slate-300">Send a new verification link to {{ verification_email }}.</p>
-    <form method="post" class="mt-5">
+<section class="kh-mcard">
+    <p class="kh-eyebrow"><span class="kh-eyebrow__dot" aria-hidden="true"></span>Email verification</p>
+    <h1 class="kh-mtitle">Need a fresh link?<br><span>We'll send it right over.</span></h1>
+    <p class="kh-mlead">
+        Send a new verification link to <strong>{{ verification_email }}</strong> and continue where you left off.
+    </p>
+    <form method="post">
         {% csrf_token %}
-        <button type="submit" class="btn-primary w-full px-4 py-3 text-sm">Resend verification email</button>
+        <button type="submit" class="kh-mbtn">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3.75 6.75h16.5v10.5H3.75z"></path>
+                <path d="m4.5 7.5 7.5 5.25 7.5-5.25"></path>
+            </svg>
+            Resend verification email
+        </button>
     </form>
     {% if resend_seconds_remaining %}
-        <p class="mt-3 text-xs text-slate-400">Another request is available in about {{ resend_seconds_remaining }} seconds.</p>
+        <div class="kh-mnote">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.25"></circle>
+                <path d="M12 7.75V12l3 1.75"></path>
+            </svg>
+            <span>Another request is available in about <strong>{{ resend_seconds_remaining }} seconds</strong>. Thanks for waiting.</span>
+        </div>
+    {% else %}
+        <div class="kh-mnote">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="8.25"></circle>
+                <path d="M12 7.75V12l3 1.75"></path>
+            </svg>
+            <span>The link expires in <strong>24 hours</strong>. You can request a new one whenever you need it.</span>
+        </div>
     {% endif %}
-    <a href="{% url 'student_login' %}" class="mt-5 inline-block text-sm text-indigo-300">Back to login</a>
+    <a href="{% url 'student_login' %}" class="kh-mback">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6"></path>
+        </svg>
+        Back to login
+    </a>
 </section>
 </div>
 {% endblock %}

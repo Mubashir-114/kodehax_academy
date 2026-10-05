@@ -2,7 +2,7 @@ import secrets
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
@@ -167,19 +167,20 @@ def mask_email(email):
 
 
 def send_login_otp_email(user, otp):
-    message = render_to_string(
-        "accounts/email/login_otp.txt",
-        {
-            "user": user,
-            "otp": otp,
-            "expires_minutes": LOGIN_OTP_TTL_SECONDS // 60,
-            "site_name": "Kodehax Academy",
-        },
-    )
-    send_mail(
+    context = {
+        "user": user,
+        "otp": otp,
+        "expires_minutes": LOGIN_OTP_TTL_SECONDS // 60,
+        "site_name": "Kodehax Academy",
+        "logo_url": getattr(settings, "EMAIL_LOGO_URL", ""),
+    }
+    text_message = render_to_string("accounts/email/login_otp.txt", context)
+    html_message = render_to_string("accounts/email/login_otp.html", context)
+    email = EmailMultiAlternatives(
         subject="Your Login Verification Code",
-        message=message,
+        body=text_message,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
-        fail_silently=False,
+        to=[user.email],
     )
+    email.attach_alternative(html_message, "text/html")
+    email.send(fail_silently=False)
